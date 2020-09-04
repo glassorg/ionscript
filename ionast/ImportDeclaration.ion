@@ -1,0 +1,10 @@
+import
+    ion.*
+    .*
+
+
+export
+    type Specifier = ImportSpecifier | ImportDefaultSpecifier | ImportNamespaceSpecifier
+    class ImportDeclaration extends Declaration
+        var specifiers: Array<Specifier>
+        var source: Literal

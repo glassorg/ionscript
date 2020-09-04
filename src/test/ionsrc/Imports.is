@@ -1,0 +1,14 @@
+import "for/side/effects"
+import "foo/bar/baz" a, b, c, c
+import foo.bar
+import foo.Bar
+import foo.Foo
+    x
+    y
+import .foo.bar
+import ..foo.bar
+import ...foo.bar
+import ....foo.bar
+    foo
+    bar
+    baz

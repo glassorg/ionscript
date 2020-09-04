@@ -1,0 +1,28 @@
+{
+  "name": "ionscript",
+  "version": "0.0.0",
+  "description": "Indented Javascript",
+  "main": "index.js",
+  "repository": "https://github.com/glassorg/ionscript.git",
+  "author": "Kris Nye <krisnye@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "setup": "yarn install",
+    "build": "guild build && yarn run buildGrammar",
+    "buildAst": "ionc src/ast ionast",
+    "watch": "./watch.sh",
+    "test": "gtest lib # echo should be just guild test, todo: fix this",
+    "watchGrammar": "nodemon -w src/parser.pegs -x yarn run buildGrammar",
+    "buildGrammar": "pegs src/parser.pegs lib/parser.js",
+    "debug": "node --inspect-brk node_modules/@glas/test/gtest.js lib",
+    "deploy": "yarn build && yarn publish --patch"
+  },
+  "dependencies": {
+    "@glas/ion": "0.1.8",
+    "@glas/test": "^1.0.3",
+    "@glas/traverse": "^1.0.4",
+    "escodegen": "^2.0.0",
+    "jsondiffpatch": "0.2.5",
+    "pegs": "^0.1.1"
+  }
+}
