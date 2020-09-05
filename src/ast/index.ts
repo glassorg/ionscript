@@ -23,6 +23,9 @@ export {
     default as Expression
 } from './Expression';
 export {
+    default as FunctionExpression
+} from './FunctionExpression';
+export {
     default as Identifier
 } from './Identifier';
 export {
@@ -64,6 +67,9 @@ export {
 export {
     default as Reference
 } from './Reference';
+export {
+    default as ReturnStatement
+} from './ReturnStatement';
 export {
     default as Scope
 } from './Scope';

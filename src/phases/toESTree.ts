@@ -1,6 +1,6 @@
 import { Options } from "../Compiler"
-import { traverse, skip } from "@glas/traverse"
-import { Exportable, Node, Program } from "../ast"
+import { traverse, skip, replace } from "@glas/traverse"
+import { Exportable, ImportDeclaration, Node, Parameter, Program } from "../ast"
 import Position from "../ast/Position"
 import VariableDeclaration from "../ast/VariableDeclaration"
 import Reference from "../ast/Reference"
@@ -38,6 +38,9 @@ export default function toEsTree(root: Map<string, any>, options: Options) {
                         }]
                     }
                 }
+                else if (Parameter.is(node)) {
+                    result = changes.id
+                }
                 else {
                     result = { type: node.constructor.name, ...node, ...changes }
                 }
@@ -45,12 +48,24 @@ export default function toEsTree(root: Map<string, any>, options: Options) {
                 if (MemberExpression.is(node) && Expression.is(node.property)) {
                     result.computed = true
                 }
+                // handle exports
                 if (Exportable.is(node) && node.export > 0) {
-                    result = {
-                        type: node.export === 2 ? "ExportDefaultDeclaration" : "ExportNamedDeclaration",
-                        declaration: result,
-                        specifiers: [],
-                        source: null,
+                    if (ImportDeclaration.is(node)) {
+                        result = replace({
+                            type: "ExpressionStatement",
+                            expression: { type: "Literal", value: "Fuck" },
+                        }, {
+                            type: "ExpressionStatement",
+                            expression: { type: "Literal", value: "You" },
+                        })
+                    }
+                    else {
+                        result = {
+                            type: node.export === 2 ? "ExportDefaultDeclaration" : "ExportNamedDeclaration",
+                            declaration: result,
+                            specifiers: [],
+                            source: null,
+                        }
                     }
                 }
                 return result

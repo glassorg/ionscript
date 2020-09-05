@@ -4,8 +4,8 @@ import
 
 export
     class FunctionExpression extends Expression, Scope
-        var id: Id | Null = null
-        var parameters: Array<Parameter>
+        var id: Identifier | Null = null
+        var params: Array<Parameter>
         var body: BlockStatement
         # var returnType: Expression | Null = null
         # var typeGuard: Reference | Null = null

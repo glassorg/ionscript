@@ -5,6 +5,7 @@ import ImportDeclaration from "../ast/ImportDeclaration"
 import ImportNamespaceSpecifier from "../ast/ImportNamespaceSpecifier"
 import ImportDefaultSpecifier from "../ast/ImportDefaultSpecifier"
 import ImportSpecifier from "../ast/ImportSpecifier"
+import { SemanticError } from "../common"
 
 export default function fixImports(root: Map<string, any>, options: Options) {
     return traverse(root, {
@@ -16,6 +17,11 @@ export default function fixImports(root: Map<string, any>, options: Options) {
         leave(node) {
             if (Program.is(node)) {
                 let originalImports = node.body.filter(node => ImportDeclaration.is(node)) as ImportDeclaration[]
+                for (let i of originalImports) {
+                    if (i.export) {
+                        throw SemanticError("export import not implemented yet: " , i)
+                    }
+                }
                 let others = node.body.filter(node => !ImportDeclaration.is(node))
                 let newImports = new Array<ImportDeclaration>()
                 for (let declaration of originalImports) {

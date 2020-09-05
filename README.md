@@ -59,7 +59,10 @@ Indented Javascript
 
 ## Todo
 
-    FunctionExpressions
+    X FunctionExpressions
+    If/Else
+    While
+    For
     ClassDeclaration
     Async/Await
     Generators

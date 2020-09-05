@@ -211,8 +211,8 @@ AssignmentStatement
     }
 
 BlockStatement
-    = EOL Indent statements:(Dent @Statement)+ Outdent
-    { return node("BlockStatement", { statements }) }
+    = EOL Indent body:(Dent @Statement)+ Outdent
+    { return node("BlockStatement", { body }) }
 
 ForInStatement
     = ForToken _ left:Pattern _ InToken _ right:InlineExpression body:BlockStatement
@@ -228,8 +228,8 @@ IfStatement
     { return node("IfStatement", { test, consequent, alternate }) }
 
 ReturnStatement
-    = ReturnToken _ value:InlineExpression? EOL
-    { return node("ReturnStatement", { value }) }
+    = ReturnToken _ argument:InlineExpression? EOL
+    { return node("ReturnStatement", { argument }) }
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Patterns
@@ -269,9 +269,9 @@ AssignmentProperty
 
 ClassDeclaration
     = meta:MetaProperties isStructure:(ClassToken { return false } / StructToken { return true })
-        _ id:Identifier parameters:TemplateParameters? _ baseClasses:Extends? EOL
+        _ id:Identifier params:TemplateParameters? _ baseClasses:Extends? EOL
         Indent declarations:(Dent @Declaration)* Outdent
-        { return node("ClassDeclaration", { id, isStructure, parameters: parameters || [], meta, baseClasses: baseClasses || [], declarations: toMap(declarations), static: new Map() }) }
+        { return node("ClassDeclaration", { id, isStructure, params: params || [], meta, baseClasses: baseClasses || [], declarations: toMap(declarations), static: new Map() }) }
 
 TemplateParameters
     = "<" _ head:Parameter tail:(_ ',' _ @Parameter)* _ ">" { return [head, ...tail] }
@@ -310,8 +310,8 @@ Constraint
     // { return node('UnaryExpression', { operator: "typeof", argument })}
 
 FunctionType
-    = parameters:FunctionParameters _ "=>" _ returnType:Type
-    { return node("FunctionType", {parameters, returnType}) }
+    = params:FunctionParameters _ "=>" _ returnType:Type
+    { return node("FunctionType", {params, returnType}) }
     / "(" _ @FunctionType _ ")"
 
 TemplateArgument
@@ -435,12 +435,12 @@ FunctionParameters
     / "(" _ head:Parameter tail:(_ ',' _ @Parameter)* _ ")" { return [head, ...tail] }
 
 FunctionHead
-    = id:(@Identifier _ &"(")? parameters:FunctionParameters? type:(_ ":" _ @Type)? _ "=>"
-    { return { id, type, parameters: parameters || [] } }
+    = id:(@Identifier _ &"(")? params:FunctionParameters? type:(_ ":" _ @Type)? _ "=>"
+    { return { id, type, params: params || [] } }
 
 InlineFunction
     = head:FunctionHead _ value:InlineExpression
-    { return node("FunctionExpression", { ...head, body: node("BlockStatement", { statements: [node("ReturnStatement", { value } )] } ) } ) }
+    { return node("FunctionExpression", { ...head, body: node("BlockStatement", { body: [node("ReturnStatement", { argument: value } )] } ) } ) }
 
 OutlineFunction
     = head:FunctionHead _ body:BlockStatement

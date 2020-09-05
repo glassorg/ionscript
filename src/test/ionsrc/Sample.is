@@ -5,5 +5,7 @@
 
 # let x = foo?.bar[12 + 5]?.baz?("foo", true, x)
 
-export let y = 12
-export default 20
+let identity = (a, b) => a * b
+
+# export let y = 12
+# export default 20
