@@ -4,15 +4,16 @@ This file was generated from ion source. Do not edit.
 import * as Location from '../Location';
 import * as Null from './Null';
 import * as _Array from './Array';
-import * as Expression from '../Expression';
+import * as Statement from '../Statement';
 import * as Boolean from './Boolean';
 import * as Number from './Number';
 import * as String from './String';
 import * as Identifier from '../Identifier';
+import * as Expression from '../Expression';
 import * as Integer from './Integer';
 import * as Class from './Class';
 export type Location_Location_or_ion_Null_Null = Location.Location | Null.Null;
-export type ___TemplateReference___ = _Array.Array<Expression.Expression>;
+export type ___TemplateReference___ = _Array.Array<Statement.Statement>;
 export type ion_Boolean_Boolean_or_ion_Null_Null = Boolean.Boolean | Null.Null;
 export type ion_Number_Number_or_ion_types_ion_Boolean_Boolean_or_ion_Null_Null = Number.Number | (Boolean.Boolean | Null.Null);
 export type ion_String_String_or_ion_types_ion_Number_Number_or_ion_types_ion_Boolean_Boolean_or_ion_Null_Null = String.String | (Number.Number | (Boolean.Boolean | Null.Null));

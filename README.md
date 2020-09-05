@@ -56,3 +56,12 @@ Indented Javascript
     0.8 Generating output typescript definitions
     0.9 Structure Classes
     1.0 Structure Array runtime storage
+
+## Todo
+
+    FunctionExpressions
+    ClassDeclaration
+    Async/Await
+    Generators
+    Destructors
+    

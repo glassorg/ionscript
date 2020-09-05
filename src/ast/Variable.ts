@@ -2,8 +2,6 @@
 This file was generated from ion source. Do not edit.
 */
 import * as _Object from './ion/Object';
-import * as Declaration from './Declaration';
-import * as Statement from './Statement';
 import * as Node from './Node';
 import * as Location from './Location';
 import * as Null from './ion/Null';
@@ -11,7 +9,7 @@ import * as Identifier from './Identifier';
 import * as Expression from './Expression';
 import * as Boolean from './ion/Boolean';
 import * as Class from './ion/Class';
-export class Variable implements _Object.Object , Declaration.Declaration , Statement.Statement , Node.Node {
+export class Variable implements _Object.Object , Node.Node {
     readonly location: Location.Location | Null.Null;
     readonly id: Identifier.Identifier;
     readonly value: Expression.Expression | Null.Null;
@@ -20,8 +18,6 @@ export class Variable implements _Object.Object , Declaration.Declaration , Stat
     static readonly implements = new Set([
         'Variable',
         'ion_Object',
-        'Declaration',
-        'Statement',
         'Node'
     ]);
     constructor({location = null, id, value = null, assignable = false}: {

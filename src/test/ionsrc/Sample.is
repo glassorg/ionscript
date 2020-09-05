@@ -1,6 +1,9 @@
-import "foo/bar/baz" a, b
-import foo.Foo
-    x
-    y
+# import "foo/bar/baz" a, b
+# import foo.Foo
+#     x
+#     y
 
-let x = foo?.bar[12 + 5]?.baz?("foo", true, x)
+# let x = foo?.bar[12 + 5]?.baz?("foo", true, x)
+
+export let y = 12
+export default 20

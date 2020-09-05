@@ -3,4 +3,4 @@ import
     .*
 
 export
-    class Declaration extends Statement
+    class Declaration extends Statement, Exportable

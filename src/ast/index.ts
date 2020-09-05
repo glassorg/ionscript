@@ -2,6 +2,9 @@ export {
     default as BinaryExpression
 } from './BinaryExpression';
 export {
+    default as BlockStatement
+} from './BlockStatement';
+export {
     default as CallExpression
 } from './CallExpression';
 export {
@@ -13,6 +16,9 @@ export {
 export {
     default as Declaration
 } from './Declaration';
+export {
+    default as Exportable
+} from './Exportable';
 export {
     default as Expression
 } from './Expression';
@@ -58,6 +64,9 @@ export {
 export {
     default as Reference
 } from './Reference';
+export {
+    default as Scope
+} from './Scope';
 export {
     default as Statement
 } from './Statement';

@@ -1,0 +1,7 @@
+import
+    ion.*
+    .*
+
+export
+    class Exportable extends Node
+        var export: Integer = 0 # 1 = export, 2 = default export

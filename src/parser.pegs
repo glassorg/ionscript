@@ -76,14 +76,29 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 Module
-    = EOL? body:Declaration* EOL EOF
+    = EOL? body:ModuleDeclaration* EOL EOF
     { return node("Program", { sourceType: "module", body }) }
 
-Exports
-    //  Allow Declaration meta properties to be specified before the export declaration
-    // = meta:MetaProperties ExportToken _ value:Declaration { return node(value.constructor.name, {meta}, value) }
-    = ExportToken EOL Indent declarations:(Dent @Declaration)+ Outdent
-    { return declarations.map(d => node(d.constructor.name, d, { export: true })) }
+ModuleDeclaration
+    = ImportDeclaration
+    / Declaration
+    / ExportDeclaration
+
+////////////////////////////////////////////////////////////////////////////////
+//  ExportDeclaration
+////////////////////////////////////////////////////////////////////////////////
+
+ExportDeclaration
+    = ExportNamedDeclaration
+    / ExportDefaultDeclaration
+
+ExportNamedDeclaration
+    = ExportToken _ declaration:(Declaration / ImportDeclaration)
+    { return node(declaration.constructor.name, { ...declaration, export: 1 }) }
+
+ExportDefaultDeclaration
+    = ExportToken _ isDefault:DefaultToken? _ declaration:(ClassDeclaration / OutlineExpression)
+    { return node(declaration.constructor.name, { ...declaration, export: isDefault ? 2 : 1 }) }
 
 ////////////////////////////////////////////////////////////////////////////////
 //  ImportDeclaration
@@ -152,8 +167,7 @@ ExpressionStatement
     { return node("ExpressionStatement", { value }) }
 
 Declaration
-    = ImportDeclaration
-    / ClassDeclaration
+    = ClassDeclaration
     / VariableDeclaration
 
 VariableDeclarationType
@@ -641,6 +655,7 @@ TypeofToken     = @"typeof"     !IdPart
 WhereToken      = @"where"      !IdPart
 ImportToken     = @"import"     !IdPart
 ExportToken     = @"export"     !IdPart
+DefaultToken    = @"default"    !IdPart
 ClassToken      = @"class"      !IdPart
 StructToken     = @"struct"     !IdPart
 VarToken        = @"var"        !IdPart

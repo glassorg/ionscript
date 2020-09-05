@@ -3,52 +3,49 @@ This file was generated from ion source. Do not edit.
 */
 import * as _Object from './ion/Object';
 import * as Statement from './Statement';
-import * as Exportable from './Exportable';
+import * as Scope from './Scope';
 import * as Node from './Node';
 import * as Location from './Location';
 import * as Null from './ion/Null';
-import * as Integer from './ion/Integer';
+import * as _Array from './ion/Array';
 import * as Class from './ion/Class';
-export class Declaration implements _Object.Object , Statement.Statement , Exportable.Exportable , Node.Node {
+export class BlockStatement implements _Object.Object , Statement.Statement , Scope.Scope , Node.Node {
     readonly location: Location.Location | Null.Null;
-    readonly export: Integer.Integer;
-    static readonly id = 'Declaration';
+    readonly body: _Array.Array<Statement.Statement>;
+    static readonly id = 'BlockStatement';
     static readonly implements = new Set([
-        'Declaration',
+        'BlockStatement',
         'ion_Object',
         'Statement',
-        'Exportable',
+        'Scope',
         'Node'
     ]);
-    constructor({
-        location = null,
-        export: _export = 0
-    }: {
+    constructor({location = null, body}: {
         location?: Location.Location | Null.Null,
-        export?: Integer.Integer
+        body: _Array.Array<Statement.Statement>
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
             throw new Error('location is not a Location | Null: ' + Class.toString(location));
-        if (!Integer.isInteger(_export))
-            throw new Error('export is not a Integer: ' + Class.toString(_export));
+        if (!_Array.isArray(body))
+            throw new Error('body is not a Array: ' + Class.toString(body));
         this.location = location;
-        this.export = _export;
+        this.body = body;
         Object.freeze(this);
     }
     patch(properties: {
         location?: Location.Location | Null.Null,
-        export?: Integer.Integer
+        body?: _Array.Array<Statement.Statement>
     }) {
-        return new Declaration({
+        return new BlockStatement({
             ...this,
             ...properties
         });
     }
-    static is(value): value is Declaration {
-        return isDeclaration(value);
+    static is(value): value is BlockStatement {
+        return isBlockStatement(value);
     }
 }
-export function isDeclaration(value): value is Declaration {
-    return Class.isInstance(Declaration, value);
+export function isBlockStatement(value): value is BlockStatement {
+    return Class.isInstance(BlockStatement, value);
 }
-export default Declaration;
+export default BlockStatement;

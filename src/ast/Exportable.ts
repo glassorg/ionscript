@@ -3,20 +3,18 @@ This file was generated from ion source. Do not edit.
 */
 import * as _Object from './ion/Object';
 import * as Node from './Node';
-import * as Exportable from './Exportable';
 import * as Location from './Location';
 import * as Null from './ion/Null';
 import * as Integer from './ion/Integer';
 import * as Class from './ion/Class';
-export class Expression implements _Object.Object , Node.Node , Exportable.Exportable {
+export class Exportable implements _Object.Object , Node.Node {
     readonly location: Location.Location | Null.Null;
     readonly export: Integer.Integer;
-    static readonly id = 'Expression';
+    static readonly id = 'Exportable';
     static readonly implements = new Set([
-        'Expression',
+        'Exportable',
         'ion_Object',
-        'Node',
-        'Exportable'
+        'Node'
     ]);
     constructor({
         location = null,
@@ -37,16 +35,16 @@ export class Expression implements _Object.Object , Node.Node , Exportable.Expor
         location?: Location.Location | Null.Null,
         export?: Integer.Integer
     }) {
-        return new Expression({
+        return new Exportable({
             ...this,
             ...properties
         });
     }
-    static is(value): value is Expression {
-        return isExpression(value);
+    static is(value): value is Exportable {
+        return isExportable(value);
     }
 }
-export function isExpression(value): value is Expression {
-    return Class.isInstance(Expression, value);
+export function isExportable(value): value is Exportable {
+    return Class.isInstance(Exportable, value);
 }
-export default Expression;
+export default Exportable;
