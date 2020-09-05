@@ -1,0 +1,6 @@
+import "foo/bar/baz" a, b
+import foo.Foo
+    x
+    y
+
+let x = foo?.bar[12 + 5]?.baz?("foo", true, x)

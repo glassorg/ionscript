@@ -1,4 +1,16 @@
 export {
+    default as BinaryExpression
+} from './BinaryExpression';
+export {
+    default as CallExpression
+} from './CallExpression';
+export {
+    default as ChainElement
+} from './ChainElement';
+export {
+    default as ConditionalExpression
+} from './ConditionalExpression';
+export {
     default as Declaration
 } from './Declaration';
 export {
@@ -26,11 +38,17 @@ export {
     default as Location
 } from './Location';
 export {
+    default as MemberExpression
+} from './MemberExpression';
+export {
     default as ModuleSpecifier
 } from './ModuleSpecifier';
 export {
     default as Node
 } from './Node';
+export {
+    default as Parameter
+} from './Parameter';
 export {
     default as Position
 } from './Position';
@@ -38,5 +56,14 @@ export {
     default as Program
 } from './Program';
 export {
+    default as Reference
+} from './Reference';
+export {
     default as Statement
 } from './Statement';
+export {
+    default as Variable
+} from './Variable';
+export {
+    default as VariableDeclaration
+} from './VariableDeclaration';

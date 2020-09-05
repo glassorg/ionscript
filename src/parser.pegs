@@ -164,7 +164,7 @@ VariableDeclarationType
 VariableDeclaration
     = TypeToken _ id:Identifier _ "=" _ value:Type EOL
     { return node("TypeDeclaration", { id, value }) }
-    / meta:MetaProperties declarationType: VariableDeclarationType
+    / meta:MetaProperties declarationType:VariableDeclarationType
         _ id:Pattern _ type:(":" _ @Type)? _ value:('=' _ @OutlineExpression / EOL {return null})?
     {
         return node("VariableDeclaration", { ...declarationType, id, type, value, meta })
@@ -338,14 +338,14 @@ TemplateReference
 ////////////////////////////////////////////////////////////////////////////////
 
 UnaryOperator
-    = "+" / "-" / NotToken / TypeofToken
+    = "+" / "-" / NotToken / "!" / TypeofToken
 
 UnaryExpression
     = MemberExpression
     / operator:UnaryOperator _ argument:MemberExpression { return operation(argument, operator) }
 
 ExponentiationOperator "operator"
-    = "^" / "<<" / ">>"
+    = "**" / "<<" / ">>"
 
 ExponentiationExpression
     = left:UnaryExpression right:(_ operator:ExponentiationOperator _ right:ExponentiationExpression {return {operator,right}})?
@@ -483,29 +483,34 @@ Property
     { return node("Property", {key,value}) }
 
 PropertyList
-    = head:Property tail:(_ "," _ @Property)* { return [head, ...tail] }
+    = head:Property tail:(_ "," _ @Property)*
+    { return [head, ...tail] }
+
+InlineExpressionList
+    = head:InlineExpression tail:(_ "," _ @InlineExpression)*
+    { return [head, ...tail] }
 
 InlineArguments
     = "()" { return [] }
-    / "(" _ @PropertyList _ ")"
+    / "(" _ @InlineExpressionList _ ")"
     // / " " _ @PropertyList
 
 MemberExpression =
     head: PrimaryExpression
     tail: (
-        "[" _ property:InlineExpression _ "]" { return {property, computed:true} }
-        / "." property:Identifier { return {property, computed:false} }
-        / InlineArguments
+        optional:"?"? "[" _ property:InlineExpression _ "]" { return { property, computed:true, optional: optional != null } }
+        / optional:"?"? "." property:Identifier { return { property, computed:false, optional: optional != null } }
+        / optional:"?"? args:InlineArguments { return { arguments:args, optional: optional != null } }
+        // TODO: Add optional to InlineArguments.
     )*
     {
         return tail.reduce(
             (left, right) => {
-                if (Array.isArray(right)) {
-                    return node("CallExpression", {callee:left, arguments:right})
+                if (right.arguments) {
+                    return node("CallExpression", {callee:left, ...right})
                 }
                 else {
-                    let {property,computed} = right
-                    return node("MemberExpression", {object:left, property, computed})
+                    return node("MemberExpression", { object:left, ...right })
                 }
             }
             ,head

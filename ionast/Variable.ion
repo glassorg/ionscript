@@ -1,0 +1,9 @@
+import
+    ion.*
+    .*
+
+export
+    class Variable extends Declaration
+        var id: Identifier
+        var value: Expression | Null = null
+        var assignable: Boolean = false
