@@ -6,4 +6,9 @@
 # let x = foo?.bar[12 + 5]?.baz?("foo", true, x)
 
 let identity = (a, b) =>
-    return (a .dot b) .cross (c .dot d)
+    try
+        return 1
+    catch e
+        console.error(e)
+    finally
+        return 2

@@ -162,14 +162,26 @@ Statement
     / WhileStatement
     / ExpressionStatement
     / ThrowStatement
+    / TryStatement
+
+TryStatement
+    = TryToken _
+        block:BlockStatement
+        handler:(Dent @CatchClause)?
+        finalizer:(Dent FinallyToken _ @BlockStatement)?
+    { return node("TryStatement", { block, handler, finalizer }) }
+
+CatchClause
+    = CatchToken _ param:Pattern _ body:BlockStatement
+    { return node("CatchClause", { param, body }) }
 
 ThrowStatement
     = ThrowToken _ arg:OutlineExpression
     { return node("ThrowStatement", { argument: arg }) }
 
 ExpressionStatement
-    = value:OutlineExpression
-    { return node("ExpressionStatement", { value }) }
+    = expression:OutlineExpression
+    { return node("ExpressionStatement", { expression }) }
 
 Declaration
     = ClassDeclaration
@@ -700,6 +712,9 @@ BreakToken      = @"break"      !IdPart
 ContinueToken   = @"continue"   !IdPart
 AsmToken        = @"asm"        !IdPart
 ThrowToken      = @"throw"      !IdPart
+TryToken        = @"try"        !IdPart
+CatchToken      = @"catch"      !IdPart
+FinallyToken    = @"finally"    !IdPart
 
 Keyword
     = ThisToken
@@ -731,6 +746,9 @@ Keyword
     / ImportToken
     / AsmToken
     / ThrowToken
+    / TryToken
+    / CatchToken
+    / FinallyToken
 
 ReservedWord
     = Keyword

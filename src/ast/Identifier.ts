@@ -2,18 +2,20 @@
 This file was generated from ion source. Do not edit.
 */
 import * as _Object from './ion/Object';
+import * as Pattern from './Pattern';
 import * as Node from './Node';
 import * as Location from './Location';
 import * as Null from './ion/Null';
 import * as String from './ion/String';
 import * as Class from './ion/Class';
-export class Identifier implements _Object.Object , Node.Node {
+export class Identifier implements _Object.Object , Pattern.Pattern , Node.Node {
     readonly location: Location.Location | Null.Null;
     readonly name: String.String;
     static readonly id = 'Identifier';
     static readonly implements = new Set([
         'Identifier',
         'ion_Object',
+        'Pattern',
         'Node'
     ]);
     constructor({location = null, name}: {

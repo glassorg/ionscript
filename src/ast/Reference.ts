@@ -4,6 +4,7 @@ This file was generated from ion source. Do not edit.
 import * as _Object from './ion/Object';
 import * as Identifier from './Identifier';
 import * as Expression from './Expression';
+import * as Pattern from './Pattern';
 import * as Node from './Node';
 import * as Exportable from './Exportable';
 import * as Location from './Location';
@@ -11,7 +12,7 @@ import * as Null from './ion/Null';
 import * as String from './ion/String';
 import * as Integer from './ion/Integer';
 import * as Class from './ion/Class';
-export class Reference implements _Object.Object , Identifier.Identifier , Expression.Expression , Node.Node , Exportable.Exportable {
+export class Reference implements _Object.Object , Identifier.Identifier , Expression.Expression , Pattern.Pattern , Node.Node , Exportable.Exportable {
     readonly location: Location.Location | Null.Null;
     readonly name: String.String;
     readonly export: Integer.Integer;
@@ -21,6 +22,7 @@ export class Reference implements _Object.Object , Identifier.Identifier , Expre
         'ion_Object',
         'Identifier',
         'Expression',
+        'Pattern',
         'Node',
         'Exportable'
     ]);

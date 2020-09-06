@@ -8,6 +8,9 @@ export {
     default as CallExpression
 } from './CallExpression';
 export {
+    default as CatchClause
+} from './CatchClause';
+export {
     default as ChainElement
 } from './ChainElement';
 export {
@@ -22,6 +25,9 @@ export {
 export {
     default as Expression
 } from './Expression';
+export {
+    default as ExpressionStatement
+} from './ExpressionStatement';
 export {
     default as FunctionExpression
 } from './FunctionExpression';
@@ -62,6 +68,9 @@ export {
     default as Parameter
 } from './Parameter';
 export {
+    default as Pattern
+} from './Pattern';
+export {
     default as Position
 } from './Position';
 export {
@@ -82,6 +91,9 @@ export {
 export {
     default as ThrowStatement
 } from './ThrowStatement';
+export {
+    default as TryStatement
+} from './TryStatement';
 export {
     default as Variable
 } from './Variable';

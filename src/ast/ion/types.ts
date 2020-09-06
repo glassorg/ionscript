@@ -12,6 +12,7 @@ import * as Boolean from './Boolean';
 import * as Number from './Number';
 import * as String from './String';
 import * as Expression from '../Expression';
+import * as CatchClause from '../CatchClause';
 import * as Integer from './Integer';
 import * as Class from './Class';
 export type Location_Location_or_ion_Null_Null = Location.Location | Null.Null;
@@ -24,6 +25,8 @@ export type ion_Number_Number_or_ion_types_ion_Boolean_Boolean_or_ion_Null_Null 
 export type ion_String_String_or_ion_types_ion_Number_Number_or_ion_types_ion_Boolean_Boolean_or_ion_Null_Null = String.String | (Number.Number | (Boolean.Boolean | Null.Null));
 export type Identifier_Identifier_or_Expression_Expression = Identifier.Identifier | Expression.Expression;
 export type Expression_Expression_or_ion_Null_Null = Expression.Expression | Null.Null;
+export type CatchClause_CatchClause_or_ion_Null_Null = CatchClause.CatchClause | Null.Null;
+export type BlockStatement_BlockStatement_or_ion_Null_Null = BlockStatement.BlockStatement | Null.Null;
 export type ion_Integer_Integer___gte_0_ = Integer.Integer;
 export type func__class__ion_Class_Class_instance__UNDEFINED__returns_ion_Boolean_Boolean = undefined;
 export type func___returns_ion_String_String = undefined;

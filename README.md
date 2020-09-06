@@ -62,7 +62,7 @@ Indented Javascript
     X FunctionExpressions
     X If/Else
     X While
-    Throw
+    X Throw
     Catch
     For
     ClassDeclaration
