@@ -161,6 +161,11 @@ Statement
     / ReturnStatement
     / WhileStatement
     / ExpressionStatement
+    / ThrowStatement
+
+ThrowStatement
+    = ThrowToken _ arg:OutlineExpression
+    { return node("ThrowStatement", { argument: arg }) }
 
 ExpressionStatement
     = value:OutlineExpression
@@ -651,7 +656,7 @@ OrToken         = @"or"         !IdPart
 XorToken        = @"xor"        !IdPart
 NotToken        = @"not"        !IdPart
 TypeofToken     = @"typeof"     !IdPart
-// NewToken        = @"new"        !IdPart
+NewToken        = @"new"        !IdPart
 WhereToken      = @"where"      !IdPart
 ImportToken     = @"import"     !IdPart
 ExportToken     = @"export"     !IdPart
@@ -672,6 +677,7 @@ ReturnToken     = @"return"     !IdPart
 BreakToken      = @"break"      !IdPart
 ContinueToken   = @"continue"   !IdPart
 AsmToken        = @"asm"        !IdPart
+ThrowToken      = @"throw"      !IdPart
 
 Keyword
     = ThisToken
@@ -681,12 +687,12 @@ Keyword
     / AndToken
     / IsToken
     / IsntToken
-    // / AsToken
+    / AsToken
     / OrToken
     / XorToken
     / NotToken
     / TypeofToken
-    // / NewToken
+    / NewToken
     / WhereToken
     / ClassToken
     / StructToken
@@ -699,9 +705,10 @@ Keyword
     / ReturnToken
     / BreakToken
     / ContinueToken
-    // / ExportToken
-    // / ImportToken
+    / ExportToken
+    / ImportToken
     / AsmToken
+    / ThrowToken
 
 ReservedWord
     = Keyword
