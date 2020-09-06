@@ -6,6 +6,6 @@
 # let x = foo?.bar[12 + 5]?.baz?("foo", true, x)
 
 let identity = (a, b) =>
-    for item in a
-        return foo.bar(x, y)
+    return
+        foo.bar(x, y)
             z

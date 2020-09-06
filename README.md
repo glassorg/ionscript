@@ -78,7 +78,7 @@ Indented Javascript
     - for ; ;
     - for item of
     Fix Outline Call Syntax to use a call operator? (..)
-    ArrayExpression
+    X ArrayExpression
     ObjectExpression
     ThisExpression
     Destructors

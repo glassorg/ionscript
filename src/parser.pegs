@@ -245,7 +245,9 @@ IfStatement
     { return node("IfStatement", { test, consequent, alternate }) }
 
 ReturnStatement
-    = ReturnToken _ argument:OutlineExpression?
+    = ReturnToken EOL Indent Dent argument:OutlineExpression Outdent
+    { return node("ReturnStatement", { argument }) }
+    / ReturnToken _ argument:InlineExpression EOL?
     { return node("ReturnStatement", { argument }) }
 
 ////////////////////////////////////////////////////////////////////////////////
