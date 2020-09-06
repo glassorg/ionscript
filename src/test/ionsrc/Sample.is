@@ -7,4 +7,5 @@
 
 let identity = (a, b) =>
     for item in a
-        console.log a
+        return foo.bar(x, y)
+            z

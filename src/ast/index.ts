@@ -1,4 +1,13 @@
 export {
+    default as ArrayExpression
+} from './ArrayExpression';
+export {
+    default as ArrayPattern
+} from './ArrayPattern';
+export {
+    default as AssignmentPattern
+} from './AssignmentPattern';
+export {
     default as BinaryExpression
 } from './BinaryExpression';
 export {
@@ -88,6 +97,9 @@ export {
 export {
     default as Reference
 } from './Reference';
+export {
+    default as RestElement
+} from './RestElement';
 export {
     default as ReturnStatement
 } from './ReturnStatement';

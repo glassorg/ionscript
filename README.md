@@ -74,12 +74,17 @@ Indented Javascript
     X While
     X Throw
     X Try/Catch/Finally
-    for ; ;
-    for key in
-    for item of
+    X for item in
+    - for ; ;
+    - for item of
+    Fix Outline Call Syntax to use a call operator? (..)
+    ArrayExpression
+    ObjectExpression
+    ThisExpression
+    Destructors
     Switch?
     ClassDeclaration
     Async/Await
     Generators
-    Destructors
+
     

@@ -1,0 +1,7 @@
+import
+    ion.*
+    .*
+
+export
+    class RestElement extends Pattern
+        var argument: Pattern

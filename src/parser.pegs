@@ -469,6 +469,7 @@ OutlineFunction
 
 OutlineExpression
     = OutlineFunction
+    / OutlineArrayExpression
     / OutlineCallExpression
     / OutlineNewExpression
     / OutlineStringLiteral
@@ -479,8 +480,9 @@ OutlineArguments
     = EOL Indent @(Dent @OutlineExpression)+ Outdent
 
 OutlineCallExpression
-    = callee:InlineExpression args:OutlineArguments
-    { return node("CallExpression", { callee, arguments: args }) }
+    = call:InlineExpression args:OutlineArguments
+    & { return ast.CallExpression.is(call) }
+    { return node("CallExpression", { ...call, arguments: [...call.arguments, ...args] }) }
 
 OutlineNewExpression
     = NewToken _ callee:MemberExpressionNoCall args:(InlineArguments / OutlineArguments)
@@ -496,7 +498,7 @@ PrimaryExpression
     / ThisExpression
     / DotExpression
     / GroupExpression
-    / ArrayExpression
+    / InlineArrayExpression
     / ObjectExpression
 
 GroupExpression
@@ -529,7 +531,7 @@ InlineExpressionList
 InlineArguments
     = "()" { return [] }
     / "(" _ @InlineExpressionList _ ")"
-    / _ @InlineExpressionList
+    // / _ @InlineExpressionList
 
 ChainMemberComputed
     = optional:"?"? "[" _ property:InlineExpression _ "]"
@@ -574,9 +576,6 @@ MemberExpressionNoCall =
 //  Literals
 ////////////////////////////////////////////////////////////////////////////////
 
-ArrayExpression
-    = InlineArrayExpression
-
 ArrayElements
     = head:InlineExpression tail:(_ "," _ @InlineExpression)*
     { return [head, ...tail] }
@@ -584,8 +583,12 @@ ArrayElements
 InlineArrayExpression
     = "[" _ elements:ArrayElements? _ "]"
     {
-        return node("ArrayExpression", {elements:elements || []})
+        return node("ArrayExpression", { elements:elements || [] })
     }
+
+OutlineArrayExpression
+    = "[]" elements: OutlineArguments
+    { return node("ArrayExpression", { elements }) }
 
 ObjectExpression
     = InlineObjectExpression
