@@ -5,7 +5,14 @@
 
 # let x = foo?.bar[12 + 5]?.baz?("foo", true, x)
 
-let identity = (a, b) => a * b
+let identity = (a, b) =>
+    while true
+        if a > b
+            return a
+        else if b > a
+            return b
+        else
+            return a - b
 
 # export let y = 12
 # export default 20

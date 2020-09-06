@@ -60,8 +60,10 @@ Indented Javascript
 ## Todo
 
     X FunctionExpressions
-    If/Else
-    While
+    X If/Else
+    X While
+    Throw
+    Catch
     For
     ClassDeclaration
     Async/Await

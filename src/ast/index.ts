@@ -29,6 +29,9 @@ export {
     default as Identifier
 } from './Identifier';
 export {
+    default as IfStatement
+} from './IfStatement';
+export {
     default as ImportDeclaration
 } from './ImportDeclaration';
 export {
@@ -77,8 +80,14 @@ export {
     default as Statement
 } from './Statement';
 export {
+    default as ThrowStatement
+} from './ThrowStatement';
+export {
     default as Variable
 } from './Variable';
 export {
     default as VariableDeclaration
 } from './VariableDeclaration';
+export {
+    default as WhileStatement
+} from './WhileStatement';
