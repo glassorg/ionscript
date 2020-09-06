@@ -1,0 +1,6 @@
+import
+    ion.*
+    .*
+
+export
+    class ForOfStatement extends ForStatement

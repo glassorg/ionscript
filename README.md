@@ -29,6 +29,16 @@ Indented Javascript
         - makes analyzing everything as declarations trickier.
     - ?.
 
+- For/of and for/in loops?
+    - should we support both?
+    - for in is sort of worthless... we would never want to use on arrays, and shouldn't use on objects.
+    - can we only have a single for/in loop?
+    for [key, value] in map
+    for item in array
+    for char in "string"
+    for [property, value] in object
+    for i in 0 .. 10
+
 ## Syntax
 
 ### Import
@@ -63,8 +73,11 @@ Indented Javascript
     X If/Else
     X While
     X Throw
-    Catch
-    For
+    X Try/Catch/Finally
+    for ; ;
+    for key in
+    for item of
+    Switch?
     ClassDeclaration
     Async/Await
     Generators

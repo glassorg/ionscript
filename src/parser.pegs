@@ -157,7 +157,7 @@ Statement
     / AssignmentStatement
     // / OutlineExpression
     / IfStatement
-    / ForInStatement
+    / ForOfStatement
     / ReturnStatement
     / WhileStatement
     / ExpressionStatement
@@ -165,10 +165,10 @@ Statement
     / TryStatement
 
 TryStatement
-    = TryToken _
+    = TryToken
         block:BlockStatement
         handler:(Dent @CatchClause)?
-        finalizer:(Dent FinallyToken _ @BlockStatement)?
+        finalizer:(Dent FinallyToken @BlockStatement)?
     { return node("TryStatement", { block, handler, finalizer }) }
 
 CatchClause
@@ -231,9 +231,9 @@ BlockStatement
     = EOL Indent body:(Dent @Statement)+ Outdent
     { return node("BlockStatement", { body }) }
 
-ForInStatement
+ForOfStatement
     = ForToken _ left:Pattern _ InToken _ right:InlineExpression body:BlockStatement
-    { return node("ForInStatement", { left, right, body } ) }
+    { return node("ForOfStatement", { left: (node("VariableDeclaration", { id: left })), right, body } ) }
 
 WhileStatement
     = WhileToken _ test:InlineExpression body:BlockStatement

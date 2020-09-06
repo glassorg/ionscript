@@ -6,9 +6,5 @@
 # let x = foo?.bar[12 + 5]?.baz?("foo", true, x)
 
 let identity = (a, b) =>
-    try
-        return 1
-    catch e
-        console.error(e)
-    finally
-        return 2
+    for item in a
+        console.log a

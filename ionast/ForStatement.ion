@@ -1,0 +1,9 @@
+import
+    ion.*
+    .*
+
+export
+    class ForStatement extends Statement
+        var left: VariableDeclaration
+        var right: Expression
+        var body: BlockStatement

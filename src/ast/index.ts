@@ -29,6 +29,15 @@ export {
     default as ExpressionStatement
 } from './ExpressionStatement';
 export {
+    default as ForInStatement
+} from './ForInStatement';
+export {
+    default as ForOfStatement
+} from './ForOfStatement';
+export {
+    default as ForStatement
+} from './ForStatement';
+export {
     default as FunctionExpression
 } from './FunctionExpression';
 export {
