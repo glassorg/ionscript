@@ -6,7 +6,4 @@
 # let x = foo?.bar[12 + 5]?.baz?("foo", true, x)
 
 let identity = (a, b) =>
-    throw Error("bad")
-
-# export let y = 12
-# export default 20
+    return (a .dot b) .cross (c .dot d)

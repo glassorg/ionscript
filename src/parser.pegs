@@ -233,7 +233,7 @@ IfStatement
     { return node("IfStatement", { test, consequent, alternate }) }
 
 ReturnStatement
-    = ReturnToken _ argument:InlineExpression? EOL
+    = ReturnToken _ argument:OutlineExpression?
     { return node("ReturnStatement", { argument }) }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -458,6 +458,7 @@ OutlineFunction
 OutlineExpression
     = OutlineFunction
     / OutlineCallExpression
+    / OutlineNewExpression
     / OutlineStringLiteral
     / @InlineExpression EOL
     //  TODO: Allow Optional BlockStatement After to imply function call.
@@ -467,7 +468,11 @@ OutlineArguments
 
 OutlineCallExpression
     = callee:InlineExpression args:OutlineArguments
-    { return node("CallExpression", {callee, arguments: args}) }
+    { return node("CallExpression", { callee, arguments: args }) }
+
+OutlineNewExpression
+    = NewToken _ callee:MemberExpressionNoCall args:(InlineArguments / OutlineArguments)
+    { return node("CallExpression", { new: true, callee, arguments: args }) }
 
 InlineExpression
     = InlineFunction
@@ -512,16 +517,23 @@ InlineExpressionList
 InlineArguments
     = "()" { return [] }
     / "(" _ @InlineExpressionList _ ")"
-    // / " " _ @PropertyList
+    / _ @InlineExpressionList
+
+ChainMemberComputed
+    = optional:"?"? "[" _ property:InlineExpression _ "]"
+    { return { property, computed:true, optional: optional != null } }
+
+ChainMember
+    = optional:"?"? _ "." property:Identifier
+    { return { property, computed:false, optional: optional != null } }
+
+ChainMemberCall
+    = optional:"?"? args:InlineArguments
+    { return { arguments:args, optional: optional != null } }
 
 MemberExpression =
     head: PrimaryExpression
-    tail: (
-        optional:"?"? "[" _ property:InlineExpression _ "]" { return { property, computed:true, optional: optional != null } }
-        / optional:"?"? "." property:Identifier { return { property, computed:false, optional: optional != null } }
-        / optional:"?"? args:InlineArguments { return { arguments:args, optional: optional != null } }
-        // TODO: Add optional to InlineArguments.
-    )*
+    tail: (ChainMemberComputed / ChainMember / ChainMemberCall)*
     {
         return tail.reduce(
             (left, right) => {
@@ -532,6 +544,16 @@ MemberExpression =
                     return node("MemberExpression", { object:left, ...right })
                 }
             }
+            ,head
+        )
+    }
+
+MemberExpressionNoCall =
+    head: PrimaryExpression
+    tail: (ChainMemberComputed / ChainMember)*
+    {
+        return tail.reduce(
+            (left, right) => node("MemberExpression", { object:left, ...right })
             ,head
         )
     }

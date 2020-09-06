@@ -16,12 +16,11 @@ export class CallExpression implements _Object.Object , Expression.Expression , 
     readonly location: Location.Location | Null.Null;
     readonly export: Integer.Integer;
     readonly optional: Boolean.Boolean;
-    readonly new: Boolean.Boolean;
     readonly callee: Expression.Expression;
     readonly arguments: _Array.Array<Expression.Expression>;
-    static readonly id = 'CallExpression';
+    static readonly id = 'NewExpression_CallExpression';
     static readonly implements = new Set([
-        'CallExpression',
+        'NewExpression_CallExpression',
         'ion_Object',
         'Expression',
         'ChainElement',
@@ -32,14 +31,12 @@ export class CallExpression implements _Object.Object , Expression.Expression , 
         location = null,
         export: _export = 0,
         optional = false,
-        new: _new = false,
         callee,
         arguments: _arguments
     }: {
         location?: Location.Location | Null.Null,
         export?: Integer.Integer,
         optional?: Boolean.Boolean,
-        new?: Boolean.Boolean,
         callee: Expression.Expression,
         arguments: _Array.Array<Expression.Expression>
     }) {
@@ -49,8 +46,6 @@ export class CallExpression implements _Object.Object , Expression.Expression , 
             throw new Error('export is not a Integer: ' + Class.toString(_export));
         if (!Boolean.isBoolean(optional))
             throw new Error('optional is not a Boolean: ' + Class.toString(optional));
-        if (!Boolean.isBoolean(_new))
-            throw new Error('new is not a Boolean: ' + Class.toString(_new));
         if (!Expression.isExpression(callee))
             throw new Error('callee is not a Expression: ' + Class.toString(callee));
         if (!_Array.isArray(_arguments))
@@ -58,7 +53,6 @@ export class CallExpression implements _Object.Object , Expression.Expression , 
         this.location = location;
         this.export = _export;
         this.optional = optional;
-        this.new = _new;
         this.callee = callee;
         this.arguments = _arguments;
         Object.freeze(this);
@@ -67,7 +61,6 @@ export class CallExpression implements _Object.Object , Expression.Expression , 
         location?: Location.Location | Null.Null,
         export?: Integer.Integer,
         optional?: Boolean.Boolean,
-        new?: Boolean.Boolean,
         callee?: Expression.Expression,
         arguments?: _Array.Array<Expression.Expression>
     }) {
@@ -83,4 +76,3 @@ export class CallExpression implements _Object.Object , Expression.Expression , 
 export function isCallExpression(value): value is CallExpression {
     return Class.isInstance(CallExpression, value);
 }
-export default CallExpression;
