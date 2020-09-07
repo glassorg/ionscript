@@ -77,9 +77,20 @@ Indented Javascript
     X for item in
     - for ; ;
     - for item of
-    Fix Outline Call Syntax to use a call operator? (..)
+    X Fix Outline Call Syntax to use a call operator? ()
     X ArrayExpression
     ObjectExpression
+        methods
+            inline
+            outline
+        properties
+            outline
+        get
+            inline
+            outline
+        set
+            inline
+            outline
     ThisExpression
     Destructors
     Switch?

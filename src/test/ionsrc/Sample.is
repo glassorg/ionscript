@@ -7,5 +7,16 @@
 
 let identity = (a, b) =>
     return
-        foo.bar(x, y)
-            z
+        []
+            { foo: 12, bar: a, [computed]: true, shorthand, fun() => 12, set a(value) => 13, get a() => 14 }
+            {}
+                foo: 12
+                bar: a
+                [computed]: true
+                shorthand
+                fun() =>
+                    return 12
+                set a(value) =>
+                    return 13
+                get a() =>
+                    return 14

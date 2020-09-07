@@ -1,0 +1,12 @@
+import
+    ion.*
+    .*
+
+export
+    class Property extends Node
+        var key: Literal | Identifier
+        var value: Expression
+        var kind: String = "init" # init | get | set
+        var method: Boolean = false
+        var shorthand: Boolean = false
+        var computed: Boolean = false

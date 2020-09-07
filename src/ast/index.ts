@@ -29,6 +29,9 @@ export {
     default as Declaration
 } from './Declaration';
 export {
+    default as DotExpression
+} from './DotExpression';
+export {
     default as Exportable
 } from './Exportable';
 export {
@@ -83,6 +86,9 @@ export {
     default as Node
 } from './Node';
 export {
+    default as ObjectExpression
+} from './ObjectExpression';
+export {
     default as Parameter
 } from './Parameter';
 export {
@@ -94,6 +100,9 @@ export {
 export {
     default as Program
 } from './Program';
+export {
+    default as Property
+} from './Property';
 export {
     default as Reference
 } from './Reference';
@@ -109,6 +118,9 @@ export {
 export {
     default as Statement
 } from './Statement';
+export {
+    default as ThisExpression
+} from './ThisExpression';
 export {
     default as ThrowStatement
 } from './ThrowStatement';

@@ -190,7 +190,7 @@ Declaration
 VariableDeclarationType
     = VarToken { return { assignable: true } }
     / LetToken { return { assignable: false } }
-    // / PropertyToken { return "Property" } // I think this was used for meta?
+    // / PropertyToken { return "InlineProperty" } // I think this was used for meta?
 
 VariableDeclaration
     = TypeToken _ id:Identifier _ "=" _ value:Type EOL
@@ -461,9 +461,15 @@ InlineFunction
     = head:FunctionHead _ value:InlineExpression
     { return node("FunctionExpression", { ...head, body: node("BlockStatement", { body: [node("ReturnStatement", { argument: value } )] } ) } ) }
 
+NamedInlineFunction
+    = &Identifier @InlineFunction
+
 OutlineFunction
     = head:FunctionHead _ body:BlockStatement
     { return node("FunctionExpression", { ...head, body }) }
+
+NamedOutlineFunction
+    = &Identifier @OutlineFunction
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Expressions
@@ -472,6 +478,7 @@ OutlineFunction
 OutlineExpression
     = OutlineFunction
     / OutlineArrayExpression
+    / OutlineObjectExpression
     / OutlineCallExpression
     / OutlineNewExpression
     / OutlineStringLiteral
@@ -501,7 +508,7 @@ PrimaryExpression
     / DotExpression
     / GroupExpression
     / InlineArrayExpression
-    / ObjectExpression
+    / InlineObjectExpression
 
 GroupExpression
     = "(" _ @InlineExpression _ ")"
@@ -516,15 +523,6 @@ DotExpression
     { return node('MemberExpression',{object:node('DotExpression'),property,computed:true}) }
     / "."
     { return node('DotExpression') }
-
-Property
-    = "[" _ key:InlineExpression _ "]" _ ":" _ value: InlineExpression
-    / key:(@Identifier _ ":")? _ value:InlineExpression
-    { return node("Property", {key,value}) }
-
-PropertyList
-    = head:Property tail:(_ "," _ @Property)*
-    { return [head, ...tail] }
 
 InlineExpressionList
     = head:InlineExpression tail:(_ "," _ @InlineExpression)*
@@ -592,15 +590,48 @@ OutlineArrayExpression
     = "[]" elements: OutlineArguments
     { return node("ArrayExpression", { elements }) }
 
-ObjectExpression
-    = InlineObjectExpression
+OutlineObjectExpression
+    = e:InlineObjectExpression properties: OutlinePropertyList
+    { return node("ObjectExpression", {properties: [...e.properties, ...properties] }) }
+
+OutlinePropertyList
+    = EOL Indent @(Dent @OutlineProperty)+ Outdent
+
+OutlineProperty
+    = "[" _ key:InlineExpression _ "]" _ ":" _ value: OutlineExpression
+    { return node("Property", { key, value, computed: true }) }
+    / key:(@Identifier _ ":") _ value:OutlineExpression
+    { return node("Property", { key, value }) }
+    / GetToken _ value:NamedOutlineFunction
+    { return node("Property", { key: value.id, value, kind: "get", method: true }) }
+    / SetToken _ value:NamedOutlineFunction
+    { return node("Property", { key: value.id, value, kind: "set", method: true }) }
+    / value:NamedOutlineFunction
+    { return node("Property", { key: value.id, value, method: true }) }
+    / key:Identifier EOL
+    { return node("Property", { key, value: node("Reference", key), shorthand: true }) }
 
 InlineObjectExpression
-    = "{" _ properties:PropertyList? _ "}"
-    {
-        return node("ObjectExpression", {properties: properties || []})
-    }
+    = "{" _ properties:InlinePropertyList? _ "}"
+    { return node("ObjectExpression", {properties: properties || []}) }
 
+InlineProperty
+    = "[" _ key:InlineExpression _ "]" _ ":" _ value: InlineExpression
+    { return node("Property", { key, value, computed: true }) }
+    / key:(@Identifier _ ":") _ value:InlineExpression
+    { return node("Property", { key, value }) }
+    / GetToken _ value:NamedInlineFunction
+    { return node("Property", { key: value.id, value, kind: "get", method: true }) }
+    / SetToken _ value:NamedInlineFunction
+    { return node("Property", { key: value.id, value, kind: "set", method: true }) }
+    / value:NamedInlineFunction
+    { return node("Property", { key: value.id, value, method: true }) }
+    / key:Identifier
+    { return node("Property", { key, value: node("Reference", key), shorthand: true }) }
+
+InlinePropertyList
+    = head:InlineProperty tail:(_ "," _ @InlineProperty)*
+    { return [head, ...tail] }
 
 Literal
     = NumericLiteral
@@ -720,6 +751,8 @@ ThrowToken      = @"throw"      !IdPart
 TryToken        = @"try"        !IdPart
 CatchToken      = @"catch"      !IdPart
 FinallyToken    = @"finally"    !IdPart
+GetToken        = @"get"        !IdPart
+SetToken        = @"set"        !IdPart
 
 Keyword
     = ThisToken
@@ -754,6 +787,8 @@ Keyword
     / TryToken
     / CatchToken
     / FinallyToken
+    / GetToken
+    / SetToken
 
 ReservedWord
     = Keyword
