@@ -89,6 +89,9 @@ export {
     default as ObjectExpression
 } from './ObjectExpression';
 export {
+    default as ObjectPattern
+} from './ObjectPattern';
+export {
     default as Parameter
 } from './Parameter';
 export {

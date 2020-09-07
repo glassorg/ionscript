@@ -6,17 +6,4 @@
 # let x = foo?.bar[12 + 5]?.baz?("foo", true, x)
 
 let identity = (a, b) =>
-    return
-        []
-            { foo: 12, bar: a, [computed]: true, shorthand, fun() => 12, set a(value) => 13, get a() => 14 }
-            {}
-                foo: 12
-                bar: a
-                [computed]: true
-                shorthand
-                fun() =>
-                    return 12
-                set a(value) =>
-                    return 13
-                get a() =>
-                    return 14
+    let {x, y, ...rest} = a

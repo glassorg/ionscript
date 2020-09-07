@@ -262,11 +262,12 @@ Pattern
 ArrayPattern
     = "[" _ element:RestElement _ "]"
     { return node("ArrayPattern", { elements: [element] }) }
-    / "[" _ head:Pattern? tail:(_ "," _ !"." @Pattern?)* _ rest:("," _ @RestElement)? _ "]"
+    / "[" _ head:Pattern? tail:(_ "," _ !"." @Pattern?)* rest:(_ "," _ @RestElement)? _ "]"
     {
         let elements = [head || null, ...tail.map((x) => x || null)]
-        if (rest)
+        if (rest) {
             elements.push(rest)
+        }
         return node("ArrayPattern", { elements })
     }
 
@@ -275,12 +276,18 @@ RestElement
     { return node("RestElement", { argument }) }
 
 ObjectPattern
-    = "{" _ head:AssignmentProperty tail:(_ "," @AssignmentProperty)* _ "}"
-    { return node("ObjectPattern", { elements: [head, ...tail] }) }
+    = "{" _ head:AssignmentProperty tail:(_ "," _ @AssignmentProperty)* rest:(_ "," _ @RestElement)? _ "}"
+    {
+        let properties = [head, ...tail]
+        if (rest) {
+            properties.push(rest)
+        }
+        return node("ObjectPattern", { properties })
+    }
 
 AssignmentProperty
     = key:Identifier value:(_ ":" _ @Pattern)?
-    { return node("KeyValuePair", { key, value: value || node("Identifier", { name: key }) } ) }
+    { return node("Property", { key, value: value || node("Reference", key), shorthand: value == null } ) }
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Class

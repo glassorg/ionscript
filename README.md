@@ -75,23 +75,10 @@ Indented Javascript
     X Throw
     X Try/Catch/Finally
     X for item in
-    - for ; ;
-    - for item of
     X Fix Outline Call Syntax to use a call operator? ()
     X ArrayExpression
-    ObjectExpression
-        methods
-            inline
-            outline
-        properties
-            outline
-        get
-            inline
-            outline
-        set
-            inline
-            outline
-    ThisExpression
+    X ObjectExpression
+    X ThisExpression
     Destructors
     Switch?
     ClassDeclaration
