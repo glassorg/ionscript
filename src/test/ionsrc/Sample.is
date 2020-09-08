@@ -6,4 +6,13 @@
 # let x = foo?.bar[12 + 5]?.baz?("foo", true, x)
 
 let identity = (a, b) =>
-    let {x, y, ...rest} = a
+    switch a
+        1, 2, 3
+            return 10
+        2
+            return 20
+        3
+            return 30
+        default
+            return 100
+

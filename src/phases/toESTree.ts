@@ -1,6 +1,6 @@
 import { Options } from "../Compiler"
 import { traverse, skip, replace } from "@glas/traverse"
-import { CallExpression, Exportable, ImportDeclaration, Node, Parameter, Program } from "../ast"
+import { CallExpression, Exportable, ImportDeclaration, Node, Parameter, Program, SwitchCase } from "../ast"
 import Position from "../ast/Position"
 import VariableDeclaration from "../ast/VariableDeclaration"
 import Reference from "../ast/Reference"
@@ -67,6 +67,11 @@ export default function toEsTree(root: Map<string, any>, options: Options) {
                             source: null,
                         }
                     }
+                }
+                if (SwitchCase.is(node)) {
+                    // EsTree SwitchCase.consequent: Array<Statement>
+                    // Ours is BlockStatement, so we convert to theirs.
+                    result.consequent = result.consequent?.body ?? []
                 }
                 if (CallExpression.is(node) && node.new) {
                     result.type = "NewExpression"

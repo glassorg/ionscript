@@ -122,6 +122,12 @@ export {
     default as Statement
 } from './Statement';
 export {
+    default as SwitchCase
+} from './SwitchCase';
+export {
+    default as SwitchStatement
+} from './SwitchStatement';
+export {
     default as ThisExpression
 } from './ThisExpression';
 export {

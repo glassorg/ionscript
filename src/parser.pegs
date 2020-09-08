@@ -163,6 +163,24 @@ Statement
     / ExpressionStatement
     / ThrowStatement
     / TryStatement
+    / SwitchStatement
+
+SwitchStatement
+    = SwitchToken _ discriminant:InlineExpression EOL
+        Indent
+            cases: (Dent @SwitchCase)+
+        Outdent
+    { return node("SwitchStatement", { discriminant, cases: cases.flat() }) }
+
+SwitchTest
+    = (InlineExpression / DefaultToken { return null })
+
+SwitchCase
+    = head:SwitchTest tail:(_ "," _ @SwitchTest)* consequent:BlockStatement
+    {
+        let tests = [head, ...tail]
+        return tests.map((test, index) => node("SwitchCase", { test, consequent: index === tests.length - 1 ? consequent : null }))
+    }
 
 TryStatement
     = TryToken
@@ -760,6 +778,7 @@ CatchToken      = @"catch"      !IdPart
 FinallyToken    = @"finally"    !IdPart
 GetToken        = @"get"        !IdPart
 SetToken        = @"set"        !IdPart
+SwitchToken     = @"switch"     !IdPart
 
 Keyword
     = ThisToken
@@ -796,6 +815,7 @@ Keyword
     / FinallyToken
     / GetToken
     / SetToken
+    / SwitchToken
 
 ReservedWord
     = Keyword

@@ -69,17 +69,6 @@ Indented Javascript
 
 ## Todo
 
-    X FunctionExpressions
-    X If/Else
-    X While
-    X Throw
-    X Try/Catch/Finally
-    X for item in
-    X Fix Outline Call Syntax to use a call operator? ()
-    X ArrayExpression
-    X ObjectExpression
-    X ThisExpression
-    Destructors
     Switch?
     ClassDeclaration
     Async/Await
