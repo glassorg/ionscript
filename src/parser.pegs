@@ -83,6 +83,7 @@ ModuleDeclaration
     = ImportDeclaration
     / Declaration
     / ExportDeclaration
+    / ExpressionStatement
 
 ////////////////////////////////////////////////////////////////////////////////
 //  ExportDeclaration
@@ -173,10 +174,12 @@ SwitchStatement
     { return node("SwitchStatement", { discriminant, cases: cases.flat() }) }
 
 SwitchTest
-    = (InlineExpression / DefaultToken { return null })
+    = DefaultToken { return null }
+    / InlineExpression
 
 SwitchCase
-    = head:SwitchTest tail:(_ "," _ @SwitchTest)* consequent:BlockStatement
+    = head:SwitchTest tail:(_ "," _ @SwitchTest)* ":" _
+        consequent: (value:Statement {return node("BlockStatement", { body: [value]}) } / BlockStatement)
     {
         let tests = [head, ...tail]
         return tests.map((test, index) => node("SwitchCase", { test, consequent: index === tests.length - 1 ? consequent : null }))
@@ -206,9 +209,12 @@ Declaration
     / VariableDeclaration
 
 VariableDeclarationType
-    = VarToken { return { assignable: true } }
-    / LetToken { return { assignable: false } }
-    // / PropertyToken { return "InlineProperty" } // I think this was used for meta?
+    = VarToken { return { kind: "var" } }
+    / LetToken { return { kind: "let" } }
+    / GetToken { return { kind: "get" } }
+    / SetToken { return { kind: "set" } }
+    // / PropertyToken { return { assignable: false, property: true }}
+    // / MetaToken { return { assignable: false, meta: true }}
 
 VariableDeclaration
     = TypeToken _ id:Identifier _ "=" _ value:Type EOL
@@ -312,10 +318,10 @@ AssignmentProperty
 ////////////////////////////////////////////////////////////////////////////////
 
 ClassDeclaration
-    = meta:MetaProperties isStructure:(ClassToken { return false } / StructToken { return true })
-        _ id:Identifier params:TemplateParameters? _ baseClasses:Extends? EOL
-        Indent declarations:(Dent @Declaration)* Outdent
-        { return node("ClassDeclaration", { id, isStructure, params: params || [], meta, baseClasses: baseClasses || [], declarations: toMap(declarations), static: new Map() }) }
+    = meta:MetaProperties
+        ClassToken _ id:Identifier params:TemplateParameters? _ baseClasses:Extends? EOL
+        Indent declarations:(Dent @VariableDeclaration)* Outdent
+        { return node("ClassDeclaration", { id, params: params || [], baseClasses: baseClasses || [], declarations: declarations, static: [] }) }
 
 TemplateParameters
     = "<" _ head:Parameter tail:(_ ',' _ @Parameter)* _ ">" { return [head, ...tail] }
@@ -483,8 +489,8 @@ FunctionHead
     { return { id, type, params: params || [] } }
 
 InlineFunction
-    = head:FunctionHead _ value:InlineExpression
-    { return node("FunctionExpression", { ...head, body: node("BlockStatement", { body: [node("ReturnStatement", { argument: value } )] } ) } ) }
+    = head:FunctionHead _ value:InlineExpression?
+    { return node("FunctionExpression", { ...head, body: node("BlockStatement", { body: !value ? [] : [node("ReturnStatement", { argument: value } )] } ) } ) }
 
 NamedInlineFunction
     = &Identifier @InlineFunction
@@ -524,7 +530,12 @@ OutlineNewExpression
 
 InlineExpression
     = InlineFunction
+    / InlineNewExpression
     / ConditionalExpression
+
+InlineNewExpression
+    = NewToken _ callee:MemberExpressionNoCall args:InlineArguments
+    { return node("CallExpression", { new: true, callee, arguments: args }) }
 
 PrimaryExpression
     = Reference
@@ -601,8 +612,16 @@ MemberExpressionNoCall =
 //  Literals
 ////////////////////////////////////////////////////////////////////////////////
 
+InlineSpreadElement
+    = "..." argument: InlineExpression
+    { return node("RestElement", { argument }) }
+
+ArrayElement
+    = InlineSpreadElement
+    / InlineExpression
+
 ArrayElements
-    = head:InlineExpression tail:(_ "," _ @InlineExpression)*
+    = head:ArrayElement tail:(_ "," _ @ArrayElement)*
     { return [head, ...tail] }
 
 InlineArrayExpression
@@ -611,9 +630,12 @@ InlineArrayExpression
         return node("ArrayExpression", { elements:elements || [] })
     }
 
+OutlineArrayArguments
+    = EOL Indent @(Dent @(OutlineExpression / @InlineExpressionList EOL))+ Outdent
+
 OutlineArrayExpression
-    = "[]" elements: OutlineArguments
-    { return node("ArrayExpression", { elements }) }
+    = "[]" elements: OutlineArrayArguments
+    { return node("ArrayExpression", { elements: elements.flat() }) }
 
 OutlineObjectExpression
     = e:InlineObjectExpression properties: OutlinePropertyList
@@ -623,7 +645,8 @@ OutlinePropertyList
     = EOL Indent @(Dent @OutlineProperty)+ Outdent
 
 OutlineProperty
-    = "[" _ key:InlineExpression _ "]" _ ":" _ value: OutlineExpression
+    = @InlineSpreadElement EOL
+    / "[" _ key:InlineExpression _ "]" _ ":" _ value: OutlineExpression
     { return node("Property", { key, value, computed: true }) }
     / key:(@Identifier _ ":") _ value:OutlineExpression
     { return node("Property", { key, value }) }
@@ -635,13 +658,16 @@ OutlineProperty
     { return node("Property", { key: value.id, value, method: true }) }
     / key:Identifier EOL
     { return node("Property", { key, value: node("Reference", key), shorthand: true }) }
+    //  don't support inline lists on outline objects... it's harder to see specific
+    // / @InlinePropertyList EOL
 
 InlineObjectExpression
     = "{" _ properties:InlinePropertyList? _ "}"
     { return node("ObjectExpression", {properties: properties || []}) }
 
 InlineProperty
-    = "[" _ key:InlineExpression _ "]" _ ":" _ value: InlineExpression
+    = InlineSpreadElement
+    / "[" _ key:InlineExpression _ "]" _ ":" _ value: InlineExpression
     { return node("Property", { key, value, computed: true }) }
     / key:(@Identifier _ ":") _ value:InlineExpression
     { return node("Property", { key, value }) }
@@ -761,6 +787,8 @@ StructToken     = @"struct"     !IdPart
 VarToken        = @"var"        !IdPart
 LetToken        = @"let"        !IdPart
 PropertyToken   = @"property"   !IdPart
+MetaToken       = @"meta"       !IdPart
+StaticToken     = @"static"     !IdPart
 ExtendsToken    = @"extends"    !IdPart
 ForToken        = @"for"        !IdPart
 WhileToken      = @"while"      !IdPart
@@ -813,9 +841,9 @@ Keyword
     / TryToken
     / CatchToken
     / FinallyToken
-    / GetToken
-    / SetToken
     / SwitchToken
+    // / GetToken
+    // / SetToken
 
 ReservedWord
     = Keyword

@@ -4,3 +4,5 @@ import
 
 export
     class VariableDeclaration extends Variable, Declaration
+        var kind: String # var, let, get, set
+

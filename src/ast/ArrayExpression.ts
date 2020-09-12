@@ -9,11 +9,12 @@ import * as Location from './Location';
 import * as Null from './ion/Null';
 import * as Integer from './ion/Integer';
 import * as _Array from './ion/Array';
+import * as SpreadElement from './SpreadElement';
 import * as Class from './ion/Class';
 export class ArrayExpression implements _Object.Object , Expression.Expression , Node.Node , Exportable.Exportable {
     readonly location: Location.Location | Null.Null;
     readonly export: Integer.Integer;
-    readonly elements: _Array.Array<Expression.Expression | Null.Null>;
+    readonly elements: _Array.Array<Expression.Expression | (SpreadElement.SpreadElement | Null.Null)>;
     static readonly id = 'ArrayExpression';
     static readonly implements = new Set([
         'ArrayExpression',
@@ -29,7 +30,7 @@ export class ArrayExpression implements _Object.Object , Expression.Expression ,
     }: {
         location?: Location.Location | Null.Null,
         export?: Integer.Integer,
-        elements: _Array.Array<Expression.Expression | Null.Null>
+        elements: _Array.Array<Expression.Expression | (SpreadElement.SpreadElement | Null.Null)>
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
             throw new Error('location is not a Location | Null: ' + Class.toString(location));
@@ -45,7 +46,7 @@ export class ArrayExpression implements _Object.Object , Expression.Expression ,
     patch(properties: {
         location?: Location.Location | Null.Null,
         export?: Integer.Integer,
-        elements?: _Array.Array<Expression.Expression | Null.Null>
+        elements?: _Array.Array<Expression.Expression | (SpreadElement.SpreadElement | Null.Null)>
     }) {
         return new ArrayExpression({
             ...this,

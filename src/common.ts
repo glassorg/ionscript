@@ -130,7 +130,7 @@ export function difference(a: Set<any>, b: Set<any>) {
 //  File operations
 ////////////////////////////////////////////////////////////////////////////////
 
-const ionExt = '.is'
+const ionExt = '.ion'
 
 export function read(file: any) {
     return fs.readFileSync(file, 'utf8')

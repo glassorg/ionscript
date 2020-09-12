@@ -6,8 +6,9 @@ import ImportNamespaceSpecifier from "../ast/ImportNamespaceSpecifier"
 import ImportDefaultSpecifier from "../ast/ImportDefaultSpecifier"
 import ImportSpecifier from "../ast/ImportSpecifier"
 import { SemanticError } from "../common"
+import Assembly from "../ast/Assembly"
 
-export default function fixImports(root: Map<string, any>, options: Options) {
+export default function fixImports(root: Assembly, options: Options) {
     return traverse(root, {
         enter(node) {
             if (Program.is(node)) {

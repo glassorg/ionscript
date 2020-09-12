@@ -6,4 +6,3 @@ export
     class Variable extends Node
         var id: Pattern
         var value: Expression | Null = null
-        var assignable: Boolean = false

@@ -1,0 +1,51 @@
+import "foo/bar/baz" a, b
+import ...Foo
+    x
+    y
+
+let x = foo?.bar[12 + 5]?.baz?("foo", true, x)
+
+let value = (x = 0, y = 0) => new Vector(1, 2)
+
+let identity = (a, b) =>
+    switch a
+        # inline cases and single statement
+        1, 2, 3: return 10
+        2:
+            # outline statements fine as well
+            return 20
+        3:
+            return 30
+        default:
+            return 55
+
+class Vector
+    var x: Number = 0
+    var y: Number = 0
+    let constructor = () =>
+        super()
+    let translate = (dx = 0, dy = 0) => new Vector(x + dx, y + dy)
+    get foo = () => 12
+    set foo = () => 12
+
+Object.defineProperties()
+    Vector.prototype
+    {}
+        bar: {}
+            get: () => 12
+            set: (value) =>
+
+let foo = [a, b, ...bar, c, d]
+let bar = { a, x: y, ...fuz, ...huh }
+let outline = {}
+    x
+    y
+    z
+    ...foo
+    x: 10
+    y: 20
+let matrix = []
+    1, 0, 0, 0
+    0, 1, 0, 0
+    0, 0, 1, 0
+    0, 0, 0, 1

@@ -4,4 +4,4 @@ import
 
 export
     class ObjectExpression extends Expression
-        var properties: Array<Property>
+        var properties: Array<Property | SpreadElement>

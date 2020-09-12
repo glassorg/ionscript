@@ -11,15 +11,15 @@ import * as Location from './Location';
 import * as Null from './ion/Null';
 import * as Pattern from './Pattern';
 import * as Expression from './Expression';
-import * as Boolean from './ion/Boolean';
 import * as Integer from './ion/Integer';
+import * as String from './ion/String';
 import * as Class from './ion/Class';
 export class VariableDeclaration implements _Object.Object , Variable.Variable , Declaration.Declaration , Node.Node , Statement.Statement , Exportable.Exportable {
     readonly location: Location.Location | Null.Null;
     readonly id: Pattern.Pattern;
     readonly value: Expression.Expression | Null.Null;
-    readonly assignable: Boolean.Boolean;
     readonly export: Integer.Integer;
+    readonly kind: String.String;
     static readonly id = 'VariableDeclaration';
     static readonly implements = new Set([
         'VariableDeclaration',
@@ -34,14 +34,14 @@ export class VariableDeclaration implements _Object.Object , Variable.Variable ,
         location = null,
         id,
         value = null,
-        assignable = false,
-        export: _export = 0
+        export: _export = 0,
+        kind
     }: {
         location?: Location.Location | Null.Null,
         id: Pattern.Pattern,
         value?: Expression.Expression | Null.Null,
-        assignable?: Boolean.Boolean,
-        export?: Integer.Integer
+        export?: Integer.Integer,
+        kind: String.String
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
             throw new Error('location is not a Location | Null: ' + Class.toString(location));
@@ -49,23 +49,23 @@ export class VariableDeclaration implements _Object.Object , Variable.Variable ,
             throw new Error('id is not a Pattern: ' + Class.toString(id));
         if (!(Expression.isExpression(value) || Null.isNull(value)))
             throw new Error('value is not a Expression | Null: ' + Class.toString(value));
-        if (!Boolean.isBoolean(assignable))
-            throw new Error('assignable is not a Boolean: ' + Class.toString(assignable));
         if (!Integer.isInteger(_export))
             throw new Error('export is not a Integer: ' + Class.toString(_export));
+        if (!String.isString(kind))
+            throw new Error('kind is not a String: ' + Class.toString(kind));
         this.location = location;
         this.id = id;
         this.value = value;
-        this.assignable = assignable;
         this.export = _export;
+        this.kind = kind;
         Object.freeze(this);
     }
     patch(properties: {
         location?: Location.Location | Null.Null,
         id?: Pattern.Pattern,
         value?: Expression.Expression | Null.Null,
-        assignable?: Boolean.Boolean,
-        export?: Integer.Integer
+        export?: Integer.Integer,
+        kind?: String.String
     }) {
         return new VariableDeclaration({
             ...this,

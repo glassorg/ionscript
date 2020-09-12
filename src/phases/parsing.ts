@@ -1,3 +1,4 @@
+import Assembly from "../ast/Assembly";
 import { Options } from "../Compiler";
 
 export default function parsing(root: { [name: string]: string }, options: Options) {
@@ -7,5 +8,5 @@ export default function parsing(root: { [name: string]: string }, options: Optio
         let module = options.parser.parse(source, name)
         modules.set(name, module)
     }
-    return { modules }
+    return new Assembly({ modules })
 }

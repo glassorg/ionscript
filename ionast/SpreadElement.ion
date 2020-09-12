@@ -1,0 +1,7 @@
+import
+    ion.*
+    .*
+
+export
+    class SpreadElement extends Pattern
+        var argument: Expression

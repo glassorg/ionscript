@@ -7,6 +7,7 @@ import Reference from "../ast/Reference"
 import MemberExpression from "../ast/MemberExpression"
 import Expression from "../ast/Expression"
 import Declaration from "../ast/Declaration"
+import ClassDeclaration from "../ast/ClassDeclaration"
 
 export default function toEsTree(root: Map<string, any>, options: Options) {
     return traverse(root, {
@@ -30,16 +31,26 @@ export default function toEsTree(root: Map<string, any>, options: Options) {
                     let values = { ...node, ...changes }
                     result = {
                         type: "VariableDeclaration",
-                        kind: node.assignable ? "let" : "const",
+                        kind: node.kind === "var" ? "let" : "const",
                         declarations: [{
                             type: "VariableDeclarator",
                             id: values.id,
                             init: values.value,
+                            kind: node.kind,
                         }]
                     }
                 }
                 else if (Parameter.is(node)) {
-                    result = changes.id
+                    if (node.value != null) {
+                        result = {
+                            type: "AssignmentPattern",
+                            left: changes.id,
+                            right: changes.value,
+                        }
+                    }
+                    else {
+                        result = changes.id
+                    }
                 }
                 else {
                     result = { type: node.constructor.name, ...node, ...changes }
@@ -75,6 +86,35 @@ export default function toEsTree(root: Map<string, any>, options: Options) {
                 }
                 if (CallExpression.is(node) && node.new) {
                     result.type = "NewExpression"
+                }
+                if (ClassDeclaration.is(node)) {
+                    let values = { ...node, ...changes }
+                    let functions = [...values.declarations.values()].filter(v => v.declarations[0].init.type === "FunctionExpression")
+                    return {
+                        type: "ClassDeclaration",
+                        id: values.id,
+                        body: {
+                            type: "ClassBody",
+                            body: functions.map(v => {
+                                let d = v.declarations[0]
+                                return {
+                                    type: "MethodDefinition",
+                                    key: d.id,
+                                    value: d.init,
+                                    kind: (() => {
+                                        switch (d.kind) {
+                                            case "let":
+                                            case "var": return "method"
+                                            case "get": return "get"
+                                            case "set": return "set"
+                                        }
+                                    })(),
+                                    //  calculate if computed or not
+                                    // computed: false,
+                                }
+                            })
+                        }
+                    }
                 }
                 return result
             }

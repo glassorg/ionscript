@@ -1,11 +1,14 @@
 {
   "name": "ionscript",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Indented Javascript",
   "main": "index.js",
   "repository": "https://github.com/glassorg/ionscript.git",
   "author": "Kris Nye <krisnye@gmail.com>",
   "license": "MIT",
+  "bin": {
+    "ionc": "bin/ionc.js"
+  },
   "scripts": {
     "setup": "yarn install",
     "build": "guild build && yarn run buildGrammar",

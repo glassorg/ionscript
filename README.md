@@ -54,6 +54,21 @@ Indented Javascript
 
     import foo.bar      // same as import "foo.bar" as bar, source: Path
 
+### Class Declarations
+
+    class Foo
+        var x: Type = defaultValue
+        let y = Expression
+
+        property bar = {}
+            get() =>
+            set(value) =>
+            value: Any
+            writable: Boolean
+            enumerable: Boolean
+            configurable: Boolean
+
+
 ## Roadmap
 
     0.1 Javascript compatible output
@@ -69,9 +84,9 @@ Indented Javascript
 
 ## Todo
 
-    Switch?
-    ClassDeclaration
+    X ClassDeclaration
+    X Module Level Execution (Side Effects, Shimming, etc)
+    X Spread Operators
+    Compilation
     Async/Await
     Generators
-
-    

@@ -5,6 +5,9 @@ export {
     default as ArrayPattern
 } from './ArrayPattern';
 export {
+    default as Assembly
+} from './Assembly';
+export {
     default as AssignmentPattern
 } from './AssignmentPattern';
 export {
@@ -22,6 +25,9 @@ export {
 export {
     default as ChainElement
 } from './ChainElement';
+export {
+    default as ClassDeclaration
+} from './ClassDeclaration';
 export {
     default as ConditionalExpression
 } from './ConditionalExpression';
@@ -80,6 +86,9 @@ export {
     default as MemberExpression
 } from './MemberExpression';
 export {
+    default as MethodDefinition
+} from './MethodDefinition';
+export {
     default as ModuleSpecifier
 } from './ModuleSpecifier';
 export {
@@ -118,6 +127,9 @@ export {
 export {
     default as Scope
 } from './Scope';
+export {
+    default as SpreadElement
+} from './SpreadElement';
 export {
     default as Statement
 } from './Statement';

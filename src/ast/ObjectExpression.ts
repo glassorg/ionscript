@@ -10,11 +10,12 @@ import * as Null from './ion/Null';
 import * as Integer from './ion/Integer';
 import * as _Array from './ion/Array';
 import * as Property from './Property';
+import * as SpreadElement from './SpreadElement';
 import * as Class from './ion/Class';
 export class ObjectExpression implements _Object.Object , Expression.Expression , Node.Node , Exportable.Exportable {
     readonly location: Location.Location | Null.Null;
     readonly export: Integer.Integer;
-    readonly properties: _Array.Array<Property.Property>;
+    readonly properties: _Array.Array<Property.Property | SpreadElement.SpreadElement>;
     static readonly id = 'ObjectExpression';
     static readonly implements = new Set([
         'ObjectExpression',
@@ -30,7 +31,7 @@ export class ObjectExpression implements _Object.Object , Expression.Expression 
     }: {
         location?: Location.Location | Null.Null,
         export?: Integer.Integer,
-        properties: _Array.Array<Property.Property>
+        properties: _Array.Array<Property.Property | SpreadElement.SpreadElement>
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
             throw new Error('location is not a Location | Null: ' + Class.toString(location));
@@ -46,7 +47,7 @@ export class ObjectExpression implements _Object.Object , Expression.Expression 
     patch(properties: {
         location?: Location.Location | Null.Null,
         export?: Integer.Integer,
-        properties?: _Array.Array<Property.Property>
+        properties?: _Array.Array<Property.Property | SpreadElement.SpreadElement>
     }) {
         return new ObjectExpression({
             ...this,

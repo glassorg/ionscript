@@ -8,13 +8,11 @@ import * as Location from './Location';
 import * as Null from './ion/Null';
 import * as Pattern from './Pattern';
 import * as Expression from './Expression';
-import * as Boolean from './ion/Boolean';
 import * as Class from './ion/Class';
 export class Parameter implements _Object.Object , Variable.Variable , Node.Node {
     readonly location: Location.Location | Null.Null;
     readonly id: Pattern.Pattern;
     readonly value: Expression.Expression | Null.Null;
-    readonly assignable: Boolean.Boolean;
     static readonly id = 'Parameter';
     static readonly implements = new Set([
         'Parameter',
@@ -22,11 +20,10 @@ export class Parameter implements _Object.Object , Variable.Variable , Node.Node
         'Variable',
         'Node'
     ]);
-    constructor({location = null, id, value = null, assignable = false}: {
+    constructor({location = null, id, value = null}: {
         location?: Location.Location | Null.Null,
         id: Pattern.Pattern,
-        value?: Expression.Expression | Null.Null,
-        assignable?: Boolean.Boolean
+        value?: Expression.Expression | Null.Null
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
             throw new Error('location is not a Location | Null: ' + Class.toString(location));
@@ -34,19 +31,15 @@ export class Parameter implements _Object.Object , Variable.Variable , Node.Node
             throw new Error('id is not a Pattern: ' + Class.toString(id));
         if (!(Expression.isExpression(value) || Null.isNull(value)))
             throw new Error('value is not a Expression | Null: ' + Class.toString(value));
-        if (!Boolean.isBoolean(assignable))
-            throw new Error('assignable is not a Boolean: ' + Class.toString(assignable));
         this.location = location;
         this.id = id;
         this.value = value;
-        this.assignable = assignable;
         Object.freeze(this);
     }
     patch(properties: {
         location?: Location.Location | Null.Null,
         id?: Pattern.Pattern,
-        value?: Expression.Expression | Null.Null,
-        assignable?: Boolean.Boolean
+        value?: Expression.Expression | Null.Null
     }) {
         return new Parameter({
             ...this,
