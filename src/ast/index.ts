@@ -11,6 +11,9 @@ export {
     default as AssignmentPattern
 } from './AssignmentPattern';
 export {
+    default as AwaitExpression
+} from './AwaitExpression';
+export {
     default as BinaryExpression
 } from './BinaryExpression';
 export {

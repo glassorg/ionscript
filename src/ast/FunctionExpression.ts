@@ -13,6 +13,7 @@ import * as Identifier from './Identifier';
 import * as _Array from './ion/Array';
 import * as Parameter from './Parameter';
 import * as BlockStatement from './BlockStatement';
+import * as Boolean from './ion/Boolean';
 import * as Class from './ion/Class';
 export class FunctionExpression implements _Object.Object , Expression.Expression , Scope.Scope , Node.Node , Exportable.Exportable {
     readonly location: Location.Location | Null.Null;
@@ -20,6 +21,7 @@ export class FunctionExpression implements _Object.Object , Expression.Expressio
     readonly id: Identifier.Identifier | Null.Null;
     readonly params: _Array.Array<Parameter.Parameter>;
     readonly body: BlockStatement.BlockStatement;
+    readonly async: Boolean.Boolean;
     static readonly id = 'FunctionExpression';
     static readonly implements = new Set([
         'FunctionExpression',
@@ -34,13 +36,15 @@ export class FunctionExpression implements _Object.Object , Expression.Expressio
         export: _export = 0,
         id = null,
         params,
-        body
+        body,
+        async: _async = false
     }: {
         location?: Location.Location | Null.Null,
         export?: Integer.Integer,
         id?: Identifier.Identifier | Null.Null,
         params: _Array.Array<Parameter.Parameter>,
-        body: BlockStatement.BlockStatement
+        body: BlockStatement.BlockStatement,
+        async?: Boolean.Boolean
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
             throw new Error('location is not a Location | Null: ' + Class.toString(location));
@@ -52,11 +56,14 @@ export class FunctionExpression implements _Object.Object , Expression.Expressio
             throw new Error('params is not a Array: ' + Class.toString(params));
         if (!BlockStatement.isBlockStatement(body))
             throw new Error('body is not a BlockStatement: ' + Class.toString(body));
+        if (!Boolean.isBoolean(_async))
+            throw new Error('async is not a Boolean: ' + Class.toString(_async));
         this.location = location;
         this.export = _export;
         this.id = id;
         this.params = params;
         this.body = body;
+        this.async = _async;
         Object.freeze(this);
     }
     patch(properties: {
@@ -64,7 +71,8 @@ export class FunctionExpression implements _Object.Object , Expression.Expressio
         export?: Integer.Integer,
         id?: Identifier.Identifier | Null.Null,
         params?: _Array.Array<Parameter.Parameter>,
-        body?: BlockStatement.BlockStatement
+        body?: BlockStatement.BlockStatement,
+        async?: Boolean.Boolean
     }) {
         return new FunctionExpression({
             ...this,

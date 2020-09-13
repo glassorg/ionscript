@@ -485,8 +485,8 @@ FunctionParameters
     / "(" _ head:Parameter tail:(_ ',' _ @Parameter)* _ ")" { return [head, ...tail] }
 
 FunctionHead
-    = id:(@Identifier _ &"(")? params:FunctionParameters? type:(_ ":" _ @Type)? _ "=>"
-    { return { id, type, params: params || [] } }
+    = async:AsyncToken? _ id:(@Identifier &"(")? params:FunctionParameters? type:(_ ":" _ @Type)? _ "=>"
+    { return { id, type, async: async != null, params: params || [] } }
 
 InlineFunction
     = head:FunctionHead _ value:InlineExpression?
@@ -507,7 +507,8 @@ NamedOutlineFunction
 ////////////////////////////////////////////////////////////////////////////////
 
 OutlineExpression
-    = OutlineFunction
+    = OutlineAwaitExpression
+    / OutlineFunction
     / OutlineArrayExpression
     / OutlineObjectExpression
     / OutlineCallExpression
@@ -515,6 +516,10 @@ OutlineExpression
     / OutlineStringLiteral
     / @InlineExpression EOL
     //  TODO: Allow Optional BlockStatement After to imply function call.
+
+OutlineAwaitExpression
+    = AwaitToken _ argument:OutlineExpression
+    { return node("AwaitExpression", { argument })}
 
 OutlineArguments
     = EOL Indent @(Dent @OutlineExpression)+ Outdent
@@ -529,9 +534,14 @@ OutlineNewExpression
     { return node("CallExpression", { new: true, callee, arguments: args }) }
 
 InlineExpression
-    = InlineFunction
+    = InlineAwaitExpression
+    / InlineFunction
     / InlineNewExpression
     / ConditionalExpression
+
+InlineAwaitExpression
+    = AwaitToken _ argument:InlineExpression
+    { return node("AwaitExpression", { argument })}
 
 InlineNewExpression
     = NewToken _ callee:MemberExpressionNoCall args:InlineArguments
@@ -807,6 +817,8 @@ FinallyToken    = @"finally"    !IdPart
 GetToken        = @"get"        !IdPart
 SetToken        = @"set"        !IdPart
 SwitchToken     = @"switch"     !IdPart
+AsyncToken      = @"async"      !IdPart
+AwaitToken      = @"await"      !IdPart
 
 Keyword
     = ThisToken

@@ -7,7 +7,9 @@ let x = foo?.bar[12 + 5]?.baz?("foo", true, x)
 
 let value = (x = 0, y = 0) => new Vector(1, 2)
 
-let identity = (a, b) =>
+await foo(await bar())
+
+let identity = async (a, b) =>
     switch a
         # inline cases and single statement
         1, 2, 3: return 10
@@ -24,7 +26,7 @@ class Vector
     var y: Number = 0
     let constructor = () =>
         super()
-    let translate = (dx = 0, dy = 0) => new Vector(x + dx, y + dy)
+    let translate = async (dx = 0, dy = 0) => new Vector(x + dx, y + dy)
     get foo = () => 12
     set foo = () => 12
 

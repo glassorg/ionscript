@@ -7,5 +7,6 @@ export
         var id: Identifier | Null = null
         var params: Array<Parameter>
         var body: BlockStatement
+        var async: Boolean = false
         # var returnType: Expression | Null = null
         # var typeGuard: Reference | Null = null
