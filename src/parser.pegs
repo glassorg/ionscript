@@ -485,8 +485,8 @@ FunctionParameters
     / "(" _ head:Parameter tail:(_ ',' _ @Parameter)* _ ")" { return [head, ...tail] }
 
 FunctionHead
-    = async:AsyncToken? _ id:(@Identifier &"(")? params:FunctionParameters? type:(_ ":" _ @Type)? _ "=>"
-    { return { id, type, async: async != null, params: params || [] } }
+    = async:AsyncToken? _ generator:"*"? id:(@Identifier &"(")? params:FunctionParameters? type:(_ ":" _ @Type)? _ "=>"
+    { return { id, type, async: async != null, generator: generator != null, params: params || [] } }
 
 InlineFunction
     = head:FunctionHead _ value:InlineExpression?
@@ -507,7 +507,8 @@ NamedOutlineFunction
 ////////////////////////////////////////////////////////////////////////////////
 
 OutlineExpression
-    = OutlineAwaitExpression
+    = OutlineYieldExpression
+    / OutlineAwaitExpression
     / OutlineFunction
     / OutlineArrayExpression
     / OutlineObjectExpression
@@ -516,6 +517,10 @@ OutlineExpression
     / OutlineStringLiteral
     / @InlineExpression EOL
     //  TODO: Allow Optional BlockStatement After to imply function call.
+
+OutlineYieldExpression
+    = YieldToken delegate:"*"? _ argument:OutlineExpression
+    { return node("YieldExpression", { argument, delegate: delegate != null })}
 
 OutlineAwaitExpression
     = AwaitToken _ argument:OutlineExpression
@@ -534,7 +539,8 @@ OutlineNewExpression
     { return node("CallExpression", { new: true, callee, arguments: args }) }
 
 InlineExpression
-    = InlineAwaitExpression
+    = InlineYieldExpression
+    / InlineAwaitExpression
     / InlineFunction
     / InlineNewExpression
     / ConditionalExpression
@@ -542,6 +548,10 @@ InlineExpression
 InlineAwaitExpression
     = AwaitToken _ argument:InlineExpression
     { return node("AwaitExpression", { argument })}
+
+InlineYieldExpression
+    = YieldToken delegate:"*"? _ argument:InlineExpression
+    { return node("YieldExpression", { argument, delegate: delegate != null })}
 
 InlineNewExpression
     = NewToken _ callee:MemberExpressionNoCall args:InlineArguments
@@ -819,6 +829,7 @@ SetToken        = @"set"        !IdPart
 SwitchToken     = @"switch"     !IdPart
 AsyncToken      = @"async"      !IdPart
 AwaitToken      = @"await"      !IdPart
+YieldToken      = @"yield"      !IdPart
 
 Keyword
     = ThisToken

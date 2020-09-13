@@ -160,3 +160,6 @@ export {
 export {
     default as WhileStatement
 } from './WhileStatement';
+export {
+    default as YieldExpression
+} from './YieldExpression';

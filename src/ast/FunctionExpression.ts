@@ -22,6 +22,7 @@ export class FunctionExpression implements _Object.Object , Expression.Expressio
     readonly params: _Array.Array<Parameter.Parameter>;
     readonly body: BlockStatement.BlockStatement;
     readonly async: Boolean.Boolean;
+    readonly generator: Boolean.Boolean;
     static readonly id = 'FunctionExpression';
     static readonly implements = new Set([
         'FunctionExpression',
@@ -37,14 +38,16 @@ export class FunctionExpression implements _Object.Object , Expression.Expressio
         id = null,
         params,
         body,
-        async: _async = false
+        async: _async = false,
+        generator = false
     }: {
         location?: Location.Location | Null.Null,
         export?: Integer.Integer,
         id?: Identifier.Identifier | Null.Null,
         params: _Array.Array<Parameter.Parameter>,
         body: BlockStatement.BlockStatement,
-        async?: Boolean.Boolean
+        async?: Boolean.Boolean,
+        generator?: Boolean.Boolean
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
             throw new Error('location is not a Location | Null: ' + Class.toString(location));
@@ -58,12 +61,15 @@ export class FunctionExpression implements _Object.Object , Expression.Expressio
             throw new Error('body is not a BlockStatement: ' + Class.toString(body));
         if (!Boolean.isBoolean(_async))
             throw new Error('async is not a Boolean: ' + Class.toString(_async));
+        if (!Boolean.isBoolean(generator))
+            throw new Error('generator is not a Boolean: ' + Class.toString(generator));
         this.location = location;
         this.export = _export;
         this.id = id;
         this.params = params;
         this.body = body;
         this.async = _async;
+        this.generator = generator;
         Object.freeze(this);
     }
     patch(properties: {
@@ -72,7 +78,8 @@ export class FunctionExpression implements _Object.Object , Expression.Expressio
         id?: Identifier.Identifier | Null.Null,
         params?: _Array.Array<Parameter.Parameter>,
         body?: BlockStatement.BlockStatement,
-        async?: Boolean.Boolean
+        async?: Boolean.Boolean,
+        generator?: Boolean.Boolean
     }) {
         return new FunctionExpression({
             ...this,

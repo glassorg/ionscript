@@ -88,5 +88,5 @@ Indented Javascript
     X Module Level Execution (Side Effects, Shimming, etc)
     X Spread Operators
     X Compilation
-    Async/Await
+    X Async/Await
     Generators

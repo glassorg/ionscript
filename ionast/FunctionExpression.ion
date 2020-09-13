@@ -8,5 +8,6 @@ export
         var params: Array<Parameter>
         var body: BlockStatement
         var async: Boolean = false
+        var generator: Boolean = false
         # var returnType: Expression | Null = null
         # var typeGuard: Reference | Null = null

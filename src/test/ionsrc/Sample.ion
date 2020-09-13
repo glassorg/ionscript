@@ -37,6 +37,11 @@ Object.defineProperties()
             get: () => 12
             set: (value) =>
 
+let generator = *() =>
+    yield* 1
+    yield 2
+    yield 3
+
 let foo = [a, b, ...bar, c, d]
 let bar = { a, x: y, ...fuz, ...huh }
 let outline = {}
