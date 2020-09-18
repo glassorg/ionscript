@@ -68,6 +68,12 @@ Indented Javascript
             enumerable: Boolean
             configurable: Boolean
 
+## New Features
+
+    Declarative Structure Programming
+    or Control Flow within Declarative Structures
+        let declarations
+        
 
 ## Roadmap
 

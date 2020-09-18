@@ -77,7 +77,7 @@
 
 Module
     = EOL? body:ModuleDeclaration* EOL EOF
-    { return node("Program", { sourceType: "module", body }) }
+    { return node("Program", { sourceType: "module", body: body.flat() }) }
 
 ModuleDeclaration
     = ImportDeclaration
@@ -179,7 +179,7 @@ SwitchTest
 
 SwitchCase
     = head:SwitchTest tail:(_ "," _ @SwitchTest)* ":" _
-        consequent: (value:Statement {return node("BlockStatement", { body: [value]}) } / BlockStatement)
+        consequent: (value:Statement {return node("BlockStatement", { body: Array.isArray(value) ? value : [value]}) } / BlockStatement)
     {
         let tests = [head, ...tail]
         return tests.map((test, index) => node("SwitchCase", { test, consequent: index === tests.length - 1 ? consequent : null }))
@@ -203,6 +203,10 @@ ThrowStatement
 ExpressionStatement
     = expression:OutlineExpression
     { return node("ExpressionStatement", { expression }) }
+    // also allow multiple expression statements separated by commas.
+    // all statement consumers call .flat() so this will be handled.
+    / expressions:InlineExpressionList EOL
+    { return expressions.map(expression => node("ExpressionStatement", { expression })) }
 
 Declaration
     = ClassDeclaration
@@ -253,7 +257,7 @@ AssignmentStatement
 
 BlockStatement
     = EOL Indent body:(Dent @Statement)+ Outdent
-    { return node("BlockStatement", { body }) }
+    { return node("BlockStatement", { body: body.flat() }) }
 
 ForOfStatement
     = ForToken _ left:Pattern _ InToken _ right:InlineExpression body:BlockStatement
@@ -651,7 +655,8 @@ InlineArrayExpression
     }
 
 OutlineArrayArguments
-    = EOL Indent @(Dent @(OutlineExpression / @InlineExpressionList EOL))+ Outdent
+    = EOL Indent args:(Dent @(@(OutlineExpression / InlineExpressionList) EOL / @Statement))+ Outdent
+    { return args.flat() }
 
 OutlineArrayExpression
     = "[]" elements: OutlineArrayArguments

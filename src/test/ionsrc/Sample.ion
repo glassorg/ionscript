@@ -1,58 +1,67 @@
-import "foo/bar/baz" a, b
-import ...Foo
-    x
-    y
 
-let x = foo?.bar[12 + 5]?.baz?("foo", true, x)
+let array = []
+    1, 2, 3
+    if foo
+        4, 5, 6
+    else
+        -1, -2, -3
+    7, 8, 9
 
-let value = (x = 0, y = 0) => new Vector(1, 2)
+# import "foo/bar/baz" a, b
+# import ...Foo
+#     x
+#     y
 
-await foo(await bar())
+# let x = foo?.bar[12 + 5]?.baz?("foo", true, x)
 
-let identity = async (a, b) =>
-    switch a
-        # inline cases and single statement
-        1, 2, 3: return 10
-        2:
-            # outline statements fine as well
-            return 20
-        3:
-            return 30
-        default:
-            return 55
+# let value = (x = 0, y = 0) => new Vector(1, 2)
 
-class Vector
-    var x: Number = 0
-    var y: Number = 0
-    let constructor = () =>
-        super()
-    let translate = async (dx = 0, dy = 0) => new Vector(x + dx, y + dy)
-    get foo = () => 12
-    set foo = () => 12
+# await foo(await bar())
 
-Object.defineProperties()
-    Vector.prototype
-    {}
-        bar: {}
-            get: () => 12
-            set: (value) =>
+# let identity = async (a, b) =>
+#     switch a
+#         # inline cases and single statement
+#         1, 2, 3: return 10
+#         2:
+#             # outline statements fine as well
+#             return 20
+#         3:
+#             return 30
+#         default:
+#             return 55
 
-let generator = *() =>
-    yield* 1
-    yield 2
-    yield 3
+# class Vector
+#     var x: Number = 0
+#     var y: Number = 0
+#     let constructor = () =>
+#         super()
+#     let translate = async (dx = 0, dy = 0) => new Vector(x + dx, y + dy)
+#     get foo = () => 12
+#     set foo = () => 12
 
-let foo = [a, b, ...bar, c, d]
-let bar = { a, x: y, ...fuz, ...huh }
-let outline = {}
-    x
-    y
-    z
-    ...foo
-    x: 10
-    y: 20
-let matrix = []
-    1, 0, 0, 0
-    0, 1, 0, 0
-    0, 0, 1, 0
-    0, 0, 0, 1
+# Object.defineProperties()
+#     Vector.prototype
+#     {}
+#         bar: {}
+#             get: () => 12
+#             set: (value) =>
+
+# let generator = *() =>
+#     yield* 1
+#     yield 2
+#     yield 3
+
+# let foo = [a, b, ...bar, c, d]
+# let bar = { a, x: y, ...fuz, ...huh }
+# let outline = {}
+#     x
+#     y
+#     z
+#     ...foo
+#     x: 10
+#     y: 20
+# let matrix = []
+#     1, 0, 0, 0
+#     0, 1, 0, 0
+#     0, 0, 1, 0
+#     0, 0, 0, 1
