@@ -14,6 +14,9 @@ export {
     default as AssignmentPattern
 } from './AssignmentPattern';
 export {
+    default as AssignmentStatement
+} from './AssignmentStatement';
+export {
     default as AwaitExpression
 } from './AwaitExpression';
 export {
@@ -121,6 +124,9 @@ export {
 export {
     default as Property
 } from './Property';
+export {
+    default as PropertyStatement
+} from './PropertyStatement';
 export {
     default as Reference
 } from './Reference';

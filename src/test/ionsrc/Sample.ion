@@ -1,11 +1,19 @@
 
-let array = []
-    1, 2, 3
+let object = {}
+    x: 1
     if foo
-        4, 5, 6
-        ...fuz
-    7, 8, 9
-    ...bar
+        y: 2
+    z: 3
+
+object = 22
+
+# let array = []
+#     1, 2, 3
+#     if foo
+#         4, 5, 6
+#         ...fuz
+#     7, 8, 9
+#     ...bar
 
 # import "foo/bar/baz" a, b
 # import ...Foo

@@ -8,6 +8,7 @@ import MemberExpression from "../ast/MemberExpression"
 import Expression from "../ast/Expression"
 import Declaration from "../ast/Declaration"
 import ClassDeclaration from "../ast/ClassDeclaration"
+import AssignmentStatement from "../ast/AssignmentStatement"
 
 export default function toEsTree(root: Map<string, any>, options: Options) {
     return traverse(root, {
@@ -47,6 +48,18 @@ export default function toEsTree(root: Map<string, any>, options: Options) {
                             init: values.value,
                             kind: node.kind,
                         }]
+                    }
+                }
+                else if (AssignmentStatement.is(node)) {
+                    let values = { ...node, ...changes }
+                    result = {
+                        type: "ExpressionStatement",
+                        expression: {
+                            type: "AssignmentExpression",
+                            left: values.left,
+                            operator: values.operator,
+                            right: values.right,
+                        }
                     }
                 }
                 else if (Parameter.is(node)) {

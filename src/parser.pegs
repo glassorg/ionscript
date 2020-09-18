@@ -83,7 +83,7 @@ ModuleDeclaration
     = ImportDeclaration
     / Declaration
     / ExportDeclaration
-    / ExpressionStatement
+    / Statement
 
 ////////////////////////////////////////////////////////////////////////////////
 //  ExportDeclaration
@@ -165,6 +165,7 @@ Statement
     / ThrowStatement
     / TryStatement
     / SwitchStatement
+    / PropertyStatement
 
 SwitchStatement
     = SwitchToken _ discriminant:InlineExpression EOL
@@ -247,12 +248,12 @@ AssignmentOperator
     / "/="
 
 AssignmentStatement
-    = left:Reference _ op:AssignmentOperator _ right:OutlineExpression
+    = left:InlineExpression _ operator:AssignmentOperator _ right:OutlineExpression
     {
-        if (op.length > 1) {
-            right = operation(left, node("Identifier",{name:op.slice(0,-1)}), right)
+        if (operator.length > 1) {
+            right = operation(left, node("Identifier",{ name:operator.slice(0,-1) }), right)
         }
-        return node("AssignmentStatement", {left, right})
+        return node("AssignmentStatement", {left, operator, right})
     }
 
 BlockStatement
@@ -668,7 +669,11 @@ OutlineObjectExpression
     { return node("ObjectExpression", {properties: [...e.properties, ...properties] }) }
 
 OutlinePropertyList
-    = EOL Indent @(Dent @OutlineProperty)+ Outdent
+    = EOL Indent @(Dent @(OutlineProperty / Statement))+ Outdent
+
+PropertyStatement
+    = property:OutlineProperty
+    { return node("PropertyStatement", { property }) }
 
 OutlineProperty
     = @InlineSpreadElement EOL
