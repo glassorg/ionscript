@@ -7,9 +7,9 @@ import * as SpreadElement from '../SpreadElement';
 import * as Expression from '../Expression';
 import * as _Array from './Array';
 import * as Pattern from '../Pattern';
+import * as BlockStatement from '../BlockStatement';
 import * as Identifier from '../Identifier';
 import * as IfStatement from '../IfStatement';
-import * as BlockStatement from '../BlockStatement';
 import * as Boolean from './Boolean';
 import * as Number from './Number';
 import * as String from './String';
@@ -24,6 +24,7 @@ export type SpreadElement_SpreadElement_or_ion_Null_Null = SpreadElement.SpreadE
 export type Expression_Expression_or_ion_types_SpreadElement_SpreadElement_or_ion_Null_Null = Expression.Expression | (SpreadElement.SpreadElement | Null.Null);
 export type ___TemplateReference___ = _Array.Array<Expression.Expression | (SpreadElement.SpreadElement | Null.Null)>;
 export type Pattern_Pattern_or_ion_Null_Null = Pattern.Pattern | Null.Null;
+export type BlockStatement_BlockStatement_or_Expression_Expression = BlockStatement.BlockStatement | Expression.Expression;
 export type Identifier_Identifier_or_ion_Null_Null = Identifier.Identifier | Null.Null;
 export type IfStatement_IfStatement_or_ion_Null_Null = IfStatement.IfStatement | Null.Null;
 export type BlockStatement_BlockStatement_or_ion_types_IfStatement_IfStatement_or_ion_Null_Null = BlockStatement.BlockStatement | (IfStatement.IfStatement | Null.Null);

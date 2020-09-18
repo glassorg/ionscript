@@ -5,6 +5,9 @@ export {
     default as ArrayPattern
 } from './ArrayPattern';
 export {
+    default as ArrowFunctionExpression
+} from './ArrowFunctionExpression';
+export {
     default as Assembly
 } from './Assembly';
 export {

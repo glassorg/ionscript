@@ -3,6 +3,7 @@ import { traverse, skip, remove } from "@glas/traverse"
 import { ArrayExpression, BlockStatement, CallExpression, Expression, ExpressionStatement, FunctionExpression, Identifier, MemberExpression, Parameter, Program, Reference, ReturnStatement, SpreadElement, Statement } from "../ast"
 import Assembly from "../ast/Assembly"
 import { SemanticError } from "../common"
+import ArrowFunctionExpression from "../ast/ArrowFunctionExpression"
 
 export default function controlFlowToExpressions(root: Assembly, options: Options) {
     return traverse(root, {
@@ -17,8 +18,9 @@ export default function controlFlowToExpressions(root: Assembly, options: Option
                     let push = new Identifier({ name: "push" })
                     let mergePushElementsWithNext = new Array<Expression>()
                     return new CallExpression({
-                        callee: new FunctionExpression({
+                        callee: new ArrowFunctionExpression({
                             params: [ new Parameter({ id }) ],
+                            expression: false,
                             body: new BlockStatement({
                                 body: traverse(node.elements, {
                                     enter(e) {
@@ -32,15 +34,16 @@ export default function controlFlowToExpressions(root: Assembly, options: Option
                                     leave(e, ancestors, path) {
                                         //  if this is an immediate child expression we treat it as a statement
                                         //  so it gets converted to an ExpressionStatement down below.
-                                        let statement = ancestors[ancestors.length - 1] === node.elements
+                                        let parent = ancestors[ancestors.length - 1]
+                                        let statement = parent === node.elements
                                         if (ExpressionStatement.is(e)) {
                                             e = e.expression
                                             statement = true
                                         }
-                                        if (SpreadElement.is(e)) {
-                                            throw SemanticError("Spread not implemented yet", e)
-                                        }
-                                        if (Expression.is(e)) {
+                                        // if (SpreadElement.is(e)) {
+                                        //     throw SemanticError("Spread not implemented yet", e)
+                                        // }
+                                        if (Expression.is(e) && Array.isArray(parent)) {
                                             // see if the next peer element is an expression or expression statement
                                             let nextPeer = ancestors[ancestors.length - 1][path[path.length - 1] + 1]
                                             if (Expression.is(nextPeer) || ExpressionStatement.is(nextPeer)) {
