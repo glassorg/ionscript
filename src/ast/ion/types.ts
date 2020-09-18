@@ -25,6 +25,7 @@ export type Expression_Expression_or_ion_types_SpreadElement_SpreadElement_or_io
 export type ___TemplateReference___ = _Array.Array<Expression.Expression | (SpreadElement.SpreadElement | Null.Null)>;
 export type Pattern_Pattern_or_ion_Null_Null = Pattern.Pattern | Null.Null;
 export type BlockStatement_BlockStatement_or_Expression_Expression = BlockStatement.BlockStatement | Expression.Expression;
+export type Expression_Expression_or_SpreadElement_SpreadElement = Expression.Expression | SpreadElement.SpreadElement;
 export type Identifier_Identifier_or_ion_Null_Null = Identifier.Identifier | Null.Null;
 export type IfStatement_IfStatement_or_ion_Null_Null = IfStatement.IfStatement | Null.Null;
 export type BlockStatement_BlockStatement_or_ion_types_IfStatement_IfStatement_or_ion_Null_Null = BlockStatement.BlockStatement | (IfStatement.IfStatement | Null.Null);

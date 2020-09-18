@@ -16,7 +16,7 @@ export default function controlFlowToExpressions(root: Assembly, options: Option
                     let ref = new Reference({ name })
                     let id = new Identifier({ name })
                     let push = new Identifier({ name: "push" })
-                    let mergePushElementsWithNext = new Array<Expression>()
+                    let mergePushElementsWithNext = new Array<Expression | SpreadElement>()
                     return new CallExpression({
                         callee: new ArrowFunctionExpression({
                             params: [ new Parameter({ id }) ],
@@ -43,10 +43,10 @@ export default function controlFlowToExpressions(root: Assembly, options: Option
                                         // if (SpreadElement.is(e)) {
                                         //     throw SemanticError("Spread not implemented yet", e)
                                         // }
-                                        if (Expression.is(e) && Array.isArray(parent)) {
+                                        if ((Expression.is(e) || SpreadElement.is(e)) && Array.isArray(parent)) {
                                             // see if the next peer element is an expression or expression statement
                                             let nextPeer = ancestors[ancestors.length - 1][path[path.length - 1] + 1]
-                                            if (Expression.is(nextPeer) || ExpressionStatement.is(nextPeer)) {
+                                            if (Expression.is(nextPeer) || SpreadElement.is(nextPeer) || ExpressionStatement.is(nextPeer)) {
                                                 mergePushElementsWithNext.push(e)
                                                 return remove
                                             }

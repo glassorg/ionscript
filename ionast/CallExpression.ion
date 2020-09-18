@@ -6,4 +6,4 @@ export
     class CallExpression extends Expression, ChainElement
         var new : Boolean = false
         var callee: Expression
-        var arguments: Array<Expression>
+        var arguments: Array<Expression | SpreadElement>

@@ -4,4 +4,4 @@ import
 
 export
     class ExpressionStatement extends Statement
-        var expression: Expression
+        var expression: Expression | SpreadElement

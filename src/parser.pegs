@@ -543,7 +543,8 @@ OutlineNewExpression
     { return node("CallExpression", { new: true, callee, arguments: args }) }
 
 InlineExpression
-    = InlineYieldExpression
+    = InlineSpreadElement
+    / InlineYieldExpression
     / InlineAwaitExpression
     / InlineFunction
     / InlineNewExpression
@@ -565,7 +566,7 @@ PrimaryExpression
     = Reference
     / Literal
     / ThisExpression
-    / DotExpression
+    // / DotExpression
     / GroupExpression
     / InlineArrayExpression
     / InlineObjectExpression
@@ -637,8 +638,8 @@ MemberExpressionNoCall =
 ////////////////////////////////////////////////////////////////////////////////
 
 InlineSpreadElement
-    = "..." argument: InlineExpression
-    { return node("RestElement", { argument }) }
+    = "..." argument:InlineExpression
+    { return node("SpreadElement", { argument }) }
 
 ArrayElement
     = InlineSpreadElement
