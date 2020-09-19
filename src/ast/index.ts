@@ -131,6 +131,9 @@ export {
     default as Reference
 } from './Reference';
 export {
+    default as RegularExpression
+} from './RegularExpression';
+export {
     default as RestElement
 } from './RestElement';
 export {
@@ -151,12 +154,6 @@ export {
 export {
     default as SwitchStatement
 } from './SwitchStatement';
-export {
-    default as TemplateElement
-} from './TemplateElement';
-export {
-    default as TemplateLiteral
-} from './TemplateLiteral';
 export {
     default as ThisExpression
 } from './ThisExpression';

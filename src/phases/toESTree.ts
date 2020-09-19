@@ -1,6 +1,6 @@
 import { Options } from "../Compiler"
 import { traverse, skip, replace } from "@glas/traverse"
-import { CallExpression, Exportable, ImportDeclaration, Literal, Node, Parameter, Program, SwitchCase } from "../ast"
+import { CallExpression, Exportable, ImportDeclaration, Literal, Node, Parameter, Program, RegularExpression, SwitchCase } from "../ast"
 import Position from "../ast/Position"
 import VariableDeclaration from "../ast/VariableDeclaration"
 import Reference from "../ast/Reference"
@@ -9,6 +9,7 @@ import Expression from "../ast/Expression"
 import Declaration from "../ast/Declaration"
 import ClassDeclaration from "../ast/ClassDeclaration"
 import AssignmentStatement from "../ast/AssignmentStatement"
+import { SemanticError } from "../common"
 
 export default function toEsTree(root: Map<string, any>, options: Options) {
     return traverse(root, {
@@ -72,6 +73,17 @@ export default function toEsTree(root: Map<string, any>, options: Options) {
                     }
                     else {
                         result = changes.id
+                    }
+                }
+                else if (RegularExpression.is(node)) {
+                    try {
+                        return {
+                            type: "Literal",
+                            value: new RegExp(node.pattern, node.flags)
+                        }
+                    }
+                    catch(e) {
+                        throw SemanticError(e.message, node)
                     }
                 }
                 else {

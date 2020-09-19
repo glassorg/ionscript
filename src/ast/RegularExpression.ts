@@ -8,17 +8,16 @@ import * as Exportable from './Exportable';
 import * as Location from './Location';
 import * as Null from './ion/Null';
 import * as Integer from './ion/Integer';
-import * as _Array from './ion/Array';
-import * as TemplateElement from './TemplateElement';
+import * as String from './ion/String';
 import * as Class from './ion/Class';
-export class TemplateLiteral implements _Object.Object , Expression.Expression , Node.Node , Exportable.Exportable {
+export class RegularExpression implements _Object.Object , Expression.Expression , Node.Node , Exportable.Exportable {
     readonly location: Location.Location | Null.Null;
     readonly export: Integer.Integer;
-    readonly quasis: _Array.Array<TemplateElement.TemplateElement>;
-    readonly expressions: _Array.Array<Expression.Expression>;
-    static readonly id = 'TemplateLiteral';
+    readonly pattern: String.String;
+    readonly flags: String.String;
+    static readonly id = 'RegularExpression';
     static readonly implements = new Set([
-        'TemplateLiteral',
+        'RegularExpression',
         'ion_Object',
         'Expression',
         'Node',
@@ -27,44 +26,44 @@ export class TemplateLiteral implements _Object.Object , Expression.Expression ,
     constructor({
         location = null,
         export: _export = 0,
-        quasis,
-        expressions
+        pattern,
+        flags
     }: {
         location?: Location.Location | Null.Null,
         export?: Integer.Integer,
-        quasis: _Array.Array<TemplateElement.TemplateElement>,
-        expressions: _Array.Array<Expression.Expression>
+        pattern: String.String,
+        flags: String.String
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
             throw new Error('location is not a Location | Null: ' + Class.toString(location));
         if (!Integer.isInteger(_export))
             throw new Error('export is not a Integer: ' + Class.toString(_export));
-        if (!_Array.isArray(quasis))
-            throw new Error('quasis is not a Array: ' + Class.toString(quasis));
-        if (!_Array.isArray(expressions))
-            throw new Error('expressions is not a Array: ' + Class.toString(expressions));
+        if (!String.isString(pattern))
+            throw new Error('pattern is not a String: ' + Class.toString(pattern));
+        if (!String.isString(flags))
+            throw new Error('flags is not a String: ' + Class.toString(flags));
         this.location = location;
         this.export = _export;
-        this.quasis = quasis;
-        this.expressions = expressions;
+        this.pattern = pattern;
+        this.flags = flags;
         Object.freeze(this);
     }
     patch(properties: {
         location?: Location.Location | Null.Null,
         export?: Integer.Integer,
-        quasis?: _Array.Array<TemplateElement.TemplateElement>,
-        expressions?: _Array.Array<Expression.Expression>
+        pattern?: String.String,
+        flags?: String.String
     }) {
-        return new TemplateLiteral({
+        return new RegularExpression({
             ...this,
             ...properties
         });
     }
-    static is(value): value is TemplateLiteral {
-        return isTemplateLiteral(value);
+    static is(value): value is RegularExpression {
+        return isRegularExpression(value);
     }
 }
-export function isTemplateLiteral(value): value is TemplateLiteral {
-    return Class.isInstance(TemplateLiteral, value);
+export function isRegularExpression(value): value is RegularExpression {
+    return Class.isInstance(RegularExpression, value);
 }
-export default TemplateLiteral;
+export default RegularExpression;

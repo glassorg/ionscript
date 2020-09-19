@@ -1,10 +1,15 @@
 
-let add = +
+let sum = +
     12
     if true
         100
     20
     45
+    *
+        10
+        20
+
+let regex = /foo\/bar/
 
 # let outlineString = ""
 #     what is up

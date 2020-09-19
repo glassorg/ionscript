@@ -767,6 +767,7 @@ Literal
     / StringLiteral
     // / CharLiteral
     / NullLiteral
+    / RegularExpressionLiteral
 
 NumericLiteral
     = HexIntegerLiteral
@@ -813,6 +814,14 @@ OutlineStringLiteralLine
 OutlineStringLiteral
     = '""' EOL Indent lines:OutlineStringLiteralLine* Outdent
     { return node('Literal', { value: lines.join('\n') }) }
+
+////////////////////////////////////////////////////////////////////////////////
+//  Regular Expressions
+////////////////////////////////////////////////////////////////////////////////
+
+RegularExpressionLiteral
+    = "/" pattern:$((("\\" .) / [^/])+)  "/" flags:$([a-z]*)
+    { return node("RegularExpression", {pattern, flags }) }
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Identifiers
