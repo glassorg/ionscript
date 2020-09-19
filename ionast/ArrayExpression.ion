@@ -5,3 +5,4 @@ import
 export
     class ArrayExpression extends Expression
         var elements: Array<Expression | SpreadElement | Null>
+        var isSet: Boolean = false

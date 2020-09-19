@@ -1,6 +1,6 @@
 import { Options } from "../Compiler"
 import { traverse, skip, remove } from "@glas/traverse"
-import { ArrayExpression, BlockStatement, CallExpression, Expression, ExpressionStatement, FunctionExpression, Identifier, Literal, MapExpression, MemberExpression, ObjectExpression, Parameter, Program, Property, Reference, ReturnStatement, SpreadElement, Statement } from "../ast"
+import { ArrayExpression, BlockStatement, CallExpression, Expression, ExpressionStatement, FunctionExpression, Identifier, Literal, MemberExpression, ObjectExpression, Parameter, Program, Property, Reference, ReturnStatement, SpreadElement, Statement } from "../ast"
 import Assembly from "../ast/Assembly"
 import { SemanticError } from "../common"
 import ArrowFunctionExpression from "../ast/ArrowFunctionExpression"
@@ -16,8 +16,11 @@ export default function controlFlowToExpressions(root: Assembly, options: Option
         enter(node) {
         },
         leave(node) {
-            const isMap = MapExpression.is(node)
-            if ((ObjectExpression.is(node) || isMap) && node.properties.find(Statement.is)) {
+            const isObjectExpression = ObjectExpression.is(node)
+            const isMap = isObjectExpression && node.isMap
+            const isArrayExpression = ArrayExpression.is(node)
+            const isSet = isArrayExpression && node.isSet
+            if (isObjectExpression && node.properties.find(Statement.is)) {
                 return new CallExpression({
                     callee: new ArrowFunctionExpression({
                         params: [ new Parameter({ id: containerId }) ],
@@ -89,9 +92,9 @@ export default function controlFlowToExpressions(root: Assembly, options: Option
                     ]
                 })
             }
-            else if (ArrayExpression.is(node) && node.elements.find(Statement.is)) {
-                let push = new Identifier({ name: "push" })
-                let mergePushElementsWithNext = new Array<Expression | SpreadElement>()
+            else if (isArrayExpression && node.elements.find(Statement.is)) {
+                const push = new Identifier({ name: isSet ? "add" : "push" })
+                const mergePushElementsWithNext = new Array<Expression | SpreadElement>()
                 return new CallExpression({
                     callee: new ArrowFunctionExpression({
                         params: [ new Parameter({ id: containerId }) ],
@@ -117,8 +120,13 @@ export default function controlFlowToExpressions(root: Assembly, options: Option
                                     }
                                     if ((Expression.is(e) || SpreadElement.is(e)) && Array.isArray(parent)) {
                                         // see if the next peer element is an expression or expression statement
-                                        let nextPeer = ancestors[ancestors.length - 1][path[path.length - 1] + 1]
-                                        if (Expression.is(nextPeer) || SpreadElement.is(nextPeer) || ExpressionStatement.is(nextPeer)) {
+                                        let mergeWithNext = false
+                                        if (!isSet) {
+                                            let nextPeer = ancestors[ancestors.length - 1][path[path.length - 1] + 1]
+                                            if (Expression.is(nextPeer) || SpreadElement.is(nextPeer) || ExpressionStatement.is(nextPeer))
+                                                mergeWithNext = true
+                                        }
+                                        if (mergeWithNext) {
                                             mergePushElementsWithNext.push(e)
                                             return remove
                                         }
@@ -136,7 +144,18 @@ export default function controlFlowToExpressions(root: Assembly, options: Option
                             }).concat([ new ReturnStatement({ argument: containerRef })])
                         })
                     }),
-                    arguments: [ new ArrayExpression({ elements: [] }) ]
+                    arguments: [
+                        isSet
+                        ? new CallExpression({ new: true, callee: new Reference({ name: "Set"}), arguments: []})
+                        : new ArrayExpression({ elements: [] })
+                    ]
+                })
+            }
+            else if (isSet) {
+                return new CallExpression({
+                    new: true,
+                    callee: new Reference({ name: "Set" }),
+                    arguments: [ node.patch({ isSet: false }) ]
                 })
             }
         }

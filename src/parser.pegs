@@ -517,7 +517,7 @@ OutlineExpression
     / OutlineFunction
     / OutlineArrayExpression
     / OutlineObjectExpression
-    / OutlineMapExpression
+    // / OutlineMapExpression
     / OutlineCallExpression
     / OutlineNewExpression
     / OutlineStringLiteral
@@ -571,7 +571,7 @@ PrimaryExpression
     / GroupExpression
     / InlineArrayExpression
     / InlineObjectExpression
-    / InlineMapExpression
+    // / InlineMapExpression
 
 GroupExpression
     = "(" _ @InlineExpression _ ")"
@@ -653,9 +653,9 @@ ArrayElements
 
 InlineArrayExpression
     = "[" _ elements:ArrayElements? _ "]"
-    {
-        return node("ArrayExpression", { elements:elements || [] })
-    }
+    { return node("ArrayExpression", { elements:elements || [] }) }
+    / "|" _ elements:ArrayElements? _ "|"
+    { return node("ArrayExpression", { elements:elements || [], isSet: true }) }
 
 OutlineArrayArguments
     = EOL Indent args:(Dent @(@(OutlineExpression / InlineExpressionList) EOL / @Statement))+ Outdent
@@ -664,14 +664,16 @@ OutlineArrayArguments
 OutlineArrayExpression
     = "[]" elements: OutlineArrayArguments
     { return node("ArrayExpression", { elements: elements.flat() }) }
+    / "||" elements: OutlineArrayArguments
+    { return node("ArrayExpression", { elements: elements.flat(), isSet: true }) }
 
 OutlineObjectExpression
     = e:InlineObjectExpression properties:OutlinePropertyList
-    { return node("ObjectExpression", {properties: [...e.properties, ...properties] }) }
+    { return node("ObjectExpression", { isMap: e.isMap, properties: [...e.properties, ...properties] }) }
 
-OutlineMapExpression
-    = e:InlineMapExpression properties:OutlineMapPropertyList
-    { return node("MapExpression", {properties: [...e.properties, ...properties] }) }
+// OutlineMapExpression
+//     = e:InlineMapExpression properties:OutlineMapPropertyList
+//     { return node("MapExpression", {properties: [...e.properties, ...properties] }) }
 
 OutlineMapPropertyList
     = EOL Indent @(Dent @(OutlineMapProperty / Statement))+ Outdent
@@ -712,13 +714,11 @@ InlineMapPropertyList
     = head:InlineMapProperty tail:(_ "," _ @InlineMapProperty)*
     { return [head, ...tail] }
 
-InlineMapExpression
-    = "(" _ properties:InlineMapPropertyList? _ ")"
-    { return node("MapExpression", { properties: properties || [] }) }
-
 InlineObjectExpression
     = "{" _ properties:InlinePropertyList? _ "}"
     { return node("ObjectExpression", {properties: properties || []}) }
+    / "(" _ properties:InlineMapPropertyList? _ ")"
+    { return node("ObjectExpression", { properties: properties || [], isMap: true }) }
 
 InlineProperty
     = InlineSpreadElement

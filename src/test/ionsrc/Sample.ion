@@ -11,6 +11,13 @@ let foo = ()
         false: true
     true: "huh"
 
+let baz = |1, 2, 3|
+let bar = ||
+    1, 2
+    if foo
+        3, 4
+    5, 6
+
 # let array = []
 #     1, 2, 3
 #     if foo

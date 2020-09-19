@@ -11,11 +11,13 @@ import * as Integer from './ion/Integer';
 import * as _Array from './ion/Array';
 import * as Property from './Property';
 import * as SpreadElement from './SpreadElement';
+import * as Boolean from './ion/Boolean';
 import * as Class from './ion/Class';
 export class ObjectExpression implements _Object.Object , Expression.Expression , Node.Node , Exportable.Exportable {
     readonly location: Location.Location | Null.Null;
     readonly export: Integer.Integer;
     readonly properties: _Array.Array<Property.Property | SpreadElement.SpreadElement>;
+    readonly isMap: Boolean.Boolean;
     static readonly id = 'ObjectExpression';
     static readonly implements = new Set([
         'ObjectExpression',
@@ -27,11 +29,13 @@ export class ObjectExpression implements _Object.Object , Expression.Expression 
     constructor({
         location = null,
         export: _export = 0,
-        properties
+        properties,
+        isMap = false
     }: {
         location?: Location.Location | Null.Null,
         export?: Integer.Integer,
-        properties: _Array.Array<Property.Property | SpreadElement.SpreadElement>
+        properties: _Array.Array<Property.Property | SpreadElement.SpreadElement>,
+        isMap?: Boolean.Boolean
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
             throw new Error('location is not a Location | Null: ' + Class.toString(location));
@@ -39,15 +43,19 @@ export class ObjectExpression implements _Object.Object , Expression.Expression 
             throw new Error('export is not a Integer: ' + Class.toString(_export));
         if (!_Array.isArray(properties))
             throw new Error('properties is not a Array: ' + Class.toString(properties));
+        if (!Boolean.isBoolean(isMap))
+            throw new Error('isMap is not a Boolean: ' + Class.toString(isMap));
         this.location = location;
         this.export = _export;
         this.properties = properties;
+        this.isMap = isMap;
         Object.freeze(this);
     }
     patch(properties: {
         location?: Location.Location | Null.Null,
         export?: Integer.Integer,
-        properties?: _Array.Array<Property.Property | SpreadElement.SpreadElement>
+        properties?: _Array.Array<Property.Property | SpreadElement.SpreadElement>,
+        isMap?: Boolean.Boolean
     }) {
         return new ObjectExpression({
             ...this,

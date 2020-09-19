@@ -10,11 +10,13 @@ import * as Null from './ion/Null';
 import * as Integer from './ion/Integer';
 import * as _Array from './ion/Array';
 import * as SpreadElement from './SpreadElement';
+import * as Boolean from './ion/Boolean';
 import * as Class from './ion/Class';
 export class ArrayExpression implements _Object.Object , Expression.Expression , Node.Node , Exportable.Exportable {
     readonly location: Location.Location | Null.Null;
     readonly export: Integer.Integer;
     readonly elements: _Array.Array<Expression.Expression | (SpreadElement.SpreadElement | Null.Null)>;
+    readonly isSet: Boolean.Boolean;
     static readonly id = 'ArrayExpression';
     static readonly implements = new Set([
         'ArrayExpression',
@@ -26,11 +28,13 @@ export class ArrayExpression implements _Object.Object , Expression.Expression ,
     constructor({
         location = null,
         export: _export = 0,
-        elements
+        elements,
+        isSet = false
     }: {
         location?: Location.Location | Null.Null,
         export?: Integer.Integer,
-        elements: _Array.Array<Expression.Expression | (SpreadElement.SpreadElement | Null.Null)>
+        elements: _Array.Array<Expression.Expression | (SpreadElement.SpreadElement | Null.Null)>,
+        isSet?: Boolean.Boolean
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
             throw new Error('location is not a Location | Null: ' + Class.toString(location));
@@ -38,15 +42,19 @@ export class ArrayExpression implements _Object.Object , Expression.Expression ,
             throw new Error('export is not a Integer: ' + Class.toString(_export));
         if (!_Array.isArray(elements))
             throw new Error('elements is not a Array: ' + Class.toString(elements));
+        if (!Boolean.isBoolean(isSet))
+            throw new Error('isSet is not a Boolean: ' + Class.toString(isSet));
         this.location = location;
         this.export = _export;
         this.elements = elements;
+        this.isSet = isSet;
         Object.freeze(this);
     }
     patch(properties: {
         location?: Location.Location | Null.Null,
         export?: Integer.Integer,
-        elements?: _Array.Array<Expression.Expression | (SpreadElement.SpreadElement | Null.Null)>
+        elements?: _Array.Array<Expression.Expression | (SpreadElement.SpreadElement | Null.Null)>,
+        isSet?: Boolean.Boolean
     }) {
         return new ArrayExpression({
             ...this,
