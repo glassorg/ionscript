@@ -1,15 +1,44 @@
 
-let object = {}
-    x: 1
-    if foo
-        y: 2
-    z: 3
+let add = +
+    12
+    if true
+        100
+    20
+    45
 
-console.log()
-    1, 2
-    if false
-        3, 4
-    5, 6
+# let outlineString = ""
+#     what is up
+#     my friends?
+#     this is pretty cool.
+
+# ion
+# console.log()
+#     1
+#     if foo
+#         2
+#         3
+#     else
+#         4
+#     6
+
+# let array = []
+#     1, 2, 3, 4
+#     for x in ["a", "b", "c"]
+#         x + x
+#     6, 7, 8
+
+# for [key, value] in (1: 2, 3: 4, 5: 6)
+#     console.log({ key, value })
+
+# for y in | "a", 1, true, { x: 1 } |
+#     console.log(y)
+
+# # ion
+# console.log()
+#     1, 2
+#     if false
+#         3, 4
+#     5, 6
 
 # let foo = ()
 #     1: 4

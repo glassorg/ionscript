@@ -1,6 +1,6 @@
 import { Options } from "../Compiler"
 import { traverse, skip, remove } from "@glas/traverse"
-import { ArrayExpression, BlockStatement, CallExpression, Expression, ExpressionStatement, FunctionExpression, Identifier, Literal, MemberExpression, ObjectExpression, Parameter, Program, Property, Reference, ReturnStatement, SpreadElement, Statement } from "../ast"
+import { ArrayExpression, BinaryExpression, BlockStatement, CallExpression, Expression, ExpressionStatement, FunctionExpression, Identifier, Literal, MemberExpression, ObjectExpression, OutlineOperation, Parameter, Program, Property, Reference, ReturnStatement, SpreadElement, Statement } from "../ast"
 import Assembly from "../ast/Assembly"
 import { SemanticError } from "../common"
 import ArrowFunctionExpression from "../ast/ArrowFunctionExpression"
@@ -166,6 +166,30 @@ export default function controlFlowToExpressions(root: Assembly, options: Option
                     arguments: [
                         new SpreadElement({
                             argument: convertExpressionWithNestedStatements(new ArrayExpression({ elements: node.arguments }))!
+                        })
+                    ]
+                })
+            }
+            if (OutlineOperation.is(node)) {
+                let { operator } = node
+                let operands = new ArrayExpression({ elements: node.operands })
+                return new CallExpression({
+                    callee: new MemberExpression({
+                        object: convertExpressionWithNestedStatements(operands) ?? operands,
+                        property: new Identifier({ name: "reduce" })
+                    }),
+                    arguments: [
+                        new ArrowFunctionExpression({
+                            params: [
+                                new Parameter({ id:  new Identifier({ name: "a"}) }),
+                                new Parameter({ id:  new Identifier({ name: "c"}) }),
+                            ],
+                            body: new BinaryExpression({
+                                left: new Reference({ name: "a"}),
+                                operator,
+                                right: new Reference({ name: "c"})
+                            }),
+                            expression: true
                         })
                     ]
                 })

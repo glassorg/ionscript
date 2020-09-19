@@ -206,8 +206,8 @@ ExpressionStatement
     { return node("ExpressionStatement", { expression }) }
     // also allow multiple expression statements separated by commas.
     // all statement consumers call .flat() so this will be handled.
-    / expressions:InlineExpressionList EOL
-    { return expressions.map(expression => node("ExpressionStatement", { expression })) }
+    // / expressions:InlineExpressionList EOL
+    // { return expressions.map(expression => node("ExpressionStatement", { expression })) }
 
 Declaration
     = ClassDeclaration
@@ -262,7 +262,7 @@ BlockStatement
 
 ForOfStatement
     = ForToken _ left:Pattern _ InToken _ right:InlineExpression body:BlockStatement
-    { return node("ForOfStatement", { left: (node("VariableDeclaration", { id: left })), right, body } ) }
+    { return node("ForOfStatement", { left: (node("VariableDeclaration", { id: left, kind: "const" })), right, body } ) }
 
 WhileStatement
     = WhileToken _ test:InlineExpression body:BlockStatement
@@ -512,6 +512,10 @@ NamedOutlineFunction
 ////////////////////////////////////////////////////////////////////////////////
 
 OutlineExpression
+    = OutlineExpressionStartsThisLine
+    / EOL Indent Dent @OutlineExpressionStartsThisLine Outdent
+
+OutlineExpressionStartsThisLine
     = OutlineYieldExpression
     / OutlineAwaitExpression
     / OutlineFunction
@@ -522,7 +526,19 @@ OutlineExpression
     / OutlineNewExpression
     / OutlineStringLiteral
     / OutlineSpreadElement
+    / OutlineOperation
     / @InlineExpression EOL
+
+OutlineOperation
+    =
+        operator:("+" / "-" / "||" / "&&" / "|" / "&" / "**" / "*" / "/")
+        operands:OutlineArguments
+    {
+        if (operands.length === 2 && operands.every(ast.Expression.is)) {
+            return node("BinaryExpression", { left: operands[0], operator, right: operands[1] })
+        }
+        return node("OutlineOperation", { operator, operands })
+    }
 
 OutlineYieldExpression
     = YieldToken delegate:"*"? _ argument:OutlineExpression
@@ -532,13 +548,17 @@ OutlineAwaitExpression
     = AwaitToken _ argument:OutlineExpression
     { return node("AwaitExpression", { argument })}
 
+OutlineArguments
+    = EOL Indent args:(Dent @(OutlineExpression / Statement))+ Outdent
+    { return args.flat() }
+
 OutlineCallExpression
-    = call:InlineExpression args:OutlineArrayArguments
+    = call:InlineExpression args:OutlineArguments
     & { return ast.CallExpression.is(call) }
     { return node("CallExpression", { ...call, arguments: [...call.arguments, ...args] }) }
 
 OutlineNewExpression
-    = NewToken _ callee:MemberExpressionNoCall args:(InlineArguments / OutlineArrayArguments)
+    = NewToken _ callee:MemberExpressionNoCall args:(InlineArguments / OutlineArguments)
     { return node("CallExpression", { new: true, callee, arguments: args }) }
 
 InlineExpression
@@ -660,7 +680,7 @@ InlineArrayExpression
     { return node("ArrayExpression", { elements:elements || [], isSet: true }) }
 
 OutlineArrayArguments
-    = EOL Indent args:(Dent @(@(OutlineExpression / InlineExpressionList) EOL / @Statement))+ Outdent
+    = EOL Indent args:(Dent @(@(OutlineExpression / @InlineExpressionList EOL) / @Statement))+ Outdent
     { return args.flat() }
 
 OutlineArrayExpression
@@ -780,7 +800,6 @@ DecimalInteger
 
 StringLiteral
     = '"' DoubleStringChar* '"' { return node('Literal', { value: eval(text()) }); }
-
 DoubleStringChar
     = [^\r\n\t\b\f"] / "\\" ([rn"] / "u" HexDigit<4>)
 

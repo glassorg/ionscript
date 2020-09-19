@@ -56,9 +56,6 @@ export {
     default as ExpressionStatement
 } from './ExpressionStatement';
 export {
-    default as ForInStatement
-} from './ForInStatement';
-export {
     default as ForOfStatement
 } from './ForOfStatement';
 export {
@@ -110,6 +107,9 @@ export {
     default as ObjectPattern
 } from './ObjectPattern';
 export {
+    default as OutlineOperation
+} from './OutlineOperation';
+export {
     default as Parameter
 } from './Parameter';
 export {
@@ -151,6 +151,12 @@ export {
 export {
     default as SwitchStatement
 } from './SwitchStatement';
+export {
+    default as TemplateElement
+} from './TemplateElement';
+export {
+    default as TemplateLiteral
+} from './TemplateLiteral';
 export {
     default as ThisExpression
 } from './ThisExpression';

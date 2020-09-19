@@ -2,7 +2,6 @@
 This file was generated from ion source. Do not edit.
 */
 import * as _Object from './ion/Object';
-import * as ForStatement from './ForStatement';
 import * as Statement from './Statement';
 import * as Node from './Node';
 import * as Location from './Location';
@@ -11,7 +10,7 @@ import * as VariableDeclaration from './VariableDeclaration';
 import * as Expression from './Expression';
 import * as BlockStatement from './BlockStatement';
 import * as Class from './ion/Class';
-export class ForOfStatement implements _Object.Object , ForStatement.ForStatement , Statement.Statement , Node.Node {
+export class ForOfStatement implements _Object.Object , Statement.Statement , Node.Node {
     readonly location: Location.Location | Null.Null;
     readonly left: VariableDeclaration.VariableDeclaration;
     readonly right: Expression.Expression;
@@ -20,7 +19,6 @@ export class ForOfStatement implements _Object.Object , ForStatement.ForStatemen
     static readonly implements = new Set([
         'ForOfStatement',
         'ion_Object',
-        'ForStatement',
         'Statement',
         'Node'
     ]);

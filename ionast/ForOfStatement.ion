@@ -3,4 +3,7 @@ import
     .*
 
 export
-    class ForOfStatement extends ForStatement
+    class ForOfStatement extends Statement
+        var left: VariableDeclaration
+        var right: Expression
+        var body: BlockStatement
