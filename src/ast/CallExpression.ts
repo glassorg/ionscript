@@ -11,6 +11,7 @@ import * as Null from './ion/Null';
 import * as Integer from './ion/Integer';
 import * as Boolean from './ion/Boolean';
 import * as _Array from './ion/Array';
+import * as Statement from './Statement';
 import * as SpreadElement from './SpreadElement';
 import * as Class from './ion/Class';
 export class CallExpression implements _Object.Object , Expression.Expression , ChainElement.ChainElement , Node.Node , Exportable.Exportable {
@@ -19,7 +20,7 @@ export class CallExpression implements _Object.Object , Expression.Expression , 
     readonly optional: Boolean.Boolean;
     readonly new: Boolean.Boolean;
     readonly callee: Expression.Expression;
-    readonly arguments: _Array.Array<Expression.Expression | SpreadElement.SpreadElement>;
+    readonly arguments: _Array.Array<Expression.Expression | (Statement.Statement | SpreadElement.SpreadElement)>;
     static readonly id = 'CallExpression';
     static readonly implements = new Set([
         'CallExpression',
@@ -42,7 +43,7 @@ export class CallExpression implements _Object.Object , Expression.Expression , 
         optional?: Boolean.Boolean,
         new?: Boolean.Boolean,
         callee: Expression.Expression,
-        arguments: _Array.Array<Expression.Expression | SpreadElement.SpreadElement>
+        arguments: _Array.Array<Expression.Expression | (Statement.Statement | SpreadElement.SpreadElement)>
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
             throw new Error('location is not a Location | Null: ' + Class.toString(location));
@@ -70,7 +71,7 @@ export class CallExpression implements _Object.Object , Expression.Expression , 
         optional?: Boolean.Boolean,
         new?: Boolean.Boolean,
         callee?: Expression.Expression,
-        arguments?: _Array.Array<Expression.Expression | SpreadElement.SpreadElement>
+        arguments?: _Array.Array<Expression.Expression | (Statement.Statement | SpreadElement.SpreadElement)>
     }) {
         return new CallExpression({
             ...this,

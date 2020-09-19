@@ -521,6 +521,7 @@ OutlineExpression
     / OutlineCallExpression
     / OutlineNewExpression
     / OutlineStringLiteral
+    / OutlineSpreadElement
     / @InlineExpression EOL
 
 OutlineYieldExpression
@@ -531,16 +532,13 @@ OutlineAwaitExpression
     = AwaitToken _ argument:OutlineExpression
     { return node("AwaitExpression", { argument })}
 
-OutlineArguments
-    = EOL Indent @(Dent @OutlineExpression)+ Outdent
-
 OutlineCallExpression
-    = call:InlineExpression args:OutlineArguments
+    = call:InlineExpression args:OutlineArrayArguments
     & { return ast.CallExpression.is(call) }
     { return node("CallExpression", { ...call, arguments: [...call.arguments, ...args] }) }
 
 OutlineNewExpression
-    = NewToken _ callee:MemberExpressionNoCall args:(InlineArguments / OutlineArguments)
+    = NewToken _ callee:MemberExpressionNoCall args:(InlineArguments / OutlineArrayArguments)
     { return node("CallExpression", { new: true, callee, arguments: args }) }
 
 InlineExpression
@@ -641,6 +639,10 @@ MemberExpressionNoCall =
 
 InlineSpreadElement
     = "..." argument:InlineExpression
+    { return node("SpreadElement", { argument }) }
+
+OutlineSpreadElement
+    = "..." argument:OutlineExpression
     { return node("SpreadElement", { argument }) }
 
 ArrayElement

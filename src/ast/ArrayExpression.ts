@@ -10,12 +10,13 @@ import * as Null from './ion/Null';
 import * as Integer from './ion/Integer';
 import * as _Array from './ion/Array';
 import * as SpreadElement from './SpreadElement';
+import * as Statement from './Statement';
 import * as Boolean from './ion/Boolean';
 import * as Class from './ion/Class';
 export class ArrayExpression implements _Object.Object , Expression.Expression , Node.Node , Exportable.Exportable {
     readonly location: Location.Location | Null.Null;
     readonly export: Integer.Integer;
-    readonly elements: _Array.Array<Expression.Expression | (SpreadElement.SpreadElement | Null.Null)>;
+    readonly elements: _Array.Array<Expression.Expression | (SpreadElement.SpreadElement | (Statement.Statement | Null.Null))>;
     readonly isSet: Boolean.Boolean;
     static readonly id = 'ArrayExpression';
     static readonly implements = new Set([
@@ -33,7 +34,7 @@ export class ArrayExpression implements _Object.Object , Expression.Expression ,
     }: {
         location?: Location.Location | Null.Null,
         export?: Integer.Integer,
-        elements: _Array.Array<Expression.Expression | (SpreadElement.SpreadElement | Null.Null)>,
+        elements: _Array.Array<Expression.Expression | (SpreadElement.SpreadElement | (Statement.Statement | Null.Null))>,
         isSet?: Boolean.Boolean
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
@@ -53,7 +54,7 @@ export class ArrayExpression implements _Object.Object , Expression.Expression ,
     patch(properties: {
         location?: Location.Location | Null.Null,
         export?: Integer.Integer,
-        elements?: _Array.Array<Expression.Expression | (SpreadElement.SpreadElement | Null.Null)>,
+        elements?: _Array.Array<Expression.Expression | (SpreadElement.SpreadElement | (Statement.Statement | Null.Null))>,
         isSet?: Boolean.Boolean
     }) {
         return new ArrayExpression({

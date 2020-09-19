@@ -3,6 +3,7 @@ This file was generated from ion source. Do not edit.
 */
 import * as Location from '../Location';
 import * as Null from './Null';
+import * as Statement from '../Statement';
 import * as SpreadElement from '../SpreadElement';
 import * as Expression from '../Expression';
 import * as _Array from './Array';
@@ -19,12 +20,15 @@ import * as CatchClause from '../CatchClause';
 import * as Integer from './Integer';
 import * as Class from './Class';
 export type Location_Location_or_ion_Null_Null = Location.Location | Null.Null;
-export type SpreadElement_SpreadElement_or_ion_Null_Null = SpreadElement.SpreadElement | Null.Null;
-export type Expression_Expression_or_ion_types_SpreadElement_SpreadElement_or_ion_Null_Null = Expression.Expression | (SpreadElement.SpreadElement | Null.Null);
-export type ___TemplateReference___ = _Array.Array<Expression.Expression | (SpreadElement.SpreadElement | Null.Null)>;
+export type Statement_Statement_or_ion_Null_Null = Statement.Statement | Null.Null;
+export type SpreadElement_SpreadElement_or_ion_types_Statement_Statement_or_ion_Null_Null = SpreadElement.SpreadElement | (Statement.Statement | Null.Null);
+export type Expression_Expression_or_ion_types_SpreadElement_SpreadElement_or_ion_types_Statement_Statement_or_ion_Null_Null = Expression.Expression | (SpreadElement.SpreadElement | (Statement.Statement | Null.Null));
+export type ___TemplateReference___ = _Array.Array<Expression.Expression | (SpreadElement.SpreadElement | (Statement.Statement | Null.Null))>;
 export type Pattern_Pattern_or_ion_Null_Null = Pattern.Pattern | Null.Null;
 export type BlockStatement_BlockStatement_or_Expression_Expression = BlockStatement.BlockStatement | Expression.Expression;
 export type Pattern_Pattern_or_Expression_Expression = Pattern.Pattern | Expression.Expression;
+export type Statement_Statement_or_SpreadElement_SpreadElement = Statement.Statement | SpreadElement.SpreadElement;
+export type Expression_Expression_or_ion_types_Statement_Statement_or_SpreadElement_SpreadElement = Expression.Expression | (Statement.Statement | SpreadElement.SpreadElement);
 export type Expression_Expression_or_SpreadElement_SpreadElement = Expression.Expression | SpreadElement.SpreadElement;
 export type Identifier_Identifier_or_ion_Null_Null = Identifier.Identifier | Null.Null;
 export type IfStatement_IfStatement_or_ion_Null_Null = IfStatement.IfStatement | Null.Null;
