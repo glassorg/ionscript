@@ -517,11 +517,11 @@ OutlineExpression
     / OutlineFunction
     / OutlineArrayExpression
     / OutlineObjectExpression
+    / OutlineMapExpression
     / OutlineCallExpression
     / OutlineNewExpression
     / OutlineStringLiteral
     / @InlineExpression EOL
-    //  TODO: Allow Optional BlockStatement After to imply function call.
 
 OutlineYieldExpression
     = YieldToken delegate:"*"? _ argument:OutlineExpression
@@ -571,6 +571,7 @@ PrimaryExpression
     / GroupExpression
     / InlineArrayExpression
     / InlineObjectExpression
+    / InlineMapExpression
 
 GroupExpression
     = "(" _ @InlineExpression _ ")"
@@ -665,14 +666,25 @@ OutlineArrayExpression
     { return node("ArrayExpression", { elements: elements.flat() }) }
 
 OutlineObjectExpression
-    = e:InlineObjectExpression properties: OutlinePropertyList
+    = e:InlineObjectExpression properties:OutlinePropertyList
     { return node("ObjectExpression", {properties: [...e.properties, ...properties] }) }
+
+OutlineMapExpression
+    = e:InlineMapExpression properties:OutlineMapPropertyList
+    { return node("MapExpression", {properties: [...e.properties, ...properties] }) }
+
+OutlineMapPropertyList
+    = EOL Indent @(Dent @(OutlineMapProperty / Statement))+ Outdent
+
+OutlineMapProperty
+    = key:InlineExpression _ ":" _ value:OutlineExpression
+    { return node("Property", { key, value, computed: true })}
 
 OutlinePropertyList
     = EOL Indent @(Dent @(OutlineProperty / Statement))+ Outdent
 
 PropertyStatement
-    = property:OutlineProperty
+    = property:(OutlineProperty / OutlineMapProperty)
     { return node("PropertyStatement", { property }) }
 
 OutlineProperty
@@ -691,6 +703,18 @@ OutlineProperty
     { return node("Property", { key, value: node("Reference", key), shorthand: true }) }
     //  don't support inline lists on outline objects... it's harder to see specific
     // / @InlinePropertyList EOL
+
+InlineMapProperty
+    = key:InlineExpression _ ":" _ value:InlineExpression
+    { return node("Property", { key, value, computed: true })}
+
+InlineMapPropertyList
+    = head:InlineMapProperty tail:(_ "," _ @InlineMapProperty)*
+    { return [head, ...tail] }
+
+InlineMapExpression
+    = "(" _ properties:InlineMapPropertyList? _ ")"
+    { return node("MapExpression", { properties: properties || [] }) }
 
 InlineObjectExpression
     = "{" _ properties:InlinePropertyList? _ "}"

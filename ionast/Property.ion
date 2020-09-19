@@ -4,7 +4,7 @@ import
 
 export
     class Property extends Node
-        var key: Literal | Identifier
+        var key: Expression | Identifier
         var value: Expression | Pattern
         var kind: String = "init" # init | get | set
         var method: Boolean = false

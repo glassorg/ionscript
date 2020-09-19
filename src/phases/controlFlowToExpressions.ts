@@ -1,24 +1,26 @@
 import { Options } from "../Compiler"
 import { traverse, skip, remove } from "@glas/traverse"
-import { ArrayExpression, BlockStatement, CallExpression, Expression, ExpressionStatement, FunctionExpression, Identifier, MemberExpression, ObjectExpression, Parameter, Program, Property, Reference, ReturnStatement, SpreadElement, Statement } from "../ast"
+import { ArrayExpression, BlockStatement, CallExpression, Expression, ExpressionStatement, FunctionExpression, Identifier, Literal, MapExpression, MemberExpression, ObjectExpression, Parameter, Program, Property, Reference, ReturnStatement, SpreadElement, Statement } from "../ast"
 import Assembly from "../ast/Assembly"
 import { SemanticError } from "../common"
 import ArrowFunctionExpression from "../ast/ArrowFunctionExpression"
 import PropertyStatement from "../ast/PropertyStatement"
 import AssignmentStatement from "../ast/AssignmentStatement"
 
+const containerName = "$"
+const containerRef = new Reference({ name: containerName })
+const containerId = new Identifier({ name: containerName })
+
 export default function controlFlowToExpressions(root: Assembly, options: Options) {
     return traverse(root, {
         enter(node) {
         },
         leave(node) {
-            if (ObjectExpression.is(node) && node.properties.find(Statement.is)) {
-                let name = "$"
-                let ref = new Reference({ name })
-                let id = new Identifier({ name })
+            const isMap = MapExpression.is(node)
+            if ((ObjectExpression.is(node) || isMap) && node.properties.find(Statement.is)) {
                 return new CallExpression({
                     callee: new ArrowFunctionExpression({
-                        params: [ new Parameter({ id }) ],
+                        params: [ new Parameter({ id: containerId }) ],
                         expression: false,
                         body: new BlockStatement({
                             body: traverse(node.properties, {
@@ -38,48 +40,61 @@ export default function controlFlowToExpressions(root: Assembly, options: Option
                                         e = e.property
                                     }
                                     if (Property.is(e) && Array.isArray(parent)) {
-                                        return new AssignmentStatement({
-                                            left: new MemberExpression({
-                                                object: ref,
-                                                property: e.key,
-                                            }),
-                                            operator: "=",
-                                            right: e.value as Expression,
-                                        })
+                                        if (isMap) {
+                                            let { key, value } = e
+                                            if (Identifier.is(key)) {
+                                                //  keys are always computed for Maps.
+                                                key = new Reference(key)
+                                            }
+                                            return new ExpressionStatement({
+                                                expression: new CallExpression({
+                                                    callee: new MemberExpression({
+                                                        object: containerRef,
+                                                        property: new Identifier({ name: "set" })
+                                                    }),
+                                                    arguments: [e.key as Expression, e.value as Expression]
+                                                })
+                                            })
+                                        }
+                                        else {
+                                            return new AssignmentStatement({
+                                                left: new MemberExpression({
+                                                    object: containerRef,
+                                                    property: e.key,
+                                                }),
+                                                operator: "=",
+                                                right: e.value as Expression,
+                                            })
+                                        }
                                     }
                                 }
-                            }).concat([ new ReturnStatement({ argument: ref })])
+                            }).concat([ new ReturnStatement({ argument: containerRef })])
                         })
                     }),
-                    arguments: [ new ObjectExpression({ properties: [] }) ]
-                })
-                return new ObjectExpression({
-                    properties: traverse(node.properties, {
-                        enter(e) {
-                            //  don't traverse into call expressions
-                            //  also don't recurse into expressions or expression statements
-                            //  basically we only want to recurse into control flow statements
-                            if (CallExpression.is(e) || Expression.is(e) || ExpressionStatement.is(e)) {
-                                return skip
-                            }
-                        },
-                        leave(e, ancestors, path) {
-                            if (PropertyStatement.is(e)) {
-                                return e.property
-                            }
-                        }
-                    })
+                    arguments: [
+                        isMap
+                            ? new CallExpression({ new: true, callee: new Reference({ name: "Map"}), arguments: []})
+                            : new ObjectExpression({ properties: [] })
+                    ]
                 })
             }
-            if (ArrayExpression.is(node) && node.elements.find(Statement.is)) {
-                let name = "$"
-                let ref = new Reference({ name })
-                let id = new Identifier({ name })
+            else if (isMap) {
+                return new CallExpression({
+                    new: true,
+                    callee: new Reference({ name: "Map" }),
+                    arguments: [
+                        new ArrayExpression({
+                            elements: node.properties.map(({ key, value }) => new ArrayExpression({ elements: [ key, value ]}))
+                        })
+                    ]
+                })
+            }
+            else if (ArrayExpression.is(node) && node.elements.find(Statement.is)) {
                 let push = new Identifier({ name: "push" })
                 let mergePushElementsWithNext = new Array<Expression | SpreadElement>()
                 return new CallExpression({
                     callee: new ArrowFunctionExpression({
-                        params: [ new Parameter({ id }) ],
+                        params: [ new Parameter({ id: containerId }) ],
                         expression: false,
                         body: new BlockStatement({
                             body: traverse(node.elements, {
@@ -100,9 +115,6 @@ export default function controlFlowToExpressions(root: Assembly, options: Option
                                         e = e.expression
                                         statement = true
                                     }
-                                    // if (SpreadElement.is(e)) {
-                                    //     throw SemanticError("Spread not implemented yet", e)
-                                    // }
                                     if ((Expression.is(e) || SpreadElement.is(e)) && Array.isArray(parent)) {
                                         // see if the next peer element is an expression or expression statement
                                         let nextPeer = ancestors[ancestors.length - 1][path[path.length - 1] + 1]
@@ -112,7 +124,7 @@ export default function controlFlowToExpressions(root: Assembly, options: Option
                                         }
                                         let expression = new CallExpression({
                                             callee: new MemberExpression({
-                                                object: ref,
+                                                object: containerRef,
                                                 property: push
                                             }),
                                             arguments: [...mergePushElementsWithNext, e]
@@ -121,7 +133,7 @@ export default function controlFlowToExpressions(root: Assembly, options: Option
                                         return statement ? new ExpressionStatement({ expression }) : expression
                                     }
                                 }
-                            }).concat([ new ReturnStatement({ argument: ref })])
+                            }).concat([ new ReturnStatement({ argument: containerRef })])
                         })
                     }),
                     arguments: [ new ArrayExpression({ elements: [] }) ]

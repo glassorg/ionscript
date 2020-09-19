@@ -92,6 +92,9 @@ export {
     default as Location
 } from './Location';
 export {
+    default as MapExpression
+} from './MapExpression';
+export {
     default as MemberExpression
 } from './MemberExpression';
 export {
