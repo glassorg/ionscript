@@ -324,9 +324,10 @@ AssignmentProperty
 
 ClassDeclaration
     = meta:MetaProperties
-        ClassToken _ id:Identifier params:TemplateParameters? _ baseClasses:Extends? EOL
+        isStruct:(ClassToken { return false } / StructToken { return true })
+        _ id:Identifier params:TemplateParameters? _ baseClasses:Extends? EOL
         Indent declarations:(Dent @VariableDeclaration)* Outdent
-        { return node("ClassDeclaration", { id, params: params || [], baseClasses: baseClasses || [], declarations: declarations, static: [] }) }
+        { return node("ClassDeclaration", { id, isStruct, params: params || [], baseClasses: baseClasses || [], declarations: declarations, static: [] }) }
 
 TemplateParameters
     = "<" _ head:Parameter tail:(_ ',' _ @Parameter)* _ ">" { return [head, ...tail] }
@@ -518,6 +519,7 @@ OutlineExpression
 OutlineExpressionStartsThisLine
     = OutlineYieldExpression
     / OutlineAwaitExpression
+    / OutlineDoExpression // must be higher precedence than OutlineFunction
     / OutlineFunction
     / OutlineArrayExpression
     / OutlineObjectExpression
@@ -528,6 +530,10 @@ OutlineExpressionStartsThisLine
     / OutlineSpreadElement
     / OutlineOperation
     / @InlineExpression EOL
+
+OutlineDoExpression
+    = DoToken " " _ callee:OutlineFunction
+    { return node("CallExpression", { callee, arguments: [] }) }
 
 OutlineOperation
     =
@@ -895,6 +901,7 @@ SwitchToken     = @"switch"     !IdPart
 AsyncToken      = @"async"      !IdPart
 AwaitToken      = @"await"      !IdPart
 YieldToken      = @"yield"      !IdPart
+DoToken         = @"do"         !IdPart
 
 Keyword
     = ThisToken

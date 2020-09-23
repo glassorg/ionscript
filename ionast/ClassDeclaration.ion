@@ -4,6 +4,7 @@ import
 
 export
     class ClassDeclaration extends Declaration
+        var isStruct: Boolean = false
         var id: Identifier
         var parameters: Array<Parameter> = []
         var baseClasses: Array<Reference> = []

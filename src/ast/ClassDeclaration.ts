@@ -9,6 +9,7 @@ import * as Node from './Node';
 import * as Location from './Location';
 import * as Null from './ion/Null';
 import * as Integer from './ion/Integer';
+import * as Boolean from './ion/Boolean';
 import * as Identifier from './Identifier';
 import * as _Array from './ion/Array';
 import * as Parameter from './Parameter';
@@ -18,6 +19,7 @@ import * as Class from './ion/Class';
 export class ClassDeclaration implements _Object.Object , Declaration.Declaration , Statement.Statement , Exportable.Exportable , Node.Node {
     readonly location: Location.Location | Null.Null;
     readonly export: Integer.Integer;
+    readonly isStruct: Boolean.Boolean;
     readonly id: Identifier.Identifier;
     readonly parameters: _Array.Array<Parameter.Parameter>;
     readonly baseClasses: _Array.Array<Reference.Reference>;
@@ -35,6 +37,7 @@ export class ClassDeclaration implements _Object.Object , Declaration.Declaratio
     constructor({
         location = null,
         export: _export = 0,
+        isStruct = false,
         id,
         parameters = [],
         baseClasses = [],
@@ -43,6 +46,7 @@ export class ClassDeclaration implements _Object.Object , Declaration.Declaratio
     }: {
         location?: Location.Location | Null.Null,
         export?: Integer.Integer,
+        isStruct?: Boolean.Boolean,
         id: Identifier.Identifier,
         parameters?: _Array.Array<Parameter.Parameter>,
         baseClasses?: _Array.Array<Reference.Reference>,
@@ -53,6 +57,8 @@ export class ClassDeclaration implements _Object.Object , Declaration.Declaratio
             throw new Error('location is not a Location | Null: ' + Class.toString(location));
         if (!Integer.isInteger(_export))
             throw new Error('export is not a Integer: ' + Class.toString(_export));
+        if (!Boolean.isBoolean(isStruct))
+            throw new Error('isStruct is not a Boolean: ' + Class.toString(isStruct));
         if (!Identifier.isIdentifier(id))
             throw new Error('id is not a Identifier: ' + Class.toString(id));
         if (!_Array.isArray(parameters))
@@ -65,6 +71,7 @@ export class ClassDeclaration implements _Object.Object , Declaration.Declaratio
             throw new Error('static is not a Array: ' + Class.toString(_static));
         this.location = location;
         this.export = _export;
+        this.isStruct = isStruct;
         this.id = id;
         this.parameters = parameters;
         this.baseClasses = baseClasses;
@@ -75,6 +82,7 @@ export class ClassDeclaration implements _Object.Object , Declaration.Declaratio
     patch(properties: {
         location?: Location.Location | Null.Null,
         export?: Integer.Integer,
+        isStruct?: Boolean.Boolean,
         id?: Identifier.Identifier,
         parameters?: _Array.Array<Parameter.Parameter>,
         baseClasses?: _Array.Array<Reference.Reference>,

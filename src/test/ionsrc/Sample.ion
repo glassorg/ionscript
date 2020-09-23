@@ -1,15 +1,22 @@
 
-let sum = +
-    12
-    if true
-        100
-    20
-    45
-    *
-        10
-        20
+let ignore = do =>
+    console.log("Hello")
+    console.log("World")
 
-let regex = /foo\/bar/
+# struct Vector
+#     var x: Number = 0
+#     var y: Number = 0
+
+# let sum =
+#     +
+#         12
+#         if true
+#             100
+#         20
+#         45
+#         *
+#             10
+#             20
 
 # let outlineString = ""
 #     what is up
@@ -55,7 +62,8 @@ let regex = /foo\/bar/
 # let bar = ||
 #     1, 2
 #     if foo
-#         3, 4
+#         3
+#         4
 #     5, 6
 
 # let array = []

@@ -123,7 +123,7 @@ export default function toEsTree(root: Map<string, any>, options: Options) {
                 }
                 if (ClassDeclaration.is(node)) {
                     let values = { ...node, ...changes }
-                    let functions = [...values.declarations.values()].filter(v => v.declarations[0].init.type === "FunctionExpression")
+                    let functions = [...values.declarations.values()].filter(v => v.declarations[0].init?.type === "FunctionExpression")
                     return {
                         type: "ClassDeclaration",
                         id: values.id,
