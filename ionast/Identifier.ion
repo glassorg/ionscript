@@ -3,5 +3,5 @@ import
     .*
 
 export
-    class Identifier extends Pattern
+    class Identifier extends Node
         var name: String

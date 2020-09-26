@@ -1,6 +1,6 @@
 import { Options } from "../Compiler"
 import { traverse, skip, replace } from "@glas/traverse"
-import { CallExpression, Exportable, ImportDeclaration, Literal, Node, Parameter, Program, RegularExpression, SwitchCase } from "../ast"
+import { CallExpression, Exportable, Identifier, ImportDeclaration, Literal, Node, Parameter, Program, RegularExpression, SwitchCase } from "../ast"
 import Position from "../ast/Position"
 import VariableDeclaration from "../ast/VariableDeclaration"
 import Reference from "../ast/Reference"
@@ -10,6 +10,7 @@ import Declaration from "../ast/Declaration"
 import ClassDeclaration from "../ast/ClassDeclaration"
 import AssignmentStatement from "../ast/AssignmentStatement"
 import { SemanticError } from "../common"
+import Declarator from "../ast/Declarator"
 
 export default function toEsTree(root: Map<string, any>, options: Options) {
     return traverse(root, {
@@ -29,8 +30,9 @@ export default function toEsTree(root: Map<string, any>, options: Options) {
                         argument: { type: "Literal", value: Math.abs(node.value) }
                     }
                 }
-                // Convert Reference to Identifier
-                if (Reference.is(node)) {
+                //  Convert Reference and Declarators to Identifier
+                //  (They are both Identifier subclasses)
+                if (Identifier.is(node)) {
                     return {
                         type: "Identifier",
                         name: node.name

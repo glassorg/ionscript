@@ -9,10 +9,15 @@ export class Options {
 
     inputs: string[]
     output: string
-    target: "typescript" | "analysis" = "typescript"
+    namespace: string
     parser!: ReturnType<typeof Parser>
 
-    constructor(inputs: string[], output: string) {
+    constructor(
+        inputs: string[],
+        output: string,
+        namespace: string = common.findPackage()?.name ?? "_compiling_"
+    ) {
+        this.namespace= namespace
         this.inputs = inputs
         this.output = output
     }
@@ -30,7 +35,7 @@ export default class Compiler {
     compile(options: Options, files?: { [path: string]: string }) {
         options.parser = Parser()
         if (files == null) {
-            files = common.getInputFilesRecursive(options.inputs)
+            files = common.getInputFilesRecursive(options.inputs, options.namespace)
         }
         let root: any = files
         this.logger("Input", root)

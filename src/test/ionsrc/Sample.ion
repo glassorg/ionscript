@@ -1,3 +1,12 @@
+import "foo/bar/baz"
+    as d
+    * as all
+    a
+    b
+
+# import "module" as d
+#     a
+#     b
 
 let ignore = do =>
     console.log("Hello")

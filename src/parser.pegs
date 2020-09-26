@@ -83,7 +83,7 @@ ModuleDeclaration
     = ImportDeclaration
     / Declaration
     / ExportDeclaration
-    / Statement
+    // / Statement
 
 ////////////////////////////////////////////////////////////////////////////////
 //  ExportDeclaration
@@ -138,15 +138,15 @@ Specifier
     / ImportSpecifier
 
 ImportSpecifier
-    = imported: Identifier local:(_ AsToken _ @Identifier)?
-    { return node("ImportSpecifier", { imported, local: local ?? imported }) }
+    = imported:Identifier local:(_ AsToken _ @Declarator)?
+    { return node("ImportSpecifier", { imported, local: local ?? node("Declarator", imported) }) }
 
 ImportDefaultSpecifier
-    = "as" _ local: Identifier
+    = "as" _ local:Declarator
     { return node("ImportDefaultSpecifier", { local }) }
 
 ImportNamespaceSpecifier
-    = "*" _ "as" _ local: Identifier
+    = "*" _ "as" _ local:Declarator
     { return node("ImportNamespaceSpecifier", { local }) }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -284,7 +284,7 @@ ReturnStatement
 ////////////////////////////////////////////////////////////////////////////////
 
 Pattern
-    = Identifier
+    = Declarator
     / ArrayPattern
     / ObjectPattern
 
@@ -301,7 +301,7 @@ ArrayPattern
     }
 
 RestElement
-    = "..." argument:Pattern
+    = "..." argument:Declarator
     { return node("RestElement", { argument }) }
 
 ObjectPattern
@@ -325,7 +325,7 @@ AssignmentProperty
 ClassDeclaration
     = meta:MetaProperties
         isStruct:(ClassToken { return false } / StructToken { return true })
-        _ id:Identifier params:TemplateParameters? _ baseClasses:Extends? EOL
+        _ id:Declarator params:TemplateParameters? _ baseClasses:Extends? EOL
         Indent declarations:(Dent @VariableDeclaration)* Outdent
         { return node("ClassDeclaration", { id, isStruct, params: params || [], baseClasses: baseClasses || [], declarations: declarations, static: [] }) }
 
@@ -487,7 +487,7 @@ Parameter
 
 FunctionParameters
     = "(" _ ")" { return [] }
-    / id:Identifier { return [node("Parameter", { id } )] }
+    / id:Declarator { return [node("Parameter", { id } )] }
     / "(" _ head:Parameter tail:(_ ',' _ @Parameter)* _ ")" { return [head, ...tail] }
 
 FunctionHead
@@ -850,6 +850,12 @@ Reference
     = name:IdName {
         return node("Reference", { name })
     }
+
+Declarator
+    = name:IdName {
+        return node("Declarator", { name })
+    }
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Tokens and Keywords

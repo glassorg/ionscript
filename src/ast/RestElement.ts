@@ -6,10 +6,11 @@ import * as Pattern from './Pattern';
 import * as Node from './Node';
 import * as Location from './Location';
 import * as Null from './ion/Null';
+import * as Declarator from './Declarator';
 import * as Class from './ion/Class';
 export class RestElement implements _Object.Object , Pattern.Pattern , Node.Node {
     readonly location: Location.Location | Null.Null;
-    readonly argument: Pattern.Pattern;
+    readonly argument: Declarator.Declarator;
     static readonly id = 'RestElement';
     static readonly implements = new Set([
         'RestElement',
@@ -19,19 +20,19 @@ export class RestElement implements _Object.Object , Pattern.Pattern , Node.Node
     ]);
     constructor({location = null, argument}: {
         location?: Location.Location | Null.Null,
-        argument: Pattern.Pattern
+        argument: Declarator.Declarator
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
             throw new Error('location is not a Location | Null: ' + Class.toString(location));
-        if (!Pattern.isPattern(argument))
-            throw new Error('argument is not a Pattern: ' + Class.toString(argument));
+        if (!Declarator.isDeclarator(argument))
+            throw new Error('argument is not a Declarator: ' + Class.toString(argument));
         this.location = location;
         this.argument = argument;
         Object.freeze(this);
     }
     patch(properties: {
         location?: Location.Location | Null.Null,
-        argument?: Pattern.Pattern
+        argument?: Declarator.Declarator
     }) {
         return new RestElement({
             ...this,

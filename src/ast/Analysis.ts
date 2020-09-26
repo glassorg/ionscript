@@ -5,43 +5,45 @@ import * as _Object from './ion/Object';
 import * as Node from './Node';
 import * as Location from './Location';
 import * as Null from './ion/Null';
+import * as Map from './ion/Map';
 import * as String from './ion/String';
+import * as Declaration from './Declaration';
 import * as Class from './ion/Class';
-export class Identifier implements _Object.Object , Node.Node {
+export class Analysis implements _Object.Object , Node.Node {
     readonly location: Location.Location | Null.Null;
-    readonly name: String.String;
-    static readonly id = 'Identifier';
+    readonly declarations: Map.Map<String.String, Declaration.Declaration>;
+    static readonly id = 'Analysis';
     static readonly implements = new Set([
-        'Identifier',
+        'Analysis',
         'ion_Object',
         'Node'
     ]);
-    constructor({location = null, name}: {
+    constructor({location = null, declarations}: {
         location?: Location.Location | Null.Null,
-        name: String.String
+        declarations: Map.Map<String.String, Declaration.Declaration>
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
             throw new Error('location is not a Location | Null: ' + Class.toString(location));
-        if (!String.isString(name))
-            throw new Error('name is not a String: ' + Class.toString(name));
+        if (!Map.isMap(declarations))
+            throw new Error('declarations is not a Map: ' + Class.toString(declarations));
         this.location = location;
-        this.name = name;
+        this.declarations = declarations;
         Object.freeze(this);
     }
     patch(properties: {
         location?: Location.Location | Null.Null,
-        name?: String.String
+        declarations?: Map.Map<String.String, Declaration.Declaration>
     }) {
-        return new Identifier({
+        return new Analysis({
             ...this,
             ...properties
         });
     }
-    static is(value): value is Identifier {
-        return isIdentifier(value);
+    static is(value): value is Analysis {
+        return isAnalysis(value);
     }
 }
-export function isIdentifier(value): value is Identifier {
-    return Class.isInstance(Identifier, value);
+export function isAnalysis(value): value is Analysis {
+    return Class.isInstance(Analysis, value);
 }
-export default Identifier;
+export default Analysis;

@@ -2,20 +2,18 @@
 This file was generated from ion source. Do not edit.
 */
 import * as _Object from './ion/Object';
-import * as Pattern from './Pattern';
 import * as Node from './Node';
 import * as Location from './Location';
 import * as Null from './ion/Null';
 import * as Expression from './Expression';
 import * as Class from './ion/Class';
-export class SpreadElement implements _Object.Object , Pattern.Pattern , Node.Node {
+export class SpreadElement implements _Object.Object , Node.Node {
     readonly location: Location.Location | Null.Null;
     readonly argument: Expression.Expression;
     static readonly id = 'SpreadElement';
     static readonly implements = new Set([
         'SpreadElement',
         'ion_Object',
-        'Pattern',
         'Node'
     ]);
     constructor({location = null, argument}: {

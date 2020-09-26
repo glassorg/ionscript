@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as np from "path";
 import { traverse } from "@glas/traverse";
-import { absolute } from "./pathFunctions";
+import { join } from "./pathFunctions";
 
 export function getNodesOfType<T>(root, predicate: (node) => node is T) {
     let nodes = new Array<T>()
@@ -132,19 +132,32 @@ export function difference(a: Set<any>, b: Set<any>) {
 
 const ionExt = '.ion'
 
+export function findPackage(dir = process.cwd()) {
+    let checkFilename = np.join(dir, "package.json")
+    console.log("check", checkFilename)
+    if (fs.existsSync(checkFilename)) {
+        return require(checkFilename)
+    }
+    let newDir = np.dirname(dir)
+    if (newDir != dir) {
+        return findPackage(newDir)
+    }
+    return null
+}
+
 export function read(file: any) {
     return fs.readFileSync(file, 'utf8')
 }
 
-export function getPathFromFilename(filename: string) {
+export function getPathFromFilename(namespace: string, filename: string) {
     let path = filename.substring(0, filename.length - ionExt.length).split(/[\/\\]+/g)
-    return absolute(...path)
+    return join(namespace, ...path)
 }
 
-export function getInputFilesRecursive(directory: string | string[], rootDirectory : string | null = null, allFiles: {[path: string]: string} = {}): {[path: string]: string} {
+export function getInputFilesRecursive(directory: string | string[], namespace: string, rootDirectory : string | null = null, allFiles: {[path: string]: string} = {}): {[path: string]: string} {
     if (Array.isArray(directory)) {
         for (let dir of directory) {
-            getInputFilesRecursive(dir, dir, allFiles)
+            getInputFilesRecursive(dir, namespace, dir, allFiles)
         }
     }
     else {
@@ -155,12 +168,12 @@ export function getInputFilesRecursive(directory: string | string[], rootDirecto
             let fileInfo = fs.statSync(filename)
             if (fileInfo.isFile()) {
                 if (name.endsWith(ionExt)) {
-                    let path = getPathFromFilename(filename.substring(rootDirectory.length + 1))
+                    let path = getPathFromFilename(namespace, filename.substring(rootDirectory.length + 1))
                     allFiles[path] = read(filename)
                 }
             }
             else {
-                getInputFilesRecursive(filename, rootDirectory, allFiles)
+                getInputFilesRecursive(filename, namespace, rootDirectory, allFiles)
             }
         }
     }

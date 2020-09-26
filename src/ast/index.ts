@@ -1,4 +1,7 @@
 export {
+    default as Analysis
+} from './Analysis';
+export {
     default as ArrayExpression
 } from './ArrayExpression';
 export {
@@ -43,6 +46,9 @@ export {
 export {
     default as Declaration
 } from './Declaration';
+export {
+    default as Declarator
+} from './Declarator';
 export {
     default as DotExpression
 } from './DotExpression';
@@ -163,6 +169,9 @@ export {
 export {
     default as TryStatement
 } from './TryStatement';
+export {
+    default as Typed
+} from './Typed';
 export {
     default as Variable
 } from './Variable';

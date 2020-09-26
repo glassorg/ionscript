@@ -5,43 +5,43 @@ import * as _Object from './ion/Object';
 import * as Node from './Node';
 import * as Location from './Location';
 import * as Null from './ion/Null';
-import * as String from './ion/String';
+import * as Expression from './Expression';
 import * as Class from './ion/Class';
-export class Identifier implements _Object.Object , Node.Node {
+export class Typed implements _Object.Object , Node.Node {
     readonly location: Location.Location | Null.Null;
-    readonly name: String.String;
-    static readonly id = 'Identifier';
+    readonly type: Expression.Expression | Null.Null;
+    static readonly id = 'Typed';
     static readonly implements = new Set([
-        'Identifier',
+        'Typed',
         'ion_Object',
         'Node'
     ]);
-    constructor({location = null, name}: {
+    constructor({location = null, type = null}: {
         location?: Location.Location | Null.Null,
-        name: String.String
+        type?: Expression.Expression | Null.Null
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
             throw new Error('location is not a Location | Null: ' + Class.toString(location));
-        if (!String.isString(name))
-            throw new Error('name is not a String: ' + Class.toString(name));
+        if (!(Expression.isExpression(type) || Null.isNull(type)))
+            throw new Error('type is not a Expression | Null: ' + Class.toString(type));
         this.location = location;
-        this.name = name;
+        this.type = type;
         Object.freeze(this);
     }
     patch(properties: {
         location?: Location.Location | Null.Null,
-        name?: String.String
+        type?: Expression.Expression | Null.Null
     }) {
-        return new Identifier({
+        return new Typed({
             ...this,
             ...properties
         });
     }
-    static is(value): value is Identifier {
-        return isIdentifier(value);
+    static is(value): value is Typed {
+        return isTyped(value);
     }
 }
-export function isIdentifier(value): value is Identifier {
-    return Class.isInstance(Identifier, value);
+export function isTyped(value): value is Typed {
+    return Class.isInstance(Typed, value);
 }
-export default Identifier;
+export default Typed;

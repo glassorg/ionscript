@@ -3,5 +3,5 @@ import
     .*
 
 export
-    class SpreadElement extends Pattern
+    class SpreadElement extends Node
         var argument: Expression
