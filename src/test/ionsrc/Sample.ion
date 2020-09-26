@@ -8,10 +8,6 @@ import "foo/bar/baz"
 #     a
 #     b
 
-let ignore = do =>
-    console.log("Hello")
-    console.log("World")
-
 # struct Vector
 #     var x: Number = 0
 #     var y: Number = 0
@@ -33,14 +29,13 @@ let ignore = do =>
 #     this is pretty cool.
 
 # ion
-# console.log()
-#     1
-#     if foo
-#         2
-#         3
-#     else
-#         4
-#     6
+console.log()
+    if foo
+        bar
+        baz
+    else
+        4
+    6
 
 # let array = []
 #     1, 2, 3, 4

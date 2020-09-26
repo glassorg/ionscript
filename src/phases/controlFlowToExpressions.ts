@@ -1,6 +1,6 @@
 import { Options } from "../Compiler"
 import { traverse, skip, remove } from "@glas/traverse"
-import { ArrayExpression, BinaryExpression, BlockStatement, CallExpression, Expression, ExpressionStatement, FunctionExpression, Identifier, Literal, MemberExpression, ObjectExpression, OutlineOperation, Parameter, Program, Property, Reference, ReturnStatement, SpreadElement, Statement } from "../ast"
+import { ArrayExpression, BinaryExpression, BlockStatement, CallExpression, Declarator, Expression, ExpressionStatement, FunctionExpression, Identifier, Literal, MemberExpression, ObjectExpression, OutlineOperation, Parameter, Program, Property, Reference, ReturnStatement, SpreadElement, Statement } from "../ast"
 import Assembly from "../ast/Assembly"
 import { SemanticError } from "../common"
 import ArrowFunctionExpression from "../ast/ArrowFunctionExpression"
@@ -9,7 +9,7 @@ import AssignmentStatement from "../ast/AssignmentStatement"
 
 const containerName = "$"
 const containerRef = new Reference({ name: containerName })
-const containerId = new Identifier({ name: containerName })
+const containerId = new Declarator({ name: containerName })
 
 function convertExpressionWithNestedStatements(node) {
     const isObjectExpression = ObjectExpression.is(node)
@@ -181,8 +181,8 @@ export default function controlFlowToExpressions(root: Assembly, options: Option
                     arguments: [
                         new ArrowFunctionExpression({
                             params: [
-                                new Parameter({ id:  new Identifier({ name: "a"}) }),
-                                new Parameter({ id:  new Identifier({ name: "c"}) }),
+                                new Parameter({ id:  new Declarator({ name: "a"}) }),
+                                new Parameter({ id:  new Declarator({ name: "c"}) }),
                             ],
                             body: new BinaryExpression({
                                 left: new Reference({ name: "a"}),

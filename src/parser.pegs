@@ -81,9 +81,9 @@ Module
 
 ModuleDeclaration
     = ImportDeclaration
-    / Declaration
+    // / Declaration
+    / Statement
     / ExportDeclaration
-    // / Statement
 
 ////////////////////////////////////////////////////////////////////////////////
 //  ExportDeclaration
