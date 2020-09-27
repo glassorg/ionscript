@@ -26,6 +26,7 @@ export class VariableDeclaration implements _Object.Object , Variable.Variable ,
     readonly export: Integer.Integer;
     readonly kind: String.String;
     readonly static: Boolean.Boolean;
+    readonly instance: Boolean.Boolean;
     static readonly id = 'VariableDeclaration';
     static readonly implements = new Set([
         'VariableDeclaration',
@@ -44,7 +45,8 @@ export class VariableDeclaration implements _Object.Object , Variable.Variable ,
         type = null,
         export: _export = 0,
         kind,
-        static: _static = false
+        static: _static = false,
+        instance = false
     }: {
         location?: Location.Location | Null.Null,
         id: Pattern.Pattern | Expression.Expression,
@@ -52,7 +54,8 @@ export class VariableDeclaration implements _Object.Object , Variable.Variable ,
         type?: Type.Type | (Reference.Reference | Null.Null),
         export?: Integer.Integer,
         kind: String.String,
-        static?: Boolean.Boolean
+        static?: Boolean.Boolean,
+        instance?: Boolean.Boolean
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
             throw new Error('location is not a Location | Null: ' + Class.toString(location));
@@ -68,6 +71,8 @@ export class VariableDeclaration implements _Object.Object , Variable.Variable ,
             throw new Error('kind is not a String: ' + Class.toString(kind));
         if (!Boolean.isBoolean(_static))
             throw new Error('static is not a Boolean: ' + Class.toString(_static));
+        if (!Boolean.isBoolean(instance))
+            throw new Error('instance is not a Boolean: ' + Class.toString(instance));
         this.location = location;
         this.id = id;
         this.value = value;
@@ -75,6 +80,7 @@ export class VariableDeclaration implements _Object.Object , Variable.Variable ,
         this.export = _export;
         this.kind = kind;
         this.static = _static;
+        this.instance = instance;
         Object.freeze(this);
     }
     patch(properties: {
@@ -84,7 +90,8 @@ export class VariableDeclaration implements _Object.Object , Variable.Variable ,
         type?: Type.Type | (Reference.Reference | Null.Null),
         export?: Integer.Integer,
         kind?: String.String,
-        static?: Boolean.Boolean
+        static?: Boolean.Boolean,
+        instance?: Boolean.Boolean
     }) {
         return new VariableDeclaration({
             ...this,

@@ -5,12 +5,14 @@ import fixImports from "./fixImports"
 import writeFiles from "./writeFiles"
 import controlFlowToExpressions from "./controlFlowToExpressions"
 import checkReferences from "./checkReferences"
+import createRuntime from "./createRuntime"
 
 export default [
     parsing,
     fixImports,
-    // checkReferences,
+    checkReferences,
     controlFlowToExpressions,
+    createRuntime,
     toEsTree,
     codegen,
     writeFiles,

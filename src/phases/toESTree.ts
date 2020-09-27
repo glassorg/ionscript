@@ -125,14 +125,15 @@ export default function toEsTree(root: Map<string, any>, options: Options) {
                 }
                 if (ClassDeclaration.is(node)) {
                     let values = { ...node, ...changes }
-                    let functions = [...values.declarations.values()].filter(v => v.declarations[0].init?.type === "FunctionExpression")
+                    let declarations = [...values.instance.declarations, ...values.static]
+                    let originals = [...node.instance.declarations, ...node.static]
                     return {
                         type: "ClassDeclaration",
                         id: values.id,
                         body: {
                             type: "ClassBody",
-                            body: [...values.declarations.values()].map((v, index) => {
-                                let original = node.declarations[index]
+                            body: declarations.map((v, index) => {
+                                let original = originals[index]!
                                 if (!FunctionExpression.is(original.value)) {
                                     return null
                                 }
@@ -150,7 +151,7 @@ export default function toEsTree(root: Map<string, any>, options: Options) {
                                         }
                                     })(),
                                     //  calculate if computed or not
-                                    computed: Expression.is(node.declarations[index].id),
+                                    computed: Expression.is(original.id),
                                     static: original.static
                                 }
                             }).filter(value => value != null)

@@ -331,8 +331,11 @@ ClassDeclaration
             static:(Dent StaticToken EOL Indent @(Dent @VariableDeclaration)* Outdent)?
         Outdent
         {
-            let declarations = [...instance, ...(static || []).map(d => d.patch({ static: true }))]
-            return node("ClassDeclaration", { id, isStruct, params: params || [], baseClasses: baseClasses || [], declarations })
+            return node("ClassDeclaration", {
+                id, isStruct, params: params || [], baseClasses: baseClasses || [],
+                static: (static || []).map(d => d.patch({ static: true })),
+                instance: node("InstanceDeclarations", { declarations: instance.map(d => d.patch({ instance: true })) })
+            })
         }
 
 TemplateParameters

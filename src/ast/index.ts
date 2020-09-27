@@ -89,6 +89,9 @@ export {
     default as ImportSpecifier
 } from './ImportSpecifier';
 export {
+    default as InstanceDeclarations
+} from './InstanceDeclarations';
+export {
     default as Literal
 } from './Literal';
 export {

@@ -98,7 +98,9 @@ Indented Javascript
     X Compilation
     X Async/Await
     X Generators
-    X Static Properties/Methods
+    X Static Methods
+      Static Properties
+        let properties change to getters.
       Type Declarations, port pre-existing system from Ion develop branch
       .is function on Classes
       Type checks on class properties

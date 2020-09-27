@@ -8,6 +8,10 @@ export
         var id: Identifier
         var parameters: Array<Parameter> = []
         var baseClasses: Array<Reference> = []
-        var declarations: Array<VariableDeclaration>
-        # var static: Array<VariableDeclaration>
+        # var declarations: Array<VariableDeclaration>
+        var static: Array<VariableDeclaration>
+        # we place the instance declarations within a blockStatement
+        # so that the static statements are within scope for them
+        # but the instance declarations are NOT within scope from static declarations
+        var instance: InstanceDeclarations
         # var meta: Array<KeyValuePair> = []

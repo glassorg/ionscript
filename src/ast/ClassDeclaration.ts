@@ -15,6 +15,7 @@ import * as _Array from './ion/Array';
 import * as Parameter from './Parameter';
 import * as Reference from './Reference';
 import * as VariableDeclaration from './VariableDeclaration';
+import * as InstanceDeclarations from './InstanceDeclarations';
 import * as Class from './ion/Class';
 export class ClassDeclaration implements _Object.Object , Declaration.Declaration , Statement.Statement , Exportable.Exportable , Node.Node {
     readonly location: Location.Location | Null.Null;
@@ -23,7 +24,8 @@ export class ClassDeclaration implements _Object.Object , Declaration.Declaratio
     readonly id: Identifier.Identifier;
     readonly parameters: _Array.Array<Parameter.Parameter>;
     readonly baseClasses: _Array.Array<Reference.Reference>;
-    readonly declarations: _Array.Array<VariableDeclaration.VariableDeclaration>;
+    readonly static: _Array.Array<VariableDeclaration.VariableDeclaration>;
+    readonly instance: InstanceDeclarations.InstanceDeclarations;
     static readonly id = 'ClassDeclaration';
     static readonly implements = new Set([
         'ClassDeclaration',
@@ -40,7 +42,8 @@ export class ClassDeclaration implements _Object.Object , Declaration.Declaratio
         id,
         parameters = [],
         baseClasses = [],
-        declarations
+        static: _static,
+        instance
     }: {
         location?: Location.Location | Null.Null,
         export?: Integer.Integer,
@@ -48,7 +51,8 @@ export class ClassDeclaration implements _Object.Object , Declaration.Declaratio
         id: Identifier.Identifier,
         parameters?: _Array.Array<Parameter.Parameter>,
         baseClasses?: _Array.Array<Reference.Reference>,
-        declarations: _Array.Array<VariableDeclaration.VariableDeclaration>
+        static: _Array.Array<VariableDeclaration.VariableDeclaration>,
+        instance: InstanceDeclarations.InstanceDeclarations
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
             throw new Error('location is not a Location | Null: ' + Class.toString(location));
@@ -62,15 +66,18 @@ export class ClassDeclaration implements _Object.Object , Declaration.Declaratio
             throw new Error('parameters is not a Array: ' + Class.toString(parameters));
         if (!_Array.isArray(baseClasses))
             throw new Error('baseClasses is not a Array: ' + Class.toString(baseClasses));
-        if (!_Array.isArray(declarations))
-            throw new Error('declarations is not a Array: ' + Class.toString(declarations));
+        if (!_Array.isArray(_static))
+            throw new Error('static is not a Array: ' + Class.toString(_static));
+        if (!InstanceDeclarations.isInstanceDeclarations(instance))
+            throw new Error('instance is not a InstanceDeclarations: ' + Class.toString(instance));
         this.location = location;
         this.export = _export;
         this.isStruct = isStruct;
         this.id = id;
         this.parameters = parameters;
         this.baseClasses = baseClasses;
-        this.declarations = declarations;
+        this.static = _static;
+        this.instance = instance;
         Object.freeze(this);
     }
     patch(properties: {
@@ -80,7 +87,8 @@ export class ClassDeclaration implements _Object.Object , Declaration.Declaratio
         id?: Identifier.Identifier,
         parameters?: _Array.Array<Parameter.Parameter>,
         baseClasses?: _Array.Array<Reference.Reference>,
-        declarations?: _Array.Array<VariableDeclaration.VariableDeclaration>
+        static?: _Array.Array<VariableDeclaration.VariableDeclaration>,
+        instance?: InstanceDeclarations.InstanceDeclarations
     }) {
         return new ClassDeclaration({
             ...this,

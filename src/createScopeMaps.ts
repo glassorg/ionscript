@@ -74,10 +74,14 @@ export default function createScopeMaps(
             if (pathMap) {
                 pathMap.set(node, path.slice(0))
             }
+            function pushScope() {
+                scopes.push(scope = { __proto__: scope, __source: node.constructor.name + " => " + JSON.stringify(node.location ?? "NULL") })
+            }
+
             //  if this node is a scope then we push a new scope
             if (Scope.is(node)) {
+                pushScope()
                 // console.log('++++')
-                scopes.push(scope = { __proto__: scope, __source: node.constructor.name + " => " + JSON.stringify(node.location ?? "NULL") })
             }
 
             //  let's check that referenced identifiers are in scope

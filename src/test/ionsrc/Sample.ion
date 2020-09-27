@@ -5,17 +5,19 @@ import "foo/bar/baz"
     b
 
 class Vector
+    static
+        let staticSum = x + y
+        let staticX = () => 10
+        let staticY = () => 20
     var x: Number | String & .length > 0 = 0
     var y: Number = 0
+    let sum = x + y + staticSum
     let constructor = () =>
         super()
     let translate = async (dx = 0, dy = 0) => new Vector(x + dx, y + dy)
     get foo = () => 12
     set foo = () => 12
     let [Symbol.iterator] = *() => yield* Object.keys(this)
-    static
-        let staticX = () => 10
-        let staticY = () => 20
 
 # import "module" as d
 #     a
