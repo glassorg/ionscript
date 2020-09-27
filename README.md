@@ -73,7 +73,9 @@ Indented Javascript
     Declarative Structure Programming
     or Control Flow within Declarative Structures
         let declarations
-        
+    Static Properties
+    Property Runtime Type Checks
+
 
 ## Roadmap
 
@@ -95,4 +97,13 @@ Indented Javascript
     X Spread Operators
     X Compilation
     X Async/Await
-    Generators
+    X Generators
+    X Static Properties/Methods
+      Type Declarations, port pre-existing system from Ion develop branch
+      .is function on Classes
+      Type checks on class properties
+      Property definition
+      Design way for known good types to bypass checks
+        on functions
+        on constructors
+      Check Types on function call

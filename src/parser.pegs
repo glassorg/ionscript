@@ -225,7 +225,7 @@ VariableDeclaration
     = TypeToken _ id:Identifier _ "=" _ value:Type EOL
     { return node("TypeDeclaration", { id, value }) }
     / meta:MetaProperties declarationType:VariableDeclarationType
-        _ id:Pattern _ type:(":" _ @Type)? _ value:('=' _ @OutlineExpression / EOL {return null})?
+        _ id:(Pattern / "[" _ @InlineExpression _ "]") _ type:(":" _ @Type)? _ value:('=' _ @OutlineExpression / EOL {return null})?
     {
         return node("VariableDeclaration", { ...declarationType, id, type, value, meta })
     }
@@ -326,8 +326,14 @@ ClassDeclaration
     = meta:MetaProperties
         isStruct:(ClassToken { return false } / StructToken { return true })
         _ id:Declarator params:TemplateParameters? _ baseClasses:Extends? EOL
-        Indent declarations:(Dent @VariableDeclaration)* Outdent
-        { return node("ClassDeclaration", { id, isStruct, params: params || [], baseClasses: baseClasses || [], declarations: declarations, static: [] }) }
+        Indent
+            instance:(Dent @VariableDeclaration)*
+            static:(Dent StaticToken EOL Indent @(Dent @VariableDeclaration)* Outdent)?
+        Outdent
+        {
+            let declarations = [...instance, ...(static || []).map(d => d.patch({ static: true }))]
+            return node("ClassDeclaration", { id, isStruct, params: params || [], baseClasses: baseClasses || [], declarations })
+        }
 
 TemplateParameters
     = "<" _ head:Parameter tail:(_ ',' _ @Parameter)* _ ">" { return [head, ...tail] }
@@ -343,8 +349,8 @@ Extends
 Type
     = type:UnionType
     {
-        // let isReference = ast.BinaryExpression.is(type) && type.operator === "is" && ast.Reference.is(type.right)
-        // return isReference ? type.right : node("TypeExpression", { value: type })
+        let isReference = ast.BinaryExpression.is(type) && type.operator === "is" && ast.Reference.is(type.right)
+        return isReference ? type.right : node("TypeExpression", { value: type })
     }
 
 UnionType
@@ -591,7 +597,7 @@ PrimaryExpression
     = Reference
     / Literal
     / ThisExpression
-    // / DotExpression
+    / DotExpression
     / GroupExpression
     / InlineArrayExpression
     / InlineObjectExpression

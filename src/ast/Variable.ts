@@ -10,7 +10,7 @@ import * as Expression from './Expression';
 import * as Class from './ion/Class';
 export class Variable implements _Object.Object , Node.Node {
     readonly location: Location.Location | Null.Null;
-    readonly id: Pattern.Pattern;
+    readonly id: Pattern.Pattern | Expression.Expression;
     readonly value: Expression.Expression | Null.Null;
     static readonly id = 'Variable';
     static readonly implements = new Set([
@@ -20,13 +20,13 @@ export class Variable implements _Object.Object , Node.Node {
     ]);
     constructor({location = null, id, value = null}: {
         location?: Location.Location | Null.Null,
-        id: Pattern.Pattern,
+        id: Pattern.Pattern | Expression.Expression,
         value?: Expression.Expression | Null.Null
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
             throw new Error('location is not a Location | Null: ' + Class.toString(location));
-        if (!Pattern.isPattern(id))
-            throw new Error('id is not a Pattern: ' + Class.toString(id));
+        if (!(Pattern.isPattern(id) || Expression.isExpression(id)))
+            throw new Error('id is not a Pattern | Expression: ' + Class.toString(id));
         if (!(Expression.isExpression(value) || Null.isNull(value)))
             throw new Error('value is not a Expression | Null: ' + Class.toString(value));
         this.location = location;
@@ -36,7 +36,7 @@ export class Variable implements _Object.Object , Node.Node {
     }
     patch(properties: {
         location?: Location.Location | Null.Null,
-        id?: Pattern.Pattern,
+        id?: Pattern.Pattern | Expression.Expression,
         value?: Expression.Expression | Null.Null
     }) {
         return new Variable({

@@ -9,5 +9,5 @@ export
         var parameters: Array<Parameter> = []
         var baseClasses: Array<Reference> = []
         var declarations: Array<VariableDeclaration>
-        var static: Array<VariableDeclaration>
+        # var static: Array<VariableDeclaration>
         # var meta: Array<KeyValuePair> = []

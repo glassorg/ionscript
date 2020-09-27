@@ -170,6 +170,12 @@ export {
     default as TryStatement
 } from './TryStatement';
 export {
+    default as Type
+} from './Type';
+export {
+    default as TypeExpression
+} from './TypeExpression';
+export {
     default as Typed
 } from './Typed';
 export {

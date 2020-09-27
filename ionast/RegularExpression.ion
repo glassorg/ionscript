@@ -3,6 +3,6 @@ import
     .*
 
 export
-    class RegularExpression extends Expression
+    class RegularExpression extends Expression, Type
         var pattern: String
         var flags: String

@@ -2,18 +2,16 @@
 This file was generated from ion source. Do not edit.
 */
 import * as _Object from './ion/Object';
-import * as Expression from './Expression';
 import * as Node from './Node';
 import * as Location from './Location';
 import * as Null from './ion/Null';
 import * as Class from './ion/Class';
-export class ThisExpression implements _Object.Object , Expression.Expression , Node.Node {
+export class Type implements _Object.Object , Node.Node {
     readonly location: Location.Location | Null.Null;
-    static readonly id = 'ThisExpression';
+    static readonly id = 'Type';
     static readonly implements = new Set([
-        'ThisExpression',
+        'Type',
         'ion_Object',
-        'Expression',
         'Node'
     ]);
     constructor({
@@ -25,16 +23,16 @@ export class ThisExpression implements _Object.Object , Expression.Expression , 
         Object.freeze(this);
     }
     patch(properties: { location?: Location.Location | Null.Null }) {
-        return new ThisExpression({
+        return new Type({
             ...this,
             ...properties
         });
     }
-    static is(value): value is ThisExpression {
-        return isThisExpression(value);
+    static is(value): value is Type {
+        return isType(value);
     }
 }
-export function isThisExpression(value): value is ThisExpression {
-    return Class.isInstance(ThisExpression, value);
+export function isType(value): value is Type {
+    return Class.isInstance(Type, value);
 }
-export default ThisExpression;
+export default Type;

@@ -3,6 +3,7 @@ import
     .*
 
 export
-    class VariableDeclaration extends Variable, Declaration
+    class VariableDeclaration extends Variable, Typed, Declaration
         var kind: String # var, let, get, set
+        var static: Boolean = false
 

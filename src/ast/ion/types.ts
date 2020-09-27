@@ -11,6 +11,8 @@ import * as SpreadElement from '../SpreadElement';
 import * as Expression from '../Expression';
 import * as Pattern from '../Pattern';
 import * as BlockStatement from '../BlockStatement';
+import * as Reference from '../Reference';
+import * as Type from '../Type';
 import * as Identifier from '../Identifier';
 import * as IfStatement from '../IfStatement';
 import * as Boolean from './Boolean';
@@ -30,7 +32,8 @@ export type BlockStatement_BlockStatement_or_Expression_Expression = BlockStatem
 export type Pattern_Pattern_or_Expression_Expression = Pattern.Pattern | Expression.Expression;
 export type Statement_Statement_or_SpreadElement_SpreadElement = Statement.Statement | SpreadElement.SpreadElement;
 export type Expression_Expression_or_ion_types_Statement_Statement_or_SpreadElement_SpreadElement = Expression.Expression | (Statement.Statement | SpreadElement.SpreadElement);
-export type Expression_Expression_or_ion_Null_Null = Expression.Expression | Null.Null;
+export type Reference_Reference_or_ion_Null_Null = Reference.Reference | Null.Null;
+export type Type_Type_or_ion_types_Reference_Reference_or_ion_Null_Null = Type.Type | (Reference.Reference | Null.Null);
 export type Expression_Expression_or_SpreadElement_SpreadElement = Expression.Expression | SpreadElement.SpreadElement;
 export type Identifier_Identifier_or_ion_Null_Null = Identifier.Identifier | Null.Null;
 export type IfStatement_IfStatement_or_ion_Null_Null = IfStatement.IfStatement | Null.Null;
@@ -42,6 +45,7 @@ export type Identifier_Identifier_or_Expression_Expression = Identifier.Identifi
 export type Expression_Expression_or_Identifier_Identifier = Expression.Expression | Identifier.Identifier;
 export type Property_Property_or_SpreadElement_SpreadElement = Property.Property | SpreadElement.SpreadElement;
 export type Property_Property_or_RestElement_RestElement = Property.Property | RestElement.RestElement;
+export type Expression_Expression_or_ion_Null_Null = Expression.Expression | Null.Null;
 export type Expression_Expression_or_Pattern_Pattern = Expression.Expression | Pattern.Pattern;
 export type BlockStatement_BlockStatement_or_ion_Null_Null = BlockStatement.BlockStatement | Null.Null;
 export type CatchClause_CatchClause_or_ion_Null_Null = CatchClause.CatchClause | Null.Null;

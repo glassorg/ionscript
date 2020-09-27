@@ -3,5 +3,5 @@ import
     .*
 
 export
-    class Literal extends Expression
+    class Literal extends Expression, Type
         var value : String | Number | Boolean | Null

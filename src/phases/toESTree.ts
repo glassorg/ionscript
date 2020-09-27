@@ -1,6 +1,6 @@
 import { Options } from "../Compiler"
 import { traverse, skip, replace } from "@glas/traverse"
-import { CallExpression, Exportable, Identifier, ImportDeclaration, Literal, Node, Parameter, Program, RegularExpression, SwitchCase } from "../ast"
+import { CallExpression, Exportable, FunctionExpression, Identifier, ImportDeclaration, Literal, Node, Parameter, Program, RegularExpression, SwitchCase } from "../ast"
 import Position from "../ast/Position"
 import VariableDeclaration from "../ast/VariableDeclaration"
 import Reference from "../ast/Reference"
@@ -131,7 +131,11 @@ export default function toEsTree(root: Map<string, any>, options: Options) {
                         id: values.id,
                         body: {
                             type: "ClassBody",
-                            body: functions.map(v => {
+                            body: [...values.declarations.values()].map((v, index) => {
+                                let original = node.declarations[index]
+                                if (!FunctionExpression.is(original.value)) {
+                                    return null
+                                }
                                 let d = v.declarations[0]
                                 return {
                                     type: "MethodDefinition",
@@ -146,9 +150,10 @@ export default function toEsTree(root: Map<string, any>, options: Options) {
                                         }
                                     })(),
                                     //  calculate if computed or not
-                                    // computed: false,
+                                    computed: Expression.is(node.declarations[index].id),
+                                    static: original.static
                                 }
-                            })
+                            }).filter(value => value != null)
                         }
                     }
                 }

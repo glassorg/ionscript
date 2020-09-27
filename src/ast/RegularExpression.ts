@@ -3,16 +3,14 @@ This file was generated from ion source. Do not edit.
 */
 import * as _Object from './ion/Object';
 import * as Expression from './Expression';
+import * as Type from './Type';
 import * as Node from './Node';
-import * as Exportable from './Exportable';
 import * as Location from './Location';
 import * as Null from './ion/Null';
-import * as Integer from './ion/Integer';
 import * as String from './ion/String';
 import * as Class from './ion/Class';
-export class RegularExpression implements _Object.Object , Expression.Expression , Node.Node , Exportable.Exportable {
+export class RegularExpression implements _Object.Object , Expression.Expression , Type.Type , Node.Node {
     readonly location: Location.Location | Null.Null;
-    readonly export: Integer.Integer;
     readonly pattern: String.String;
     readonly flags: String.String;
     static readonly id = 'RegularExpression';
@@ -20,37 +18,27 @@ export class RegularExpression implements _Object.Object , Expression.Expression
         'RegularExpression',
         'ion_Object',
         'Expression',
-        'Node',
-        'Exportable'
+        'Type',
+        'Node'
     ]);
-    constructor({
-        location = null,
-        export: _export = 0,
-        pattern,
-        flags
-    }: {
+    constructor({location = null, pattern, flags}: {
         location?: Location.Location | Null.Null,
-        export?: Integer.Integer,
         pattern: String.String,
         flags: String.String
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
             throw new Error('location is not a Location | Null: ' + Class.toString(location));
-        if (!Integer.isInteger(_export))
-            throw new Error('export is not a Integer: ' + Class.toString(_export));
         if (!String.isString(pattern))
             throw new Error('pattern is not a String: ' + Class.toString(pattern));
         if (!String.isString(flags))
             throw new Error('flags is not a String: ' + Class.toString(flags));
         this.location = location;
-        this.export = _export;
         this.pattern = pattern;
         this.flags = flags;
         Object.freeze(this);
     }
     patch(properties: {
         location?: Location.Location | Null.Null,
-        export?: Integer.Integer,
         pattern?: String.String,
         flags?: String.String
     }) {
