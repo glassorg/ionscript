@@ -99,8 +99,8 @@ Indented Javascript
     X Async/Await
     X Generators
     X Static Methods
-      Static Properties
-        let properties change to getters.
+    X Static Properties
+    X   let properties change to getters.
       Type Declarations, port pre-existing system from Ion develop branch
       .is function on Classes
       Type checks on class properties
@@ -109,3 +109,5 @@ Indented Javascript
         on functions
         on constructors
       Check Types on function call
+
+    What if any 'let' declaration on a class if it was determined that it was static... then it was static.

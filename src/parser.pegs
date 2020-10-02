@@ -221,14 +221,16 @@ VariableDeclarationType
     // / PropertyToken { return { assignable: false, property: true }}
     // / MetaToken { return { assignable: false, meta: true }}
 
+VariableModifiers
+    = StaticToken _ { return { static: true } }
+    / &. { return {} }
+
 VariableDeclaration
-    = TypeToken _ id:Identifier _ "=" _ value:Type EOL
-    { return node("TypeDeclaration", { id, value }) }
-    / meta:MetaProperties declarationType:VariableDeclarationType
+    = modifiers:VariableModifiers TypeToken _ id:Identifier _ "=" _ value:Type EOL
+    { return node("TypeDeclaration", { id, value, ...modifiers }) }
+    / meta:MetaProperties modifiers:VariableModifiers declarationType:VariableDeclarationType
         _ id:(Pattern / "[" _ @InlineExpression _ "]") _ type:(":" _ @Type)? _ value:('=' _ @OutlineExpression / EOL {return null})?
-    {
-        return node("VariableDeclaration", { ...declarationType, id, type, value, meta })
-    }
+    { return node("VariableDeclaration", { ...declarationType, id, type, value, meta, ...modifiers }) }
 
 MetaProperties
  = (@DynamicOutlineProperty Dent)*
@@ -327,14 +329,13 @@ ClassDeclaration
         isStruct:(ClassToken { return false } / StructToken { return true })
         _ id:Declarator params:TemplateParameters? _ baseClasses:Extends? EOL
         Indent
-            instance:(Dent @VariableDeclaration)*
-            static:(Dent StaticToken EOL Indent @(Dent @VariableDeclaration)* Outdent)?
+            declarations:(Dent @VariableDeclaration)*
         Outdent
         {
             return node("ClassDeclaration", {
                 id, isStruct, params: params || [], baseClasses: baseClasses || [],
-                static: (static || []).map(d => d.patch({ static: true })),
-                instance: node("InstanceDeclarations", { declarations: instance.map(d => d.patch({ instance: true })) })
+                static: declarations.filter(d => d.static),
+                instance: node("InstanceDeclarations", { declarations: declarations.filter(d => !d.static).map(d => d.patch({ instance: true })) })
             })
         }
 
