@@ -77,7 +77,7 @@ export default function createRuntime(root: Assembly, options: Options) {
                     if (staticVarsWithDefaults.length > 0) {
                         result = replace(
                             result,
-                            ...instanceVarsWithDefaults.map(d => new AssignmentStatement({
+                            ...staticVarsWithDefaults.map(d => new AssignmentStatement({
                                 left: new MemberExpression({
                                     object: new Reference(result.id),
                                     property: new Identifier(d.id as Declarator)

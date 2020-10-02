@@ -3,5 +3,5 @@ import
     .*
 
 export
-    class Program extends Node
+    class Program extends Scope
         var body: Array<Statement>

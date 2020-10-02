@@ -27,7 +27,7 @@ Indented Javascript
         - javascript can do it and we need to shim things
     - cons:
         - makes analyzing everything as declarations trickier.
-    - ?.
+    - yes, it turns out we can do analysis without isolating declarations
 
 - For/of and for/in loops?
     - should we support both?
@@ -38,6 +38,13 @@ Indented Javascript
     for char in "string"
     for [property, value] in object
     for i in 0 .. 10
+
+- Automatic runtime type checks?
+    - pros:
+        - helps catch bugs
+    - cons:
+        - slower performance
+    - only inserted for debug builds, add explit checks if you want them in release
 
 ## Syntax
 
@@ -101,13 +108,8 @@ Indented Javascript
     X Static Methods
     X Static Properties
     X   let properties change to getters.
+    X Type checks on class properties
+    X Design way for known good types to bypass checks => remove automatic type checks on release
+    X Check Types on function call
       Type Declarations, port pre-existing system from Ion develop branch
       .is function on Classes
-      Type checks on class properties
-      Property definition
-      Design way for known good types to bypass checks
-        on functions
-        on constructors
-      Check Types on function call
-
-    What if any 'let' declaration on a class if it was determined that it was static... then it was static.

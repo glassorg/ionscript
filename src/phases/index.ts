@@ -6,15 +6,15 @@ import writeFiles from "./writeFiles"
 import controlFlowToExpressions from "./controlFlowToExpressions"
 import checkReferences from "./checkReferences"
 import createRuntime from "./createRuntime"
-import classPropertyTypeChecking from "./classPropertyTypeChecking"
+import runtimeTypeChecking from "./runtimeTypeChecking"
 
 export default [
     parsing,
     fixImports,
     checkReferences,
     controlFlowToExpressions,
-    classPropertyTypeChecking,
     createRuntime,
+    runtimeTypeChecking,
     toEsTree,
     codegen,
     writeFiles,

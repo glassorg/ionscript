@@ -4,12 +4,13 @@ This file was generated from ion source. Do not edit.
 import * as _Object from './ion/Object';
 import * as Identifier from './Identifier';
 import * as Expression from './Expression';
+import * as Type from './Type';
 import * as Node from './Node';
 import * as Location from './Location';
 import * as Null from './ion/Null';
 import * as String from './ion/String';
 import * as Class from './ion/Class';
-export class Reference implements _Object.Object , Identifier.Identifier , Expression.Expression , Node.Node {
+export class Reference implements _Object.Object , Identifier.Identifier , Expression.Expression , Type.Type , Node.Node {
     readonly location: Location.Location | Null.Null;
     readonly name: String.String;
     static readonly id = 'Reference';
@@ -18,6 +19,7 @@ export class Reference implements _Object.Object , Identifier.Identifier , Expre
         'ion_Object',
         'Identifier',
         'Expression',
+        'Type',
         'Node'
     ]);
     constructor({location = null, name}: {

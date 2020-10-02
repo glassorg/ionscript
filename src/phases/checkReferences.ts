@@ -9,6 +9,9 @@ export default function checkReferences(root: Assembly) {
         leave(node, ancestors) {
             if (Reference.is(node)) {
                 let scope = scopes.get(node)
+                if (scope == null) {
+                    console.log("scope not found for: ", node)
+                }
                 let declarator = scope[node.name]
                 if (declarator == null) {
                     // console.log(`Reference not found: ${node.name}`)

@@ -2,19 +2,21 @@
 This file was generated from ion source. Do not edit.
 */
 import * as _Object from './ion/Object';
+import * as Scope from './Scope';
 import * as Node from './Node';
 import * as Location from './Location';
 import * as Null from './ion/Null';
 import * as _Array from './ion/Array';
 import * as Statement from './Statement';
 import * as Class from './ion/Class';
-export class Program implements _Object.Object , Node.Node {
+export class Program implements _Object.Object , Scope.Scope , Node.Node {
     readonly location: Location.Location | Null.Null;
     readonly body: _Array.Array<Statement.Statement>;
     static readonly id = 'Program';
     static readonly implements = new Set([
         'Program',
         'ion_Object',
+        'Scope',
         'Node'
     ]);
     constructor({location = null, body}: {

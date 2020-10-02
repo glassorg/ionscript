@@ -5,11 +5,14 @@ import "foo/bar/baz"
 
 type Integer = Number & .fraction == 0
 
+let double = (a: Number) => a * 2
+
 class Vector
     var x: Number = 0
     var y: Number = 10
-    static var z = 12
+    static var z: Number = 12
     static var w = 22
+
 #     let sum = x + y + staticSum
 #     let constructor = () =>
 #         super()

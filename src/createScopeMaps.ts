@@ -64,6 +64,10 @@ export default function createScopeMaps(
 
     traverse(root, {
         enter(node, ancestors, path) {
+            //  do nothing on Parameters, they're handled by their containing functions
+            if (Parameter.is(node)) {
+                return
+            }
             //  get the current scope
             let scope = scopes[scopes.length - 1]
             //  save a map from this nodes location to it's scope
@@ -95,7 +99,6 @@ export default function createScopeMaps(
             //  declarations set themselves in scope
             if (Pattern.is(node)) {
                 declarePattern(node)
-                return skip
             }
 
             //  functions set their parameters in scope
@@ -103,10 +106,6 @@ export default function createScopeMaps(
                 for (let parameter of node.params) {
                     declarePattern(parameter.id)
                 }
-            }
-            else if (Parameter.is(node)) {
-                // we skip Parameters as functions already add them above.
-                return skip
             }
         },
         leave(node) {
