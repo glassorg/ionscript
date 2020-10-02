@@ -2,14 +2,10 @@ import { Options } from "../Compiler"
 import { traverse, skip, replace } from "@glas/traverse"
 import Assembly from "../ast/Assembly"
 import { AssignmentStatement, BlockStatement, CallExpression, ClassDeclaration, Declarator, DotExpression, ExpressionStatement, FunctionExpression, Identifier, InstanceDeclarations, MemberExpression, ObjectExpression, Property, Reference, ReturnStatement, ThisExpression, TypeExpression, VariableDeclaration } from "../ast"
+import { getLast } from "../common"
 
 export default function createRuntime(root: Assembly, options: Options) {
     return traverse(root, {
-        enter(node) {
-            // if (ClassDeclaration.is(node)) {
-            //     return skip
-            // }
-        },
         leave(node, ancestors, path) {
             //  types here.
             if (TypeExpression.is(node)) {
@@ -18,12 +14,10 @@ export default function createRuntime(root: Assembly, options: Options) {
             if (DotExpression.is(node)) {
                 return new Reference({ name: "value" })
             }
-            //  finish handling all types of properties... not done yet!
-            if (VariableDeclaration.is(node) && !FunctionExpression.is(node.value)) {
+            //  checked variables and things.
+            if (VariableDeclaration.is(node)) {
                 if (node.static || node.instance) {
-                    // handling class let variables
-                    //  handle type checking on variables
-                    if (node.kind === "let" && node.value != null) {
+                    if (node.kind === "let" && node.value != null && !FunctionExpression.is(node.value)) {
                         return node.patch({
                             kind: "get",
                             value: new FunctionExpression({
@@ -40,7 +34,7 @@ export default function createRuntime(root: Assembly, options: Options) {
             }
             if (ClassDeclaration.is(node)) {
                 //  iterate and find var variables with a default value
-                let instanceVarsWithDefaults = node.instance.declarations.filter(d => d.value != null)
+                let instanceVarsWithDefaults = node.instance.declarations.filter(d => d.kind === "var" && d.value != null)
                 if (instanceVarsWithDefaults.length > 0) {
                     let ctor = node.instance.declarations.find(d => (d.id as Declarator).name === "constructor")
                         ?? new VariableDeclaration({
@@ -78,8 +72,8 @@ export default function createRuntime(root: Assembly, options: Options) {
                             declarations: newInstances
                         })
                     })
-                    // finally, handle static vars
-                    let staticVarsWithDefaults = node.static.filter(d => d.value != null)
+                    //  handle static vars and typed vars
+                    let staticVarsWithDefaults = node.static.filter(d => d.kind === "var" && d.value != null)
                     if (staticVarsWithDefaults.length > 0) {
                         result = replace(
                             result,
@@ -92,7 +86,6 @@ export default function createRuntime(root: Assembly, options: Options) {
                             })),
                         )
                     }
-
                     return result
                 }
             }

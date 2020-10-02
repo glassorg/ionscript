@@ -11,15 +11,18 @@ export class Options {
     output: string
     namespace: string
     parser!: ReturnType<typeof Parser>
+    debug: boolean
 
     constructor(
         inputs: string[],
         output: string,
-        namespace: string = common.findPackage()?.name ?? "_compiling_"
+        namespace: string = common.findPackage()?.name ?? "_compiling_",
+        debug = true,
     ) {
         this.namespace= namespace
         this.inputs = inputs
         this.output = output
+        this.debug = debug
     }
 
 }

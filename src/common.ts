@@ -95,6 +95,16 @@ export function mapValues<K,I,O>(object: Map<K,I>, fn: (I, K) => O): Map<K,O> {
     return result
 }
 
+export function getLast<T>(array: any[], predicate: (value) => value is T): T | null {
+    for (let i = array.length - 1; i >= 0; i--) {
+        let item = array[i]
+        if (predicate(item)) {
+            return item
+        }
+    }
+    return null
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 //  Set Functions
 ////////////////////////////////////////////////////////////////////////////////

@@ -182,6 +182,9 @@ export {
     default as Typed
 } from './Typed';
 export {
+    default as UnaryExpression
+} from './UnaryExpression';
+export {
     default as Variable
 } from './Variable';
 export {
