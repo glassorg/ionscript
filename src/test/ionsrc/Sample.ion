@@ -2,22 +2,25 @@ import "foo/bar/baz"
     as d
     * as all
     a
-    b
+
+type Integer = Number & .fraction == 0
 
 class Vector
-    var x: Number | String & .length > 0 = 0
-    var y: Number = 0
-    let sum = x + y + staticSum
-    let constructor = () =>
-        super()
-    let translate = async (dx = 0, dy = 0) => new Vector(x + dx, y + dy)
-    get foo = () => 12
-    set foo = () => 12
-    let [Symbol.iterator] = *() => yield* Object.keys(this)
-    static var staticSum = x + y
-    static let staticX = () => 10
-    static let staticY = () => 20
-    static get foo = () => 12
+    var x: Number = 0
+    var y: Number = 10
+    static var z = 12
+    static var w = 22
+#     let sum = x + y + staticSum
+#     let constructor = () =>
+#         super()
+#     let translate = async (dx = 0, dy = 0) => new Vector(x + dx, y + dy)
+#     get foo = () => 12
+#     set foo = () => 12
+#     let [Symbol.iterator] = *() => yield* Object.keys(this)
+#     static var staticSum = x + y
+#     static let staticX = () => 10
+#     static let staticY = () => 20
+#     static get foo = () => 12
 
 # import "module" as d
 #     a

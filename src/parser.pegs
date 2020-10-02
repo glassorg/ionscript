@@ -226,8 +226,8 @@ VariableModifiers
     / &. { return {} }
 
 VariableDeclaration
-    = modifiers:VariableModifiers TypeToken _ id:Identifier _ "=" _ value:Type EOL
-    { return node("TypeDeclaration", { id, value, ...modifiers }) }
+    = modifiers:VariableModifiers TypeToken _ id:Declarator _ "=" _ value:Type EOL
+    { return node("VariableDeclaration", { kind: "type", id, value, ...modifiers }) }
     / meta:MetaProperties modifiers:VariableModifiers declarationType:VariableDeclarationType
         _ id:(Pattern / "[" _ @InlineExpression _ "]") _ type:(":" _ @Type)? _ value:('=' _ @OutlineExpression / EOL {return null})?
     { return node("VariableDeclaration", { ...declarationType, id, type, value, meta, ...modifiers }) }

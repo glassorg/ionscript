@@ -3,12 +3,12 @@ This file was generated from ion source. Do not edit.
 */
 import * as _Object from './ion/Object';
 import * as Type from './Type';
+import * as Expression from './Expression';
 import * as Node from './Node';
 import * as Location from './Location';
 import * as Null from './ion/Null';
-import * as Expression from './Expression';
 import * as Class from './ion/Class';
-export class TypeExpression implements _Object.Object , Type.Type , Node.Node {
+export class TypeExpression implements _Object.Object , Type.Type , Expression.Expression , Node.Node {
     readonly location: Location.Location | Null.Null;
     readonly value: Expression.Expression;
     static readonly id = 'TypeExpression';
@@ -16,6 +16,7 @@ export class TypeExpression implements _Object.Object , Type.Type , Node.Node {
         'TypeExpression',
         'ion_Object',
         'Type',
+        'Expression',
         'Node'
     ]);
     constructor({location = null, value}: {
