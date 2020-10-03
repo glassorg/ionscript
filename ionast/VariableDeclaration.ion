@@ -5,6 +5,6 @@ import
 export
     class VariableDeclaration extends Variable, Typed, Declaration
         var kind: String # var, let, get, set
-        var static: Boolean = false
+        var static: Identifier | Null = null
         var instance: Boolean = false
 

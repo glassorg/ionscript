@@ -1,6 +1,6 @@
 import { Options } from "../Compiler"
 import { traverse, skip, replace } from "@glas/traverse"
-import { CallExpression, Exportable, FunctionExpression, Identifier, ImportDeclaration, Literal, Node, Parameter, Program, RegularExpression, SwitchCase } from "../ast"
+import { BinaryExpression, CallExpression, Exportable, FunctionExpression, Identifier, ImportDeclaration, Literal, Node, Parameter, Program, RegularExpression, SwitchCase } from "../ast"
 import Position from "../ast/Position"
 import VariableDeclaration from "../ast/VariableDeclaration"
 import Reference from "../ast/Reference"
@@ -11,6 +11,10 @@ import ClassDeclaration from "../ast/ClassDeclaration"
 import AssignmentStatement from "../ast/AssignmentStatement"
 import { SemanticError } from "../common"
 import Declarator from "../ast/Declarator"
+
+const operatorMap = {
+    "==": "==="
+}
 
 export default function toEsTree(root: Map<string, any>, options: Options) {
     return traverse(root, {
@@ -114,6 +118,9 @@ export default function toEsTree(root: Map<string, any>, options: Options) {
                             source: null,
                         }
                     }
+                }
+                if (BinaryExpression.is(node)) {
+                    result.operator = operatorMap[node.operator] ?? node.operator
                 }
                 if (SwitchCase.is(node)) {
                     // EsTree SwitchCase.consequent: Array<Statement>

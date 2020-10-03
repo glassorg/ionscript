@@ -3,13 +3,19 @@ import "foo/bar/baz"
     * as all
     a
 
-type Integer = Number & .fraction == 0
+type Integer = Number & Math.floor(.) == .
+type AlsoInteger = Integer
+type Literal = "a" | 12 | false
 
-let double = (a: Number) => a * 2
+let double = (a: Number) =>
+    if a is Integer
+        console.log(a)
+    else
+        console.log(a)
 
 class Vector
-    var x: Number = 0
-    var y: Number = 10
+    var x: Number | String = 0
+    var y: Number & . > 0 | "foo" = 10
     static var z: Number = 12
     static var w = 22
 

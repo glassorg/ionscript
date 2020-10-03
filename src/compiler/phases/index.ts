@@ -7,14 +7,18 @@ import controlFlowToExpressions from "./controlFlowToExpressions"
 import checkReferences from "./checkReferences"
 import createRuntime from "./createRuntime"
 import runtimeTypeChecking from "./runtimeTypeChecking"
+import semanticAnalysis from "./semanticAnalysis"
+import createConditionalDeclarations from "./createConditionalDeclarations"
 
 export default [
     parsing,
+    semanticAnalysis,
     fixImports,
     checkReferences,
     controlFlowToExpressions,
-    createRuntime,
+    // createConditionalDeclarations,
     runtimeTypeChecking,
+    createRuntime,
     toEsTree,
     codegen,
     writeFiles,

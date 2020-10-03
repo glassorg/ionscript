@@ -2,6 +2,7 @@
 This file was generated from ion source. Do not edit.
 */
 import * as _Object from './ion/Object';
+import * as VariableDeclaration from './VariableDeclaration';
 import * as Variable from './Variable';
 import * as Typed from './Typed';
 import * as Declaration from './Declaration';
@@ -16,21 +17,24 @@ import * as Type from './Type';
 import * as Reference from './Reference';
 import * as Integer from './ion/Integer';
 import * as String from './ion/String';
+import * as Identifier from './Identifier';
 import * as Boolean from './ion/Boolean';
 import * as Class from './ion/Class';
-export class VariableDeclaration implements _Object.Object , Variable.Variable , Typed.Typed , Declaration.Declaration , Node.Node , Statement.Statement , Exportable.Exportable {
+export class ConditionalDeclaration implements _Object.Object , VariableDeclaration.VariableDeclaration , Variable.Variable , Typed.Typed , Declaration.Declaration , Node.Node , Statement.Statement , Exportable.Exportable {
     readonly location: Location.Location | Null.Null;
     readonly id: Pattern.Pattern | Expression.Expression;
     readonly value: Expression.Expression | Null.Null;
-    readonly type: Type.Type | (Reference.Reference | Null.Null);
+    readonly type: Type.Type | (Reference.Reference | (Expression.Expression | Null.Null));
     readonly export: Integer.Integer;
     readonly kind: String.String;
-    readonly static: Boolean.Boolean;
+    readonly static: Identifier.Identifier | Null.Null;
     readonly instance: Boolean.Boolean;
-    static readonly id = 'VariableDeclaration';
+    readonly negate: Boolean.Boolean;
+    static readonly id = 'ConditionalDeclaration';
     static readonly implements = new Set([
-        'VariableDeclaration',
+        'ConditionalDeclaration',
         'ion_Object',
+        'VariableDeclaration',
         'Variable',
         'Typed',
         'Declaration',
@@ -45,17 +49,19 @@ export class VariableDeclaration implements _Object.Object , Variable.Variable ,
         type = null,
         export: _export = 0,
         kind,
-        static: _static = false,
-        instance = false
+        static: _static = null,
+        instance = false,
+        negate = false
     }: {
         location?: Location.Location | Null.Null,
         id: Pattern.Pattern | Expression.Expression,
         value?: Expression.Expression | Null.Null,
-        type?: Type.Type | (Reference.Reference | Null.Null),
+        type?: Type.Type | (Reference.Reference | (Expression.Expression | Null.Null)),
         export?: Integer.Integer,
         kind: String.String,
-        static?: Boolean.Boolean,
-        instance?: Boolean.Boolean
+        static?: Identifier.Identifier | Null.Null,
+        instance?: Boolean.Boolean,
+        negate?: Boolean.Boolean
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
             throw new Error('location is not a Location | Null: ' + Class.toString(location));
@@ -63,16 +69,18 @@ export class VariableDeclaration implements _Object.Object , Variable.Variable ,
             throw new Error('id is not a Pattern | Expression: ' + Class.toString(id));
         if (!(Expression.isExpression(value) || Null.isNull(value)))
             throw new Error('value is not a Expression | Null: ' + Class.toString(value));
-        if (!(Type.isType(type) || (Reference.isReference(type) || Null.isNull(type))))
-            throw new Error('type is not a Type | Reference | Null: ' + Class.toString(type));
+        if (!(Type.isType(type) || (Reference.isReference(type) || (Expression.isExpression(type) || Null.isNull(type)))))
+            throw new Error('type is not a Type | Reference | Expression | Null: ' + Class.toString(type));
         if (!Integer.isInteger(_export))
             throw new Error('export is not a Integer: ' + Class.toString(_export));
         if (!String.isString(kind))
             throw new Error('kind is not a String: ' + Class.toString(kind));
-        if (!Boolean.isBoolean(_static))
-            throw new Error('static is not a Boolean: ' + Class.toString(_static));
+        if (!(Identifier.isIdentifier(_static) || Null.isNull(_static)))
+            throw new Error('static is not a Identifier | Null: ' + Class.toString(_static));
         if (!Boolean.isBoolean(instance))
             throw new Error('instance is not a Boolean: ' + Class.toString(instance));
+        if (!Boolean.isBoolean(negate))
+            throw new Error('negate is not a Boolean: ' + Class.toString(negate));
         this.location = location;
         this.id = id;
         this.value = value;
@@ -81,28 +89,30 @@ export class VariableDeclaration implements _Object.Object , Variable.Variable ,
         this.kind = kind;
         this.static = _static;
         this.instance = instance;
+        this.negate = negate;
         Object.freeze(this);
     }
     patch(properties: {
         location?: Location.Location | Null.Null,
         id?: Pattern.Pattern | Expression.Expression,
         value?: Expression.Expression | Null.Null,
-        type?: Type.Type | (Reference.Reference | Null.Null),
+        type?: Type.Type | (Reference.Reference | (Expression.Expression | Null.Null)),
         export?: Integer.Integer,
         kind?: String.String,
-        static?: Boolean.Boolean,
-        instance?: Boolean.Boolean
+        static?: Identifier.Identifier | Null.Null,
+        instance?: Boolean.Boolean,
+        negate?: Boolean.Boolean
     }) {
-        return new VariableDeclaration({
+        return new ConditionalDeclaration({
             ...this,
             ...properties
         });
     }
-    static is(value): value is VariableDeclaration {
-        return isVariableDeclaration(value);
+    static is(value): value is ConditionalDeclaration {
+        return isConditionalDeclaration(value);
     }
 }
-export function isVariableDeclaration(value): value is VariableDeclaration {
-    return Class.isInstance(VariableDeclaration, value);
+export function isConditionalDeclaration(value): value is ConditionalDeclaration {
+    return Class.isInstance(ConditionalDeclaration, value);
 }
-export default VariableDeclaration;
+export default ConditionalDeclaration;

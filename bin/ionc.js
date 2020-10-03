@@ -15,7 +15,7 @@ if (!input || !output) {
     let clean = (path) => path.endsWith("/") ? input.slice(0, -1) : path
     input = clean(input)
     output = clean(output)
-    const { default: Compiler, Options } = require("../lib/Compiler");
+    const { default: Compiler, Options } = require("../lib/compiler/Compiler");
     let options = new Options([input], output, namespace);
     let compiler = new Compiler();
     compiler.compile(options);

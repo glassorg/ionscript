@@ -41,6 +41,9 @@ export {
     default as ClassDeclaration
 } from './ClassDeclaration';
 export {
+    default as ConditionalDeclaration
+} from './ConditionalDeclaration';
+export {
     default as ConditionalExpression
 } from './ConditionalExpression';
 export {

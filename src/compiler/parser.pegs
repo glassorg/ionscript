@@ -222,7 +222,7 @@ VariableDeclarationType
     // / MetaToken { return { assignable: false, meta: true }}
 
 VariableModifiers
-    = StaticToken _ { return { static: true } }
+    = &StaticToken id:Identifier _ { return { static: id } }
     / &. { return {} }
 
 VariableDeclaration
@@ -359,11 +359,11 @@ Type
 
 UnionType
     = left:ConstrainedType right:(_ "|" _ @UnionType)?
-    { return right ? node('BinaryExpression', { left, operator: "|", right }) : left }
+    { return right ? node('BinaryExpression', { left, operator: "||", right }) : left }
 
 ConstrainedType
     = left:Constraint right:(_ "&" _ @ConstrainedType)?
-    { return right ? node('BinaryExpression', { left, operator: "&", right }) : left }
+    { return right ? node('BinaryExpression', { left, operator: "&&", right }) : left }
 
 Constraint
     = right:Literal

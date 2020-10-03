@@ -1,11 +1,16 @@
-import { Options } from "../Compiler"
-import { traverse, skip, replace } from "@glas/traverse"
-import Assembly from "../ast/Assembly"
-import { AssignmentStatement, BlockStatement, CallExpression, ClassDeclaration, Declarator, DotExpression, ExpressionStatement, FunctionExpression, Identifier, InstanceDeclarations, MemberExpression, ObjectExpression, Property, Reference, ReturnStatement, ThisExpression, TypeExpression, VariableDeclaration } from "../ast"
-import { getLast } from "../common"
+import { Options } from "../Compiler";
+import { traverse, skip, replace } from "@glas/traverse";
+import Assembly from "../ast/Assembly";
+import { AssignmentStatement, BinaryExpression, BlockStatement, CallExpression, ClassDeclaration, Declarator, DotExpression, Expression, ExpressionStatement, FunctionExpression, Identifier, InstanceDeclarations, Literal, MemberExpression, ObjectExpression, Parameter, Property, Reference, ReturnStatement, ThisExpression, TypeExpression, VariableDeclaration } from "../ast";
+import { replaceNodes } from "./runtimeTypeChecking";
 
 export default function createRuntime(root: Assembly, options: Options) {
     return traverse(root, {
+        enter(node) {
+            if (VariableDeclaration.is(node) && node.kind === "type") {
+                return skip
+            }
+        },
         leave(node, ancestors, path) {
             //  types here.
             if (TypeExpression.is(node)) {
@@ -14,6 +19,21 @@ export default function createRuntime(root: Assembly, options: Options) {
             if (DotExpression.is(node)) {
                 return new Reference({ name: "value" })
             }
+            if (BinaryExpression.is(node) && node.operator === "is") {
+                if (Reference.is(node.right)) {
+                    return new CallExpression({
+                        callee: new MemberExpression({
+                            object: new Reference({ name: "ion" }),
+                            property: new Identifier({ name: "is" })
+                        }),
+                        arguments: [ node.left, node.right ],
+                    })
+                }
+                else {
+                    return replaceNodes(node.right, DotExpression.is, node.left)
+                }
+            }
+
             //  checked variables and things.
             if (VariableDeclaration.is(node)) {
                 if (node.static || node.instance) {

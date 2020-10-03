@@ -10,8 +10,8 @@ let count = perfTest ? 1000 : 1
 for (let i = 0; i < count; i++) {
     let result = compiler.compile(
         new Options(
-            [path.join(__dirname, "../../ionsrc"), path.join(__dirname, "../../src/test/ionsrc")],
-            path.join(__dirname, "../../dist"),
+            [path.join(__dirname, "../../../ionsrc"), path.join(__dirname, "../../../src/compiler/test/ionsrc")],
+            path.join(__dirname, "../../../dist"),
         )
     )
 }
