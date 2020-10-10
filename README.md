@@ -7,8 +7,8 @@ Indented Javascript
 2. Beautiful syntax
 3. Improve maintainability
 4. Improve productivity
-5. Improve correctness
-6. Improve performance
+5. Improve performance
+6. Improve correctness
 
 ## Design Decisions
 
@@ -46,6 +46,25 @@ Indented Javascript
         - slower performance
     - only inserted for debug builds, add explit checks if you want them in release
 
+- Extend built in objects with new functions/properties?
+    - pros:
+        Can fix and patch missing functionality.
+    - cons:
+        Frowned upon by javascript community, for good reason in the case of libraries.
+        Most important property to set "is" for type checking is already used on Object.is for equality comparisons.
+    - Only set ion specific symbols like [ion.symbols.is] on built in objects.
+    - Provide "is" for convenience on ion classes.
+
+- Make pure functional collections (DataArray, DataSet, DataMap etc)?
+    - pros:
+        Can use compound structure keys in sets, maps, and array.indexOf
+    - cons:
+        Messing with Array decreases performance and new parallel runtime classes complicates things
+        Object.freeze really kills array performance... even on arrays that are not frozen
+        Would need alternative syntax for outline collection declarations to use standard collections
+    - No. Keys should just be strings or integers.
+    - In debug mode we can freeze child properties in data classes and add pure functional properties there.
+
 ## Syntax
 
 ### Import
@@ -67,22 +86,23 @@ Indented Javascript
         var x: Type = defaultValue
         let y = Expression
 
-        property bar = {}
-            get() =>
-            set(value) =>
-            value: Any
-            writable: Boolean
-            enumerable: Boolean
-            configurable: Boolean
-
 ## New Features
+
+    Declarative Collections         pure functional equals?
+        String  "" => String        
+        Array   [] => DataArray
+            .indexOf requires equality comparison so we HAVE to use our own subclass of Array
+        Map     () => DataMap
+        Set     || => DataSet
+        Object  {} => DataObject
+        Element <> => Dynamic, should be treated as immutable
+    All declarative collections are immutable
 
     Declarative Structure Programming
     or Control Flow within Declarative Structures
         let declarations
     Static Properties
     Property Runtime Type Checks
-
 
 ## Roadmap
 

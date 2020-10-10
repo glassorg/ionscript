@@ -15,6 +15,11 @@ export function getNodesOfType<T>(root, predicate: (node) => node is T) {
     return nodes
 }
 
+export function memoizeIntern<A extends any, B>(fn: (a: A) => B): (a: A) => B {
+    const cache = new Map<A, B>()
+    return (memoize as any)(fn, false, cache)
+}
+
 export function memoize<A extends object, B>(fn: (a: A, ...rest) => B, cacheResultAsKey = false, cache: WeakMap<A, B> = new WeakMap()): (a: A) => B {
     return function(this, arg) {
         let result = cache.get(arg)

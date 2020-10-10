@@ -13,6 +13,16 @@ let double = (a: Number) =>
     else
         console.log(a)
 
+#   data class Foo
+#   data struct Foo
+#   what about a not data struct, what about a struct with writeable fields?
+#   there is nothing wrong with that... but it would NOT have .equals, .hashcode etc.
+#   data class
+#   data struct
+# ion.DataMap
+# ion.DataSet
+# ion.DataArray
+
 class Vector
     var x: Number | String = 0
     var y: Number & . > 0 | "foo" = 10
