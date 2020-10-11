@@ -131,6 +131,9 @@ Indented Javascript
     X Type checks on class properties
     X Design way for known good types to bypass checks => remove automatic type checks on release
     X Check Types on function call
-      Write data classes.
+      is function for normal classes
+    X Write data classes.
+    X add static baseClasses to data classes.
+        add runtime type checking for data classes... is function
       Type Declarations, port pre-existing system from Ion develop branch
       .is function on Classes

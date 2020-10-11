@@ -11,6 +11,7 @@ data class Vertical
 
 data class Vector extends Horizontal, Vertical
     var z: Number = 0
+    static var w = 1
 
 # type Integer = Number & Math.floor(.) == .
 # type AlsoInteger = Integer

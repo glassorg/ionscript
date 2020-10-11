@@ -53,6 +53,7 @@ export default function createRuntime(root: Assembly, options: Options) {
                 }
             }
             if (ClassDeclaration.is(node)) {
+                let result = node
                 //  iterate and find var variables with a default value
                 let instanceVarsWithDefaults = node.instance.declarations.filter(d => d.kind === "var" && d.value != null)
                 if (instanceVarsWithDefaults.length > 0) {
@@ -87,33 +88,45 @@ export default function createRuntime(root: Assembly, options: Options) {
                     if (newInstances.length === node.instance.declarations.length) {
                         newInstances = [newCtor, ...newInstances]
                     }
-                    node = node.patch({
+                    result = result.patch({
                         instance: new InstanceDeclarations({
                             declarations: newInstances
                         })
                     })
-                    //  handle static vars and typed vars
-                    let staticVarsWithDefaults = node.static.filter(d => d.kind === "var" && d.value != null)
-                    if (staticVarsWithDefaults.length > 0) {
-                        node = replace(
-                            node,
-                            ...staticVarsWithDefaults.map(d => new AssignmentStatement({
-                                left: new MemberExpression({
-                                    object: new Reference(node.id),
-                                    property: new Identifier(d.id as Declarator)
-                                }),
-                                right: d.value!
-                            })),
-                        )
-                    }
                 }
                 // remove extends from data classes
                 if (node.isData) {
-                    node = node.patch({
-                        baseClasses: []
-                    })
+                    result = result.patch({ baseClasses: [] })
                 }
-                return node
+                //  handle static vars and typed vars
+                let staticVarsWithDefaults = node.static.filter(d => d.kind === "var" && d.value != null)
+                if (node.isData) {
+                    staticVarsWithDefaults.push(
+                        new VariableDeclaration({
+                            static: new Identifier({ name: "static" }),
+                            kind: "var",
+                            id: new Declarator({ name: "baseClasses" }),
+                            value: new CallExpression({
+                                new: true,
+                                callee: new Reference({ name: "Set"}),
+                                arguments: node.baseClasses
+                            })
+                        })
+                    )
+                }
+                if (staticVarsWithDefaults.length > 0) {
+                    result = replace(
+                        result,
+                        ...staticVarsWithDefaults.map(d => new AssignmentStatement({
+                            left: new MemberExpression({
+                                object: new Reference(node.id),
+                                property: new Identifier(d.id as Declarator)
+                            }),
+                            right: d.value!
+                        })),
+                    )
+                }
+                return result
             }
         }
     })
