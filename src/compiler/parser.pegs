@@ -324,16 +324,20 @@ AssignmentProperty
 //  Class
 ////////////////////////////////////////////////////////////////////////////////
 
+ClassModifiers
+    = DataToken _ { return { isData: true } }
+    / &. { return {} }
+
 ClassDeclaration
     = meta:MetaProperties
-        isStruct:(ClassToken { return false } / StructToken { return true })
+        modifiers:ClassModifiers isStruct:(ClassToken { return false } / StructToken { return true })
         _ id:Declarator params:TemplateParameters? _ baseClasses:Extends? EOL
         Indent
             declarations:(Dent @VariableDeclaration)*
         Outdent
         {
             return node("ClassDeclaration", {
-                id, isStruct, params: params || [], baseClasses: baseClasses || [],
+                id, ...modifiers, isStruct, params: params || [], baseClasses: baseClasses || [],
                 static: declarations.filter(d => d.static),
                 instance: node("InstanceDeclarations", { declarations: declarations.filter(d => !d.static).map(d => d.patch({ instance: true })) })
             })
@@ -896,6 +900,7 @@ LetToken        = @"let"        !IdPart
 PropertyToken   = @"property"   !IdPart
 MetaToken       = @"meta"       !IdPart
 StaticToken     = @"static"     !IdPart
+DataToken       = @"data"       !IdPart
 ExtendsToken    = @"extends"    !IdPart
 ForToken        = @"for"        !IdPart
 WhileToken      = @"while"      !IdPart

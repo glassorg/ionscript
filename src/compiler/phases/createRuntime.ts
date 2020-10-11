@@ -87,7 +87,7 @@ export default function createRuntime(root: Assembly, options: Options) {
                     if (newInstances.length === node.instance.declarations.length) {
                         newInstances = [newCtor, ...newInstances]
                     }
-                    let result = node.patch({
+                    node = node.patch({
                         instance: new InstanceDeclarations({
                             declarations: newInstances
                         })
@@ -95,19 +95,25 @@ export default function createRuntime(root: Assembly, options: Options) {
                     //  handle static vars and typed vars
                     let staticVarsWithDefaults = node.static.filter(d => d.kind === "var" && d.value != null)
                     if (staticVarsWithDefaults.length > 0) {
-                        result = replace(
-                            result,
+                        node = replace(
+                            node,
                             ...staticVarsWithDefaults.map(d => new AssignmentStatement({
                                 left: new MemberExpression({
-                                    object: new Reference(result.id),
+                                    object: new Reference(node.id),
                                     property: new Identifier(d.id as Declarator)
                                 }),
                                 right: d.value!
                             })),
                         )
                     }
-                    return result
                 }
+                // remove extends from data classes
+                if (node.isData) {
+                    node = node.patch({
+                        baseClasses: []
+                    })
+                }
+                return node
             }
         }
     })

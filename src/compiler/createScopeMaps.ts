@@ -21,15 +21,15 @@ export default function createScopeMaps(
     options: {
         checkDeclareBeforeUse?: boolean,
         identifiers?: Set<String>,
-        ancestorsMap?: Map<Node, Array<any>>,
-        pathMap?: Map<Node, Array<String>>,
+        ancestorsMap?: Map<Node, Node>,
+        // pathMap?: Map<Node, Array<String>>,  // consider doing scalar storage, like ancestors above
     } = {}
 ): ScopeMaps {
     let {
         checkDeclareBeforeUse,
         identifiers = new Set<String>(),
         ancestorsMap,
-        pathMap
+        // pathMap
     } = options
 
     let map = new Map()
@@ -64,6 +64,16 @@ export default function createScopeMaps(
 
     traverse(root, {
         enter(node, ancestors, path) {
+            if (ancestorsMap) {
+                let ancestor: Node | null = null
+                for (let i = ancestors.length - 1; i >= 0; i--) {
+                    if (Node.is(ancestors[i])) {
+                        ancestor = ancestors[i]
+                        break
+                    }
+                }
+                ancestorsMap.set(node, ancestor!)
+            }
             //  do nothing on Parameters, they're handled by their containing functions
             if (Parameter.is(node)) {
                 return
@@ -72,12 +82,9 @@ export default function createScopeMaps(
             let scope = scopes[scopes.length - 1]
             //  save a map from this nodes location to it's scope
             map.set(node, scope)
-            if (ancestorsMap) {
-                ancestorsMap.set(node, ancestors.slice(0))
-            }
-            if (pathMap) {
-                pathMap.set(node, path.slice(0))
-            }
+            // if (pathMap) {
+            //     pathMap.set(node, path.slice(0))
+            // }
             function pushScope() {
                 scopes.push(scope = { __proto__: scope, __source: node.constructor.name + " => " + JSON.stringify(node.location ?? "NULL") })
             }

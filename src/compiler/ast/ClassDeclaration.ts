@@ -21,6 +21,7 @@ export class ClassDeclaration implements _Object.Object , Declaration.Declaratio
     readonly location: Location.Location | Null.Null;
     readonly export: Integer.Integer;
     readonly isStruct: Boolean.Boolean;
+    readonly isData: Boolean.Boolean;
     readonly id: Identifier.Identifier;
     readonly parameters: _Array.Array<Parameter.Parameter>;
     readonly baseClasses: _Array.Array<Reference.Reference>;
@@ -39,6 +40,7 @@ export class ClassDeclaration implements _Object.Object , Declaration.Declaratio
         location = null,
         export: _export = 0,
         isStruct = false,
+        isData = false,
         id,
         parameters = [],
         baseClasses = [],
@@ -48,6 +50,7 @@ export class ClassDeclaration implements _Object.Object , Declaration.Declaratio
         location?: Location.Location | Null.Null,
         export?: Integer.Integer,
         isStruct?: Boolean.Boolean,
+        isData?: Boolean.Boolean,
         id: Identifier.Identifier,
         parameters?: _Array.Array<Parameter.Parameter>,
         baseClasses?: _Array.Array<Reference.Reference>,
@@ -60,6 +63,8 @@ export class ClassDeclaration implements _Object.Object , Declaration.Declaratio
             throw new Error('export is not a Integer: ' + Class.toString(_export));
         if (!Boolean.isBoolean(isStruct))
             throw new Error('isStruct is not a Boolean: ' + Class.toString(isStruct));
+        if (!Boolean.isBoolean(isData))
+            throw new Error('isData is not a Boolean: ' + Class.toString(isData));
         if (!Identifier.isIdentifier(id))
             throw new Error('id is not a Identifier: ' + Class.toString(id));
         if (!_Array.isArray(parameters))
@@ -73,6 +78,7 @@ export class ClassDeclaration implements _Object.Object , Declaration.Declaratio
         this.location = location;
         this.export = _export;
         this.isStruct = isStruct;
+        this.isData = isData;
         this.id = id;
         this.parameters = parameters;
         this.baseClasses = baseClasses;
@@ -84,6 +90,7 @@ export class ClassDeclaration implements _Object.Object , Declaration.Declaratio
         location?: Location.Location | Null.Null,
         export?: Integer.Integer,
         isStruct?: Boolean.Boolean,
+        isData?: Boolean.Boolean,
         id?: Identifier.Identifier,
         parameters?: _Array.Array<Parameter.Parameter>,
         baseClasses?: _Array.Array<Reference.Reference>,

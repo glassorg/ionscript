@@ -137,6 +137,7 @@ export default function toEsTree(root: Map<string, any>, options: Options) {
                     return {
                         type: "ClassDeclaration",
                         id: values.id,
+                        superClass: values.baseClasses[0],
                         body: {
                             type: "ClassBody",
                             body: declarations.map((v, index) => {

@@ -1,17 +1,26 @@
-import "foo/bar/baz"
-    as d
-    * as all
-    a
+# import "foo/bar/baz"
+#     as d
+#     * as all
+#     a
 
-type Integer = Number & Math.floor(.) == .
-type AlsoInteger = Integer
-type Literal = "a" | 12 | false
+data class Horizontal
+    var x: Number = 1
 
-let double = (a: Number) =>
-    if a is Integer
-        console.log(a)
-    else
-        console.log(a)
+data class Vertical
+    var y: Number = 2
+
+data class Vector extends Horizontal, Vertical
+    var z: Number = 0
+
+# type Integer = Number & Math.floor(.) == .
+# type AlsoInteger = Integer
+# type Literal = "a" | 12 | false
+
+# let double = (a: Number) =>
+#     if a is Integer
+#         console.log(a)
+#     else
+#         console.log(a)
 
 #   data class Foo
 #   data struct Foo
@@ -22,12 +31,6 @@ let double = (a: Number) =>
 # ion.DataMap
 # ion.DataSet
 # ion.DataArray
-
-class Vector
-    var x: Number | String = 0
-    var y: Number & . > 0 | "foo" = 10
-    static var z: Number = 12
-    static var w = 22
 
 #     let sum = x + y + staticSum
 #     let constructor = () =>

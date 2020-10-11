@@ -131,5 +131,6 @@ Indented Javascript
     X Type checks on class properties
     X Design way for known good types to bypass checks => remove automatic type checks on release
     X Check Types on function call
+      Write data classes.
       Type Declarations, port pre-existing system from Ion develop branch
       .is function on Classes

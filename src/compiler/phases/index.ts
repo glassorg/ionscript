@@ -8,6 +8,7 @@ import checkReferences from "./checkReferences"
 import createRuntime from "./createRuntime"
 import runtimeTypeChecking from "./runtimeTypeChecking"
 import semanticAnalysis from "./semanticAnalysis"
+import inheritBaseClasses from "./inheritBaseClasses"
 import createConditionalDeclarations from "./createConditionalDeclarations"
 
 export default [
@@ -15,6 +16,7 @@ export default [
     semanticAnalysis,
     fixImports,
     checkReferences,
+    inheritBaseClasses,
     controlFlowToExpressions,
     // createConditionalDeclarations,
     runtimeTypeChecking,
