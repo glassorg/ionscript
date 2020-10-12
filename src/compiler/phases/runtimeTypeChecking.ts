@@ -167,7 +167,7 @@ export default function runtimeTypeChecking(root: Assembly, options: Options) {
                                 })
                             }
                         }
-                        if (ClassDeclaration.is(node)) {
+                        if (ClassDeclaration.is(node) && !node.isData) {
                             // first find any typed vars we need to create symbols for
                             //  handle typed variables by adding symbols to use for storing values
                             let typedVars = [...node.static, ...node.instance.declarations].filter(d => d.type != null)

@@ -52,7 +52,7 @@ export default function createRuntime(root: Assembly, options: Options) {
                     }
                 }
             }
-            if (ClassDeclaration.is(node)) {
+            if (ClassDeclaration.is(node) && !node.isData) {
                 let result = node
                 //  iterate and find var variables with a default value
                 let instanceVarsWithDefaults = node.instance.declarations.filter(d => d.kind === "var" && d.value != null)
