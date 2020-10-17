@@ -74,6 +74,9 @@ export {
     default as FunctionExpression
 } from './FunctionExpression';
 export {
+    default as FunctionType
+} from './FunctionType';
+export {
     default as Identifier
 } from './Identifier';
 export {

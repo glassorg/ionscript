@@ -4,47 +4,59 @@ This file was generated from ion source. Do not edit.
 import * as _Object from './ion/Object';
 import * as Expression from './Expression';
 import * as Scope from './Scope';
+import * as Typed from './Typed';
 import * as Node from './Node';
 import * as Location from './Location';
 import * as Null from './ion/Null';
+import * as Type from './Type';
+import * as Reference from './Reference';
 import * as Identifier from './Identifier';
 import * as _Array from './ion/Array';
 import * as Parameter from './Parameter';
 import * as BlockStatement from './BlockStatement';
 import * as Boolean from './ion/Boolean';
 import * as Class from './ion/Class';
-export class FunctionExpression implements _Object.Object , Expression.Expression , Scope.Scope , Node.Node {
+export class FunctionExpression implements _Object.Object , Expression.Expression , Scope.Scope , Typed.Typed , Node.Node {
     readonly location: Location.Location | Null.Null;
+    readonly type: Type.Type | (Reference.Reference | Null.Null);
     readonly id: Identifier.Identifier | Null.Null;
     readonly params: _Array.Array<Parameter.Parameter>;
     readonly body: BlockStatement.BlockStatement;
     readonly async: Boolean.Boolean;
     readonly generator: Boolean.Boolean;
+    readonly returnType: Type.Type | (Reference.Reference | Null.Null);
     static readonly id = 'FunctionExpression';
     static readonly implements = new Set([
         'FunctionExpression',
         'ion_Object',
         'Expression',
         'Scope',
+        'Typed',
         'Node'
     ]);
     constructor({
         location = null,
+        type = null,
         id = null,
         params,
         body,
         async: _async = false,
-        generator = false
+        generator = false,
+        returnType = null
     }: {
         location?: Location.Location | Null.Null,
+        type?: Type.Type | (Reference.Reference | Null.Null),
         id?: Identifier.Identifier | Null.Null,
         params: _Array.Array<Parameter.Parameter>,
         body: BlockStatement.BlockStatement,
         async?: Boolean.Boolean,
-        generator?: Boolean.Boolean
+        generator?: Boolean.Boolean,
+        returnType?: Type.Type | (Reference.Reference | Null.Null)
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
             throw new Error('location is not a Location | Null: ' + Class.toString(location));
+        if (!(Type.isType(type) || (Reference.isReference(type) || Null.isNull(type))))
+            throw new Error('type is not a Type | Reference | Null: ' + Class.toString(type));
         if (!(Identifier.isIdentifier(id) || Null.isNull(id)))
             throw new Error('id is not a Identifier | Null: ' + Class.toString(id));
         if (!_Array.isArray(params))
@@ -55,21 +67,27 @@ export class FunctionExpression implements _Object.Object , Expression.Expressio
             throw new Error('async is not a Boolean: ' + Class.toString(_async));
         if (!Boolean.isBoolean(generator))
             throw new Error('generator is not a Boolean: ' + Class.toString(generator));
+        if (!(Type.isType(returnType) || (Reference.isReference(returnType) || Null.isNull(returnType))))
+            throw new Error('returnType is not a Type | Reference | Null: ' + Class.toString(returnType));
         this.location = location;
+        this.type = type;
         this.id = id;
         this.params = params;
         this.body = body;
         this.async = _async;
         this.generator = generator;
+        this.returnType = returnType;
         Object.freeze(this);
     }
     patch(properties: {
         location?: Location.Location | Null.Null,
+        type?: Type.Type | (Reference.Reference | Null.Null),
         id?: Identifier.Identifier | Null.Null,
         params?: _Array.Array<Parameter.Parameter>,
         body?: BlockStatement.BlockStatement,
         async?: Boolean.Boolean,
-        generator?: Boolean.Boolean
+        generator?: Boolean.Boolean,
+        returnType?: Type.Type | (Reference.Reference | Null.Null)
     }) {
         return new FunctionExpression({
             ...this,

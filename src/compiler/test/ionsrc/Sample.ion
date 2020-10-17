@@ -3,20 +3,22 @@
 #     * as all
 #     a
 
-data class Horizontal
-    var x: Number = 1
+# data class Horizontal
+#     var x: Number = 1
 
-data class Vertical
-    var y: Number & . < 10 & . >= 0 = 2
+# data class Vertical
+#     var y: Number & . < 10 & . >= 0 = 2
 
-data class Vector extends Horizontal, Vertical
-    var z: Number = 0
-    static var w = 1
+# data class Vector extends Horizontal, Vertical
+#     var z: Number = 0
+#     static var w = 1
+
+let { a: { b, c: [d, ...e]}, ...f } = { a: { b: 12, c: [true, false], other: 20 } }
 
 data struct Vector3
     var x: Number = 0
-    var y: Number = 0
-    var z: Number = 0
+#     var y: Number = 0
+#     var z: Number = 0
 
 # type Integer = Number & Math.floor(.) == .
 # type AlsoInteger = Integer

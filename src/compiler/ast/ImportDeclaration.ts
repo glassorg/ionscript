@@ -8,9 +8,12 @@ import * as _Object from './ion/Object';
 import * as Declaration from './Declaration';
 import * as Statement from './Statement';
 import * as Exportable from './Exportable';
+import * as Typed from './Typed';
 import * as Node from './Node';
 import * as Location from './Location';
 import * as Null from './ion/Null';
+import * as Type from './Type';
+import * as Reference from './Reference';
 import * as Integer from './ion/Integer';
 import * as _Array from './ion/Array';
 import * as Literal from './Literal';
@@ -19,8 +22,9 @@ export type Specifier = ImportSpecifier.ImportSpecifier | (ImportDefaultSpecifie
 export function isSpecifier(value): value is Specifier {
     return ImportSpecifier.isImportSpecifier(value) || (ImportDefaultSpecifier.isImportDefaultSpecifier(value) || ImportNamespaceSpecifier.isImportNamespaceSpecifier(value));
 }
-export class ImportDeclaration implements _Object.Object , Declaration.Declaration , Statement.Statement , Exportable.Exportable , Node.Node {
+export class ImportDeclaration implements _Object.Object , Declaration.Declaration , Statement.Statement , Exportable.Exportable , Typed.Typed , Node.Node {
     readonly location: Location.Location | Null.Null;
+    readonly type: Type.Type | (Reference.Reference | Null.Null);
     readonly export: Integer.Integer;
     readonly specifiers: _Array.Array<Specifier>;
     readonly source: Literal.Literal;
@@ -31,21 +35,26 @@ export class ImportDeclaration implements _Object.Object , Declaration.Declarati
         'Declaration',
         'Statement',
         'Exportable',
+        'Typed',
         'Node'
     ]);
     constructor({
         location = null,
+        type = null,
         export: _export = 0,
         specifiers,
         source
     }: {
         location?: Location.Location | Null.Null,
+        type?: Type.Type | (Reference.Reference | Null.Null),
         export?: Integer.Integer,
         specifiers: _Array.Array<Specifier>,
         source: Literal.Literal
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
             throw new Error('location is not a Location | Null: ' + Class.toString(location));
+        if (!(Type.isType(type) || (Reference.isReference(type) || Null.isNull(type))))
+            throw new Error('type is not a Type | Reference | Null: ' + Class.toString(type));
         if (!Integer.isInteger(_export))
             throw new Error('export is not a Integer: ' + Class.toString(_export));
         if (!_Array.isArray(specifiers))
@@ -53,6 +62,7 @@ export class ImportDeclaration implements _Object.Object , Declaration.Declarati
         if (!Literal.isLiteral(source))
             throw new Error('source is not a Literal: ' + Class.toString(source));
         this.location = location;
+        this.type = type;
         this.export = _export;
         this.specifiers = specifiers;
         this.source = source;
@@ -60,6 +70,7 @@ export class ImportDeclaration implements _Object.Object , Declaration.Declarati
     }
     patch(properties: {
         location?: Location.Location | Null.Null,
+        type?: Type.Type | (Reference.Reference | Null.Null),
         export?: Integer.Integer,
         specifiers?: _Array.Array<Specifier>,
         source?: Literal.Literal

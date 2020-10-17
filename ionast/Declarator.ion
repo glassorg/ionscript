@@ -3,4 +3,4 @@ import
     .*
 
 export
-    class Declarator extends Identifier, Pattern, Typed
+    class Declarator extends Identifier, Pattern

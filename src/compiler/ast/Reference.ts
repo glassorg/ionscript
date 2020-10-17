@@ -6,13 +6,15 @@ import * as Identifier from './Identifier';
 import * as Expression from './Expression';
 import * as Type from './Type';
 import * as Node from './Node';
+import * as Typed from './Typed';
 import * as Location from './Location';
 import * as Null from './ion/Null';
 import * as String from './ion/String';
 import * as Class from './ion/Class';
-export class Reference implements _Object.Object , Identifier.Identifier , Expression.Expression , Type.Type , Node.Node {
+export class Reference implements _Object.Object , Identifier.Identifier , Expression.Expression , Type.Type , Node.Node , Typed.Typed {
     readonly location: Location.Location | Null.Null;
     readonly name: String.String;
+    readonly type: Type.Type | (Reference | Null.Null);
     static readonly id = 'Reference';
     static readonly implements = new Set([
         'Reference',
@@ -20,23 +22,29 @@ export class Reference implements _Object.Object , Identifier.Identifier , Expre
         'Identifier',
         'Expression',
         'Type',
-        'Node'
+        'Node',
+        'Typed'
     ]);
-    constructor({location = null, name}: {
+    constructor({location = null, name, type = null}: {
         location?: Location.Location | Null.Null,
-        name: String.String
+        name: String.String,
+        type?: Type.Type | (Reference | Null.Null)
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
             throw new Error('location is not a Location | Null: ' + Class.toString(location));
         if (!String.isString(name))
             throw new Error('name is not a String: ' + Class.toString(name));
+        if (!(Type.isType(type) || (isReference(type) || Null.isNull(type))))
+            throw new Error('type is not a Type | Reference | Null: ' + Class.toString(type));
         this.location = location;
         this.name = name;
+        this.type = type;
         Object.freeze(this);
     }
     patch(properties: {
         location?: Location.Location | Null.Null,
-        name?: String.String
+        name?: String.String,
+        type?: Type.Type | (Reference | Null.Null)
     }) {
         return new Reference({
             ...this,

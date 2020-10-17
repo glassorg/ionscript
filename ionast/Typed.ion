@@ -4,4 +4,4 @@ import
 
 export
     class Typed extends Node
-        var type: Type | Reference | Expression | Null = null
+        var type: Type | Reference | Null = null

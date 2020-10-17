@@ -3,9 +3,9 @@ import
     .*
 
 export
-    class Property extends Node
+    class Property extends Typed
         var key: Expression | Identifier
-        var value: Expression | Pattern
+        var value: Expression | Pattern # Pattern is ONLY used here for AssignmentProperty on ObjectPatterns
         var kind: String = "init" # init | get | set
         var method: Boolean = false
         var shorthand: Boolean = false

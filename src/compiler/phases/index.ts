@@ -10,6 +10,8 @@ import runtimeTypeChecking from "./runtimeTypeChecking"
 import semanticAnalysis from "./semanticAnalysis"
 import inheritBaseClasses from "./inheritBaseClasses"
 import createConditionalDeclarations from "./createConditionalDeclarations"
+import inferTypes from "./inferTypes"
+import addDataClassConstructors from "./addDataClassConstructors"
 
 export default [
     parsing,
@@ -19,6 +21,8 @@ export default [
     inheritBaseClasses,
     controlFlowToExpressions,
     // createConditionalDeclarations,
+    inferTypes,
+    addDataClassConstructors,
     runtimeTypeChecking,
     createRuntime,
     toEsTree,

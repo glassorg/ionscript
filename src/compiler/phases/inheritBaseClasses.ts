@@ -10,101 +10,6 @@ function mergeDeclarations(base: VariableDeclaration, sub: VariableDeclaration) 
     return sub
 }
 
-function toTypeCheck(type: Type, value: Reference) {
-    if (Reference.is(type)) {
-        return new BinaryExpression({
-            left: value,
-            operator: "is",
-            right: type,
-        })
-    }
-    return replaceNodes(type, DotExpression.is, value)
-}
-
-function createDataClassConstructor(instanceVariables: VariableDeclaration[], isStruct: boolean, options: Options) {
-    return new VariableDeclaration({
-        kind: "let",
-        id: new Declarator({ name: "constructor" }),
-        value: new FunctionExpression({
-            params: isStruct ?
-                instanceVariables.map(v => {
-                    return new Parameter({
-                        id: v.id,
-                        value: v.value
-                    })
-                })
-            : [
-                new Parameter({
-                    id: new AssignmentPattern({
-                        left: new ObjectPattern({
-                            properties: instanceVariables.map(v => {
-                                return new Property({
-                                    kind: "init",
-                                    shorthand: true,
-                                    key: v.id,
-                                    value: !v.value ? v.id : new AssignmentPattern({
-                                        left: v.id,
-                                        right: v.value
-                                    }),
-                                })
-                            })
-                        }),
-                        right: new ObjectExpression({ properties: [] })
-                    })
-                })
-            ],
-            body: new BlockStatement({
-                body: [
-                    // first do type checks IF this is debug
-                    ...(!options.debug ? [] : instanceVariables).map(v => {
-                        return v.type == null ? null : new IfStatement({
-                            test: new UnaryExpression({
-                                prefix: true,
-                                operator: "!",
-                                argument: toTypeCheck(v.type, new Reference(v.id as Identifier)),
-                            }),
-                            consequent: new BlockStatement({
-                                body: [
-                                    new ThrowStatement({
-                                        argument: new CallExpression({
-                                            callee: new Reference({ name: "Error" }),
-                                            arguments: [
-                                                new Literal({ value: `Invalid value for ${(v.id as Identifier).name}`})
-                                            ]
-                                        })
-                                    })
-                                ]
-                            })
-                        })
-                    }).filter(v => v != null) as Statement[],
-                    ...instanceVariables.map(v => {
-                        return new AssignmentStatement({
-                            left: new MemberExpression({
-                                object: new ThisExpression({}),
-                                property: new Identifier(v.id as Identifier),
-                            }),
-                            right: new Reference(v.id as Identifier),
-                        })
-                    }),
-                    ...(!options.debug ? [] : [
-                        new ExpressionStatement({
-                            expression: new CallExpression({
-                                callee: new MemberExpression({
-                                    object: new Reference({ name: "Object" }),
-                                    property: new Identifier({ name: "freeze" }),
-                                }),
-                                arguments: [
-                                    new ThisExpression({})
-                                ]
-                            })
-                        })
-                    ])
-                ]
-            })
-        })
-    })
-}
-
 // cannot extend from ion.Object until we provide ability to change reserved names.
 // const rootClassReference = new Reference({ name: getAbsoluteName("ion.Object", "Object")})
 
@@ -165,7 +70,6 @@ export default function inheritBaseClasses(root: Assembly, options: Options) {
                 baseClasses: Array.from(baseClasses.values()),
                 instance: classDeclaration.instance.patch({
                     declarations: [
-                        createDataClassConstructor([...baseDeclarations.values()].filter(a => a.kind === "var"), classDeclaration.isStruct, options),
                         ...baseDeclarations.values(),
                     ]
                 })

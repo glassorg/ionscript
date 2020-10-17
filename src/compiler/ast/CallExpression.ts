@@ -4,16 +4,20 @@ This file was generated from ion source. Do not edit.
 import * as _Object from './ion/Object';
 import * as Expression from './Expression';
 import * as ChainElement from './ChainElement';
+import * as Typed from './Typed';
 import * as Node from './Node';
 import * as Location from './Location';
 import * as Null from './ion/Null';
+import * as Type from './Type';
+import * as Reference from './Reference';
 import * as Boolean from './ion/Boolean';
 import * as _Array from './ion/Array';
 import * as Statement from './Statement';
 import * as SpreadElement from './SpreadElement';
 import * as Class from './ion/Class';
-export class CallExpression implements _Object.Object , Expression.Expression , ChainElement.ChainElement , Node.Node {
+export class CallExpression implements _Object.Object , Expression.Expression , ChainElement.ChainElement , Typed.Typed , Node.Node {
     readonly location: Location.Location | Null.Null;
+    readonly type: Type.Type | (Reference.Reference | Null.Null);
     readonly optional: Boolean.Boolean;
     readonly new: Boolean.Boolean;
     readonly callee: Expression.Expression;
@@ -24,16 +28,19 @@ export class CallExpression implements _Object.Object , Expression.Expression , 
         'ion_Object',
         'Expression',
         'ChainElement',
+        'Typed',
         'Node'
     ]);
     constructor({
         location = null,
+        type = null,
         optional = false,
         new: _new = false,
         callee,
         arguments: _arguments
     }: {
         location?: Location.Location | Null.Null,
+        type?: Type.Type | (Reference.Reference | Null.Null),
         optional?: Boolean.Boolean,
         new?: Boolean.Boolean,
         callee: Expression.Expression,
@@ -41,6 +48,8 @@ export class CallExpression implements _Object.Object , Expression.Expression , 
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
             throw new Error('location is not a Location | Null: ' + Class.toString(location));
+        if (!(Type.isType(type) || (Reference.isReference(type) || Null.isNull(type))))
+            throw new Error('type is not a Type | Reference | Null: ' + Class.toString(type));
         if (!Boolean.isBoolean(optional))
             throw new Error('optional is not a Boolean: ' + Class.toString(optional));
         if (!Boolean.isBoolean(_new))
@@ -50,6 +59,7 @@ export class CallExpression implements _Object.Object , Expression.Expression , 
         if (!_Array.isArray(_arguments))
             throw new Error('arguments is not a Array: ' + Class.toString(_arguments));
         this.location = location;
+        this.type = type;
         this.optional = optional;
         this.new = _new;
         this.callee = callee;
@@ -58,6 +68,7 @@ export class CallExpression implements _Object.Object , Expression.Expression , 
     }
     patch(properties: {
         location?: Location.Location | Null.Null,
+        type?: Type.Type | (Reference.Reference | Null.Null),
         optional?: Boolean.Boolean,
         new?: Boolean.Boolean,
         callee?: Expression.Expression,

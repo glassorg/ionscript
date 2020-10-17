@@ -6,7 +6,7 @@ export
     class ClassDeclaration extends Declaration
         var isStruct: Boolean = false
         var isData: Boolean = false
-        var id: Identifier
+        var id: Declarator
         var parameters: Array<Parameter> = []
         var baseClasses: Array<Reference> = []
         # var declarations: Array<VariableDeclaration>

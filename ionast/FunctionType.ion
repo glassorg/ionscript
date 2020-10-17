@@ -1,0 +1,9 @@
+import
+    ion.*
+    .*
+
+export
+    class FunctionType extends Type
+        var params: Array<Parameter>
+        var async: Boolean = false
+        var returnType: Type | Reference | Null = null

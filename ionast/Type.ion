@@ -3,4 +3,4 @@ import
     .*
 
 export
-    class Type extends Node
+    class Type extends Expression

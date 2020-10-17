@@ -3,15 +3,19 @@ This file was generated from ion source. Do not edit.
 */
 import * as _Object from './ion/Object';
 import * as Statement from './Statement';
+import * as Typed from './Typed';
 import * as Node from './Node';
 import * as Location from './Location';
 import * as Null from './ion/Null';
+import * as Type from './Type';
+import * as Reference from './Reference';
 import * as String from './ion/String';
 import * as Pattern from './Pattern';
 import * as Expression from './Expression';
 import * as Class from './ion/Class';
-export class AssignmentStatement implements _Object.Object , Statement.Statement , Node.Node {
+export class AssignmentStatement implements _Object.Object , Statement.Statement , Typed.Typed , Node.Node {
     readonly location: Location.Location | Null.Null;
+    readonly type: Type.Type | (Reference.Reference | Null.Null);
     readonly operator: String.String;
     readonly left: Pattern.Pattern | Expression.Expression;
     readonly right: Expression.Expression;
@@ -20,16 +24,20 @@ export class AssignmentStatement implements _Object.Object , Statement.Statement
         'AssignmentStatement',
         'ion_Object',
         'Statement',
+        'Typed',
         'Node'
     ]);
-    constructor({location = null, operator = '=', left, right}: {
+    constructor({location = null, type = null, operator = '=', left, right}: {
         location?: Location.Location | Null.Null,
+        type?: Type.Type | (Reference.Reference | Null.Null),
         operator?: String.String,
         left: Pattern.Pattern | Expression.Expression,
         right: Expression.Expression
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
             throw new Error('location is not a Location | Null: ' + Class.toString(location));
+        if (!(Type.isType(type) || (Reference.isReference(type) || Null.isNull(type))))
+            throw new Error('type is not a Type | Reference | Null: ' + Class.toString(type));
         if (!String.isString(operator))
             throw new Error('operator is not a String: ' + Class.toString(operator));
         if (!(Pattern.isPattern(left) || Expression.isExpression(left)))
@@ -37,6 +45,7 @@ export class AssignmentStatement implements _Object.Object , Statement.Statement
         if (!Expression.isExpression(right))
             throw new Error('right is not a Expression: ' + Class.toString(right));
         this.location = location;
+        this.type = type;
         this.operator = operator;
         this.left = left;
         this.right = right;
@@ -44,6 +53,7 @@ export class AssignmentStatement implements _Object.Object , Statement.Statement
     }
     patch(properties: {
         location?: Location.Location | Null.Null,
+        type?: Type.Type | (Reference.Reference | Null.Null),
         operator?: String.String,
         left?: Pattern.Pattern | Expression.Expression,
         right?: Expression.Expression
