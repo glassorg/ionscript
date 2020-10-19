@@ -9,5 +9,5 @@ export
         var body: BlockStatement
         var async: Boolean = false
         var generator: Boolean = false
-        var returnType: Type | Reference | Null = null
+        var returnType: Type | Null = null
         # var typeGuard: Reference | Null = null

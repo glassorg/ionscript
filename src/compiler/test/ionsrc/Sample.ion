@@ -13,10 +13,29 @@
 #     var z: Number = 0
 #     static var w = 1
 
-let { a: { b, c: [d, ...e]}, ...f } = { a: { b: 12, c: [true, false], other: 20 } }
+# let { a: { b, c: [d, ...e]}, ...f } = { a: { b: 12, c: [true, false], other: 20 } }
 
-data struct Vector3
-    var x: Number = 0
+import "for/side/effects"
+import "ion/Library"
+    foo
+    bar
+    as importDefault
+    * as importStar
+
+export let double = a =>
+    if a is Number
+        return foo
+    else if a is String
+        return bar
+
+double(2)
+
+export default class Vector
+
+console.log(Vector)
+
+# data struct Vector3
+#     var x: Number = 0
 #     var y: Number = 0
 #     var z: Number = 0
 

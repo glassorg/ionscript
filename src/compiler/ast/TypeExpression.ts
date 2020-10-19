@@ -8,11 +8,10 @@ import * as Typed from './Typed';
 import * as Node from './Node';
 import * as Location from './Location';
 import * as Null from './ion/Null';
-import * as Reference from './Reference';
 import * as Class from './ion/Class';
 export class TypeExpression implements _Object.Object , Type.Type , Expression.Expression , Typed.Typed , Node.Node {
     readonly location: Location.Location | Null.Null;
-    readonly type: Type.Type | (Reference.Reference | Null.Null);
+    readonly type: Type.Type | Null.Null;
     readonly value: Expression.Expression;
     static readonly id = 'TypeExpression';
     static readonly implements = new Set([
@@ -25,13 +24,13 @@ export class TypeExpression implements _Object.Object , Type.Type , Expression.E
     ]);
     constructor({location = null, type = null, value}: {
         location?: Location.Location | Null.Null,
-        type?: Type.Type | (Reference.Reference | Null.Null),
+        type?: Type.Type | Null.Null,
         value: Expression.Expression
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
             throw new Error('location is not a Location | Null: ' + Class.toString(location));
-        if (!(Type.isType(type) || (Reference.isReference(type) || Null.isNull(type))))
-            throw new Error('type is not a Type | Reference | Null: ' + Class.toString(type));
+        if (!(Type.isType(type) || Null.isNull(type)))
+            throw new Error('type is not a Type | Null: ' + Class.toString(type));
         if (!Expression.isExpression(value))
             throw new Error('value is not a Expression: ' + Class.toString(value));
         this.location = location;
@@ -41,7 +40,7 @@ export class TypeExpression implements _Object.Object , Type.Type , Expression.E
     }
     patch(properties: {
         location?: Location.Location | Null.Null,
-        type?: Type.Type | (Reference.Reference | Null.Null),
+        type?: Type.Type | Null.Null,
         value?: Expression.Expression
     }) {
         return new TypeExpression({

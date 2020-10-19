@@ -8,12 +8,11 @@ import * as Node from './Node';
 import * as Location from './Location';
 import * as Null from './ion/Null';
 import * as Type from './Type';
-import * as Reference from './Reference';
 import * as Property from './Property';
 import * as Class from './ion/Class';
 export class PropertyStatement implements _Object.Object , Statement.Statement , Typed.Typed , Node.Node {
     readonly location: Location.Location | Null.Null;
-    readonly type: Type.Type | (Reference.Reference | Null.Null);
+    readonly type: Type.Type | Null.Null;
     readonly property: Property.Property;
     static readonly id = 'PropertyStatement';
     static readonly implements = new Set([
@@ -25,13 +24,13 @@ export class PropertyStatement implements _Object.Object , Statement.Statement ,
     ]);
     constructor({location = null, type = null, property}: {
         location?: Location.Location | Null.Null,
-        type?: Type.Type | (Reference.Reference | Null.Null),
+        type?: Type.Type | Null.Null,
         property: Property.Property
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
             throw new Error('location is not a Location | Null: ' + Class.toString(location));
-        if (!(Type.isType(type) || (Reference.isReference(type) || Null.isNull(type))))
-            throw new Error('type is not a Type | Reference | Null: ' + Class.toString(type));
+        if (!(Type.isType(type) || Null.isNull(type)))
+            throw new Error('type is not a Type | Null: ' + Class.toString(type));
         if (!Property.isProperty(property))
             throw new Error('property is not a Property: ' + Class.toString(property));
         this.location = location;
@@ -41,7 +40,7 @@ export class PropertyStatement implements _Object.Object , Statement.Statement ,
     }
     patch(properties: {
         location?: Location.Location | Null.Null,
-        type?: Type.Type | (Reference.Reference | Null.Null),
+        type?: Type.Type | Null.Null,
         property?: Property.Property
     }) {
         return new PropertyStatement({

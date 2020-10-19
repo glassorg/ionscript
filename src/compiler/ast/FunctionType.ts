@@ -8,17 +8,15 @@ import * as Typed from './Typed';
 import * as Node from './Node';
 import * as Location from './Location';
 import * as Null from './ion/Null';
-import * as Reference from './Reference';
 import * as _Array from './ion/Array';
-import * as Parameter from './Parameter';
 import * as Boolean from './ion/Boolean';
 import * as Class from './ion/Class';
 export class FunctionType implements _Object.Object , Type.Type , Expression.Expression , Typed.Typed , Node.Node {
     readonly location: Location.Location | Null.Null;
-    readonly type: Type.Type | (Reference.Reference | Null.Null);
-    readonly params: _Array.Array<Parameter.Parameter>;
+    readonly type: Type.Type | Null.Null;
+    readonly params: _Array.Array<Type.Type>;
     readonly async: Boolean.Boolean;
-    readonly returnType: Type.Type | (Reference.Reference | Null.Null);
+    readonly returnType: Type.Type | Null.Null;
     static readonly id = 'FunctionType';
     static readonly implements = new Set([
         'FunctionType',
@@ -36,21 +34,21 @@ export class FunctionType implements _Object.Object , Type.Type , Expression.Exp
         returnType = null
     }: {
         location?: Location.Location | Null.Null,
-        type?: Type.Type | (Reference.Reference | Null.Null),
-        params: _Array.Array<Parameter.Parameter>,
+        type?: Type.Type | Null.Null,
+        params: _Array.Array<Type.Type>,
         async?: Boolean.Boolean,
-        returnType?: Type.Type | (Reference.Reference | Null.Null)
+        returnType?: Type.Type | Null.Null
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
             throw new Error('location is not a Location | Null: ' + Class.toString(location));
-        if (!(Type.isType(type) || (Reference.isReference(type) || Null.isNull(type))))
-            throw new Error('type is not a Type | Reference | Null: ' + Class.toString(type));
+        if (!(Type.isType(type) || Null.isNull(type)))
+            throw new Error('type is not a Type | Null: ' + Class.toString(type));
         if (!_Array.isArray(params))
             throw new Error('params is not a Array: ' + Class.toString(params));
         if (!Boolean.isBoolean(_async))
             throw new Error('async is not a Boolean: ' + Class.toString(_async));
-        if (!(Type.isType(returnType) || (Reference.isReference(returnType) || Null.isNull(returnType))))
-            throw new Error('returnType is not a Type | Reference | Null: ' + Class.toString(returnType));
+        if (!(Type.isType(returnType) || Null.isNull(returnType)))
+            throw new Error('returnType is not a Type | Null: ' + Class.toString(returnType));
         this.location = location;
         this.type = type;
         this.params = params;
@@ -60,10 +58,10 @@ export class FunctionType implements _Object.Object , Type.Type , Expression.Exp
     }
     patch(properties: {
         location?: Location.Location | Null.Null,
-        type?: Type.Type | (Reference.Reference | Null.Null),
-        params?: _Array.Array<Parameter.Parameter>,
+        type?: Type.Type | Null.Null,
+        params?: _Array.Array<Type.Type>,
         async?: Boolean.Boolean,
-        returnType?: Type.Type | (Reference.Reference | Null.Null)
+        returnType?: Type.Type | Null.Null
     }) {
         return new FunctionType({
             ...this,

@@ -10,12 +10,11 @@ import * as Location from './Location';
 import * as Null from './ion/Null';
 import * as String from './ion/String';
 import * as Type from './Type';
-import * as Reference from './Reference';
 import * as Class from './ion/Class';
 export class Declarator implements _Object.Object , Identifier.Identifier , Pattern.Pattern , Node.Node , Typed.Typed {
     readonly location: Location.Location | Null.Null;
     readonly name: String.String;
-    readonly type: Type.Type | (Reference.Reference | Null.Null);
+    readonly type: Type.Type | Null.Null;
     static readonly id = 'Declarator';
     static readonly implements = new Set([
         'Declarator',
@@ -28,14 +27,14 @@ export class Declarator implements _Object.Object , Identifier.Identifier , Patt
     constructor({location = null, name, type = null}: {
         location?: Location.Location | Null.Null,
         name: String.String,
-        type?: Type.Type | (Reference.Reference | Null.Null)
+        type?: Type.Type | Null.Null
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
             throw new Error('location is not a Location | Null: ' + Class.toString(location));
         if (!String.isString(name))
             throw new Error('name is not a String: ' + Class.toString(name));
-        if (!(Type.isType(type) || (Reference.isReference(type) || Null.isNull(type))))
-            throw new Error('type is not a Type | Reference | Null: ' + Class.toString(type));
+        if (!(Type.isType(type) || Null.isNull(type)))
+            throw new Error('type is not a Type | Null: ' + Class.toString(type));
         this.location = location;
         this.name = name;
         this.type = type;
@@ -44,7 +43,7 @@ export class Declarator implements _Object.Object , Identifier.Identifier , Patt
     patch(properties: {
         location?: Location.Location | Null.Null,
         name?: String.String,
-        type?: Type.Type | (Reference.Reference | Null.Null)
+        type?: Type.Type | Null.Null
     }) {
         return new Declarator({
             ...this,

@@ -1,0 +1,8 @@
+
+# should we traverse past a publicly exported value to a non-publicly exported value?
+# probably not.
+let privateValue = 30
+
+export let foo = 10
+export let bar = privateValue
+export default { foo, bar }

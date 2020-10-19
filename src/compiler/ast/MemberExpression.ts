@@ -9,13 +9,12 @@ import * as Node from './Node';
 import * as Location from './Location';
 import * as Null from './ion/Null';
 import * as Type from './Type';
-import * as Reference from './Reference';
 import * as Boolean from './ion/Boolean';
 import * as Identifier from './Identifier';
 import * as Class from './ion/Class';
 export class MemberExpression implements _Object.Object , Expression.Expression , ChainElement.ChainElement , Typed.Typed , Node.Node {
     readonly location: Location.Location | Null.Null;
-    readonly type: Type.Type | (Reference.Reference | Null.Null);
+    readonly type: Type.Type | Null.Null;
     readonly optional: Boolean.Boolean;
     readonly object: Expression.Expression;
     readonly property: Identifier.Identifier | Expression.Expression;
@@ -30,15 +29,15 @@ export class MemberExpression implements _Object.Object , Expression.Expression 
     ]);
     constructor({location = null, type = null, optional = false, object, property}: {
         location?: Location.Location | Null.Null,
-        type?: Type.Type | (Reference.Reference | Null.Null),
+        type?: Type.Type | Null.Null,
         optional?: Boolean.Boolean,
         object: Expression.Expression,
         property: Identifier.Identifier | Expression.Expression
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
             throw new Error('location is not a Location | Null: ' + Class.toString(location));
-        if (!(Type.isType(type) || (Reference.isReference(type) || Null.isNull(type))))
-            throw new Error('type is not a Type | Reference | Null: ' + Class.toString(type));
+        if (!(Type.isType(type) || Null.isNull(type)))
+            throw new Error('type is not a Type | Null: ' + Class.toString(type));
         if (!Boolean.isBoolean(optional))
             throw new Error('optional is not a Boolean: ' + Class.toString(optional));
         if (!Expression.isExpression(object))
@@ -54,7 +53,7 @@ export class MemberExpression implements _Object.Object , Expression.Expression 
     }
     patch(properties: {
         location?: Location.Location | Null.Null,
-        type?: Type.Type | (Reference.Reference | Null.Null),
+        type?: Type.Type | Null.Null,
         optional?: Boolean.Boolean,
         object?: Expression.Expression,
         property?: Identifier.Identifier | Expression.Expression

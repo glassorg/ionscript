@@ -17,6 +17,7 @@ export const Object = ref("Object")
 export const Null = ref("Null")
 export const Any = ref("Any")
 export const Never = ref("Never")
+export const Void = ref("Void")
 
 // export const EmptyLocation = new Location({ start: new Position(0, 0), end: new Position(0, 0), filename: "inferType.empty" })
 

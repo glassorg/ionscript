@@ -6,7 +6,7 @@ import { getLast } from "../common"
 
 // let Vector_x = Symbol("Vector_x")
 function getSymbolName(c: ClassDeclaration, d: VariableDeclaration) {
-    return `${c.id.name}_${(d.id as Identifier).name}`
+    return `${c.id.name}_${(d.id as Reference).name}`
 }
 
 function typeCheckOrThrow(value: Expression, type: Type, name: string): Statement {
@@ -138,7 +138,7 @@ export default function runtimeTypeChecking(root: Assembly, options: Options) {
                                                 property: new Identifier({ name: "Type" })
                                             }),
                                             arguments: [
-                                                new Literal({ value: (node.id as Identifier).name }),
+                                                new Literal({ value: (node.id as Reference).name }),
                                                 new FunctionExpression({
                                                     params: [
                                                         new Parameter({ id: new Declarator({ name: "_" }) })
@@ -160,7 +160,7 @@ export default function runtimeTypeChecking(root: Assembly, options: Options) {
                                 return node.patch({
                                     body: node.body.patch({
                                         body: [
-                                            ...typedParams.map(p => typeCheckOrThrow(new Reference(p.id as Identifier), p.type!, (p.id as Identifier).name)),
+                                            ...typedParams.map(p => typeCheckOrThrow(new Reference(p.id as Reference), p.type!, (p.id as Reference).name)),
                                             ...node.body.body
                                         ]
                                     })

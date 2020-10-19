@@ -2,7 +2,6 @@ import Assembly from "../ast/Assembly";
 import { Options } from "../Compiler";
 import Analysis from "../ast/Analysis";
 import Declaration from "../ast/Declaration";
-import * as pathFunctions from "../pathFunctions";
 
 export default function assemblyToAnalysis(root: Assembly, options: Options): Analysis {
 

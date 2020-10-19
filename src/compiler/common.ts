@@ -1,9 +1,9 @@
 import * as fs from "fs";
 import * as np from "path";
 import { traverse } from "@glas/traverse";
-import { join } from "./pathFunctions";
+// import { join } from "./pathFunctions";
 import { NodeMap, ScopeMap } from "./createScopeMaps";
-import { Reference, Node, VariableDeclaration } from "./ast";
+import { Reference, Node, VariableDeclaration, ModuleSpecifier, ImportDeclaration, Declarator, Program, ImportDefaultSpecifier, ImportNamespaceSpecifier, ImportSpecifier, Exportable } from "./ast";
 
 export function getNodesOfType<T>(root, predicate: (node) => node is T) {
     let nodes = new Array<T>()
@@ -44,20 +44,54 @@ export function isValidId(name: string) {
 //  Miscelaneous Functions
 ////////////////////////////////////////////////////////////////////////////////
 
+export function getOriginalDeclarator(declarator: Declarator, scopes: NodeMap<ScopeMap>, ancestors: Map<Node, Node>) {
+    let parent = ancestors.get(declarator)
+    if (ModuleSpecifier.is(parent)) {
+        let importDeclaration = ancestors.get(parent) as ImportDeclaration
+        let sourceModuleDeclaration = scopes.get(declarator)[importDeclaration.source.value as string]
+        if (sourceModuleDeclaration) {
+            if (ImportNamespaceSpecifier.is(parent as any)) {
+                return sourceModuleDeclaration
+            }
+            let name: string
+            if (ImportSpecifier.is(parent)) {
+                name = parent.imported.name
+            }
+            else if (ImportDefaultSpecifier.is(parent)) {
+                name = "default"
+            }
+            else {
+                throw new Error()
+            }
+            let sourceProgramScope = scopes.get(sourceModuleDeclaration)
+            let sourceDeclarator = sourceProgramScope[name]
+            if (sourceDeclarator == null) {
+                throw SemanticError(`${importDeclaration.source.value} does not have export ${name}`, parent)
+            }
+            let sourceDeclaratorParent = ancestors.get(sourceDeclarator)
+            if (!Exportable.is(sourceDeclaratorParent) || !sourceDeclaratorParent.export) {
+                throw SemanticError(`${importDeclaration.source.value} ${name} is not exported`, parent)
+            }
+            // recurse in case this exported value is also a reference or re-export
+            // return sourceDeclarator
+            return getOriginalDeclarator(sourceDeclarator, scopes, ancestors)
+        }
+    }
+    // traverse variables that are just constant re-declarations
+    if (VariableDeclaration.is(parent) && parent.kind !== "var" && Reference.is(parent.value)) {
+        // keep following references to the original
+        return getDeclarator(parent.value, scopes, ancestors, true)
+    }
+    return declarator
+}
+
 export function getDeclarator(ref: Reference, scopes: NodeMap<ScopeMap>, ancestors: Map<Node, Node>, traverseReferences = false) {
     let scope = scopes.get(ref)
     let declarator = scope[ref.name]
     if (declarator == null) {
         throw SemanticError(`${ref.name} declarator not found`, ref)
     }
-    if (traverseReferences) {
-        let ancestor = ancestors.get(declarator)
-        if (VariableDeclaration.is(ancestor) && Reference.is(ancestor.value)) {
-            // keep following references to the original
-            return getDeclarator(ancestor.value, scopes, ancestors, traverseReferences)
-        }
-    }
-    return declarator
+    return traverseReferences ? getOriginalDeclarator(declarator, scopes, ancestors) : declarator
 }
 
 export function getAncestor<T>(node: Node, ancestors: Map<Node, Node>, predicate: (a) => a is T): T | null {
@@ -195,7 +229,7 @@ export function read(file: any) {
 
 export function getPathFromFilename(namespace: string, filename: string) {
     let path = filename.substring(0, filename.length - ionExt.length).split(/[\/\\]+/g)
-    return join(namespace, ...path)
+    return namespace.replace(/[\/\\]/g, "/") + "/" + path.join("/")
 }
 
 export function getInputFilesRecursive(directory: string | string[], namespace: string, rootDirectory : string | null = null, allFiles: {[path: string]: string} = {}): {[path: string]: string} {

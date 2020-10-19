@@ -4,6 +4,6 @@ import
 
 export
     class FunctionType extends Type
-        var params: Array<Parameter>
+        var params: Array<Type>
         var async: Boolean = false
-        var returnType: Type | Reference | Null = null
+        var returnType: Type | Null = null

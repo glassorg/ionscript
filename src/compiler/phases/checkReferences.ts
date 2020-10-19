@@ -1,11 +1,30 @@
 import createScopeMaps from "../createScopeMaps";
-import { traverse } from "@glas/traverse";
-import { Assembly, ClassDeclaration, Identifier, MemberExpression, Node, Reference, ThisExpression, VariableDeclaration } from "../ast";
-import { getAncestor } from "../common";
+import { traverse, remove } from "@glas/traverse";
+import { Assembly, ClassDeclaration, Declaration, Declarator, Exportable, Identifier, ImportDeclaration, Location, MemberExpression, ModuleSpecifier, Node, Program, Reference, ThisExpression, VariableDeclaration } from "../ast";
+import { getAncestor, getOriginalDeclarator, memoizeIntern } from "../common";
+import { getGlobalPath, getModulePath } from "../pathFunctions";
 
 export default function checkReferences(root: Assembly) {
     let ancestorsMap = new Map<Node, Node>()
     let scopes = createScopeMaps(root, { ancestorsMap })
+    let getName = memoizeIntern((d: Declarator) => {
+        d = getOriginalDeclarator(d, scopes, ancestorsMap)!
+        let parent = ancestorsMap.get(d)
+        let { name } = d
+        let location: Location | undefined
+        if (Program.is(parent)) {
+            name = ""
+        }
+        else if (Exportable.is(parent)) {
+            if (parent.export === 2) {
+                name = "default"
+            }
+        }
+        else {
+            location = d.location!
+        }
+        return getModulePath(d.location!.filename, name, location)
+    })
     return traverse(root, {
         leave(node, ancestors) {
             if (Reference.is(node)) {
@@ -15,8 +34,8 @@ export default function checkReferences(root: Assembly) {
                 }
                 let declarator = scope[node.name]
                 if (declarator == null) {
-                    // console.log(`Reference not found: ${node.name}`)
-                    // throw SemanticError(`Reference not found: ${node.name}`, node)
+                    // if we cannot find a declarator then this must be a global reference
+                    return node.patch({ path: getGlobalPath(node.name) })
                 }
                 else {
                     let declaration = ancestors[ancestors.length - 1]
@@ -38,6 +57,7 @@ export default function checkReferences(root: Assembly) {
                             })
                         }
                     }
+                    return node.patch({ path: getName(declarator) })
                 }
             }
         }

@@ -201,25 +201,27 @@ export default function getSortedTypedNodes(root, scopeMap: ScopeMaps, ancestors
         if (BinaryExpression.is(node)) {
             push(node.left, node.right)
         }
-        let func = predecessors[node.constructor.name] as (node: Typed, scopeMap: ScopeMaps, ancestorsMap: Map<Node, Node>) => Iterable<Typed | Typed[]>;
         let count = 0;
-        if (func) {
-            for (let pred of func(node, scopeMap, ancestorsMap)) {
-                count++;
-                if (Array.isArray(pred)) {
-                    push(pred[0], pred[1])
-                }
-                else {
-                    push(pred, node);
+        if (Typed.is(node)) {
+            let func = predecessors[node.constructor.name] as (node: Typed, scopeMap: ScopeMaps, ancestorsMap: Map<Node, Node>) => Iterable<Typed | Typed[]>;
+            if (func) {
+                for (let pred of func(node, scopeMap, ancestorsMap)) {
+                    count++;
+                    if (Array.isArray(pred)) {
+                        push(pred[0], pred[1])
+                    }
+                    else {
+                        push(pred, node);
+                    }
                 }
             }
-        }
-        if (count === 0) {
-            push(sentinel, node);
+            if (count === 0) {
+                push(sentinel, node);
+            }
         }
     }
     let sorted = toposort(edges);
     //  remove sentinel
-    sorted.shift();
+    sorted.splice(sorted.indexOf(sentinel), 1)
     return sorted;
 }

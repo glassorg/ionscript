@@ -77,7 +77,11 @@
 
 Module
     = EOL? body:ModuleDeclaration* EOL EOF
-    { return node("Program", { sourceType: "module", body: body.flat() }) }
+    {
+        let location = getLocation()
+        let id = node("Declarator", { name: location.filename })
+        return node("Program", { sourceType: "module", id, body: body.flat() })
+    }
 
 ModuleDeclaration
     = ImportDeclaration
@@ -98,8 +102,14 @@ ExportNamedDeclaration
     { return node(declaration.constructor.name, { ...declaration, export: 1 }) }
 
 ExportDefaultDeclaration
-    = ExportToken _ isDefault:DefaultToken? _ declaration:(ClassDeclaration / OutlineExpression)
-    { return node(declaration.constructor.name, { ...declaration, export: isDefault ? 2 : 1 }) }
+    = ExportToken _ isDefault:DefaultToken? _ value:(ClassDeclaration / OutlineExpression)
+    {
+        if (ast.ClassDeclaration.is(value)) {
+            return node(value.constructor.name, { ...value, export: isDefault ? 2 : 1 })
+        }
+        // we NEED to have some Declarator for this default export.
+        return node("VariableDeclaration", { kind: "let", id: node("Declarator", { name: "default"}), value, export: isDefault ? 2 : 1})
+    }
 
 ////////////////////////////////////////////////////////////////////////////////
 //  ImportDeclaration
@@ -142,7 +152,9 @@ ImportSpecifier
     { return node("ImportSpecifier", { imported, local: local ?? node("Declarator", imported) }) }
 
 ImportDefaultSpecifier
-    = "as" _ local:Declarator
+    = DefaultToken _ AsToken _ local:Declarator
+    { return node("ImportDefaultSpecifier", { local }) }
+    / "as" _ local:Declarator
     { return node("ImportDefaultSpecifier", { local }) }
 
 ImportNamespaceSpecifier

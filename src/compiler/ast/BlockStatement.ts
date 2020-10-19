@@ -9,12 +9,11 @@ import * as Node from './Node';
 import * as Location from './Location';
 import * as Null from './ion/Null';
 import * as Type from './Type';
-import * as Reference from './Reference';
 import * as _Array from './ion/Array';
 import * as Class from './ion/Class';
 export class BlockStatement implements _Object.Object , Statement.Statement , Scope.Scope , Typed.Typed , Node.Node {
     readonly location: Location.Location | Null.Null;
-    readonly type: Type.Type | (Reference.Reference | Null.Null);
+    readonly type: Type.Type | Null.Null;
     readonly body: _Array.Array<Statement.Statement>;
     static readonly id = 'BlockStatement';
     static readonly implements = new Set([
@@ -27,13 +26,13 @@ export class BlockStatement implements _Object.Object , Statement.Statement , Sc
     ]);
     constructor({location = null, type = null, body}: {
         location?: Location.Location | Null.Null,
-        type?: Type.Type | (Reference.Reference | Null.Null),
+        type?: Type.Type | Null.Null,
         body: _Array.Array<Statement.Statement>
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
             throw new Error('location is not a Location | Null: ' + Class.toString(location));
-        if (!(Type.isType(type) || (Reference.isReference(type) || Null.isNull(type))))
-            throw new Error('type is not a Type | Reference | Null: ' + Class.toString(type));
+        if (!(Type.isType(type) || Null.isNull(type)))
+            throw new Error('type is not a Type | Null: ' + Class.toString(type));
         if (!_Array.isArray(body))
             throw new Error('body is not a Array: ' + Class.toString(body));
         this.location = location;
@@ -43,7 +42,7 @@ export class BlockStatement implements _Object.Object , Statement.Statement , Sc
     }
     patch(properties: {
         location?: Location.Location | Null.Null,
-        type?: Type.Type | (Reference.Reference | Null.Null),
+        type?: Type.Type | Null.Null,
         body?: _Array.Array<Statement.Statement>
     }) {
         return new BlockStatement({

@@ -10,18 +10,18 @@ import * as Node from './Node';
 import * as Location from './Location';
 import * as Null from './ion/Null';
 import * as Type from './Type';
-import * as Reference from './Reference';
 import * as Integer from './ion/Integer';
 import * as Boolean from './ion/Boolean';
 import * as Declarator from './Declarator';
 import * as _Array from './ion/Array';
 import * as Parameter from './Parameter';
+import * as Reference from './Reference';
 import * as VariableDeclaration from './VariableDeclaration';
 import * as InstanceDeclarations from './InstanceDeclarations';
 import * as Class from './ion/Class';
 export class ClassDeclaration implements _Object.Object , Declaration.Declaration , Statement.Statement , Exportable.Exportable , Typed.Typed , Node.Node {
     readonly location: Location.Location | Null.Null;
-    readonly type: Type.Type | (Reference.Reference | Null.Null);
+    readonly type: Type.Type | Null.Null;
     readonly export: Integer.Integer;
     readonly isStruct: Boolean.Boolean;
     readonly isData: Boolean.Boolean;
@@ -53,7 +53,7 @@ export class ClassDeclaration implements _Object.Object , Declaration.Declaratio
         instance
     }: {
         location?: Location.Location | Null.Null,
-        type?: Type.Type | (Reference.Reference | Null.Null),
+        type?: Type.Type | Null.Null,
         export?: Integer.Integer,
         isStruct?: Boolean.Boolean,
         isData?: Boolean.Boolean,
@@ -65,8 +65,8 @@ export class ClassDeclaration implements _Object.Object , Declaration.Declaratio
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
             throw new Error('location is not a Location | Null: ' + Class.toString(location));
-        if (!(Type.isType(type) || (Reference.isReference(type) || Null.isNull(type))))
-            throw new Error('type is not a Type | Reference | Null: ' + Class.toString(type));
+        if (!(Type.isType(type) || Null.isNull(type)))
+            throw new Error('type is not a Type | Null: ' + Class.toString(type));
         if (!Integer.isInteger(_export))
             throw new Error('export is not a Integer: ' + Class.toString(_export));
         if (!Boolean.isBoolean(isStruct))
@@ -97,7 +97,7 @@ export class ClassDeclaration implements _Object.Object , Declaration.Declaratio
     }
     patch(properties: {
         location?: Location.Location | Null.Null,
-        type?: Type.Type | (Reference.Reference | Null.Null),
+        type?: Type.Type | Null.Null,
         export?: Integer.Integer,
         isStruct?: Boolean.Boolean,
         isData?: Boolean.Boolean,

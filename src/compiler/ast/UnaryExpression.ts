@@ -8,13 +8,12 @@ import * as Node from './Node';
 import * as Location from './Location';
 import * as Null from './ion/Null';
 import * as Type from './Type';
-import * as Reference from './Reference';
 import * as String from './ion/String';
 import * as Boolean from './ion/Boolean';
 import * as Class from './ion/Class';
 export class UnaryExpression implements _Object.Object , Expression.Expression , Typed.Typed , Node.Node {
     readonly location: Location.Location | Null.Null;
-    readonly type: Type.Type | (Reference.Reference | Null.Null);
+    readonly type: Type.Type | Null.Null;
     readonly operator: String.String;
     readonly argument: Expression.Expression;
     readonly prefix: Boolean.Boolean;
@@ -28,15 +27,15 @@ export class UnaryExpression implements _Object.Object , Expression.Expression ,
     ]);
     constructor({location = null, type = null, operator, argument, prefix = true}: {
         location?: Location.Location | Null.Null,
-        type?: Type.Type | (Reference.Reference | Null.Null),
+        type?: Type.Type | Null.Null,
         operator: String.String,
         argument: Expression.Expression,
         prefix?: Boolean.Boolean
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
             throw new Error('location is not a Location | Null: ' + Class.toString(location));
-        if (!(Type.isType(type) || (Reference.isReference(type) || Null.isNull(type))))
-            throw new Error('type is not a Type | Reference | Null: ' + Class.toString(type));
+        if (!(Type.isType(type) || Null.isNull(type)))
+            throw new Error('type is not a Type | Null: ' + Class.toString(type));
         if (!String.isString(operator))
             throw new Error('operator is not a String: ' + Class.toString(operator));
         if (!Expression.isExpression(argument))
@@ -52,7 +51,7 @@ export class UnaryExpression implements _Object.Object , Expression.Expression ,
     }
     patch(properties: {
         location?: Location.Location | Null.Null,
-        type?: Type.Type | (Reference.Reference | Null.Null),
+        type?: Type.Type | Null.Null,
         operator?: String.String,
         argument?: Expression.Expression,
         prefix?: Boolean.Boolean

@@ -1,12 +1,14 @@
 import { Options } from "../Compiler"
 import { traverse, skip } from "@glas/traverse"
-import { Assembly, Node, Typed } from "../ast"
+import { Assembly, Node, Typed, Expression } from "../ast"
 import * as ast from "../ast"
 import * as types from "../types"
 import createScopeMaps, { ScopeMaps } from "../createScopeMaps"
 import getSortedTypedNodes, { getPredecessors } from "../analysis/getSortedTypedNodes"
 import evaluate from "../analysis/evaluate"
 import { SemanticError } from "../common"
+import simplify from "../analysis/simplify"
+import toCodeString from "../toCodeString"
 
 type Resolved = { get<T>(t: T): T }
 
@@ -60,7 +62,7 @@ export const inferType: {
         }
         return { type }
     },
-    UnaryExpression(node, {resolved}) {
+    UnaryExpression(node, {resolved, scopeMap}) {
         // for now just use the left type
         let type = unaryOperationsType[node.operator]
         if (type == null) {
@@ -151,53 +153,59 @@ export const inferType: {
         return inferType.VariableDeclaration?.apply(this, arguments as any)
     },
     VariableDeclaration(node, {resolved}) {
-        if (node.value) {
+        if (node.type == null) {
             let value = resolved.get(node.value)
-            return { type: value.type }
+            //  the "type" of a type declaration is the value
+            //  otherwise the type is the values type
+            let type = node.kind === "type" ? value : (value?.type ?? types.Any)
+            return { type }
         }
     },
-    // FunctionExpression(func, {resolved}) {
-    //     // traverse and find all return types
-    //     let returnTypes: Array<ast.TypeDefinition | ast.Reference> = []
-    //     traverse(func.body, {
-    //         enter(node) {
-    //             if (ast.ReturnStatement.is(node)) {
-    //                 let resolvedValue = resolved.get(node.value)
-    //                 if (resolvedValue.type == null) {
-    //                     throw SemanticError(`Return Value type not resolved`, node)
-    //                 }
-    //                 if (resolvedValue.type != null) {
-    //                     returnTypes.push(resolvedValue.type)
-    //                 }
-    //                 return skip
-    //             }
-    //         }
-    //     })
-    //     let returnType!: ast.Reference | ast.TypeDefinition
-    //     if (returnTypes.length > 1) {
-    //         let value: ast.Expression | null = null
-    //         for (let i = returnTypes.length - 1; i >= 0; i--) {
-    //             let type = returnTypes[i]
-    //             let newNode: Expression = ast.TypeExpression.is(type)
-    //                 ? type.value
-    //                 : new ast.BinaryExpression({ left: new ast.DotExpression({}), operator: "is", right: type, location: type.location})
-    //             value = value != null ? new ast.BinaryExpression({ left: newNode, operator: "|", right: value }) : newNode
-    //         }
-    //         returnType = simplify(new ast.TypeExpression({ location: func.body.location, value: value! })) as any
-    //     }
-    //     else if (returnTypes.length === 0) {
-    //         throw SemanticError(`Function returns no value`, func)
-    //     }
-    //     else if (returnTypes.length === 1) {
-    //         returnType = returnTypes[0]
-    //     }
-    //     // we also need to infer the function signature type
-    //     let type = func.type != null ? func.type : new ast.FunctionType({ parameters: func.parameters, returnType })
-    //     return { returnType, type }
-    // },
-    // TypeDeclaration(node) {
-    //     return { type: types.Type }
-    // },
+    FunctionExpression(func, {resolved}) {
+        // traverse and find all return types
+        let returnType = func.returnType
+        if (returnType == null) {
+            let returnTypes: Array<ast.Type> = []
+            traverse(func.body, {
+                enter(node) {
+                    if (ast.ReturnStatement.is(node)) {
+                        let resolvedValue = resolved.get(node.argument)
+                        if (resolvedValue.type != null) {
+                            returnTypes.push(resolvedValue.type)
+                        }
+                        else {
+                            // throw SemanticError(`Return Value type not resolved`, node)
+                            console.log("type not resolved ===>", toCodeString(node.argument))
+                            returnTypes.push(types.Any)
+                        }
+                        return skip
+                    }
+                }
+            })
+            //  technically, IF the last statement of (every last branch of) a function
+            //  is not a return statement then the function could return void.
+            if (returnTypes.length > 1) {
+                let value: ast.Expression | null = null
+                for (let i = returnTypes.length - 1; i >= 0; i--) {
+                    let type = returnTypes[i]
+                    let newNode: Expression = ast.TypeExpression.is(type)
+                        ? type.value
+                        : new ast.BinaryExpression({ left: new ast.DotExpression({}), operator: "is", right: type, location: type.location})
+                    value = value != null ? new ast.BinaryExpression({ left: newNode, operator: "|", right: value }) : newNode
+                }
+                returnType = simplify(new ast.TypeExpression({ location: func.body.location, value: value! })) as any
+            }
+            else if (returnTypes.length === 0) {
+                returnType = types.Void
+            }
+            else if (returnTypes.length === 1) {
+                returnType = returnTypes[0]
+            }
+        }
+        // we also need to infer the function signature type
+        let type = func.type != null ? func.type : new ast.FunctionType({ params: func.params.map(p => resolved.get(p)!.type!), returnType })
+        return { returnType, type }
+    },
     // Reference(node, {resolved, scopeMap, ancestorsMap}) {
     //     // if (isAbsoluteName(node.name) && isTypeReference(node)) {
     //     //     return null
@@ -220,19 +228,6 @@ export const inferType: {
     //     // Type of ArrayExpression
     //     // For now... just Array reference?
     //     // we would need to find the common base type of multiple type expressions or references.
-    // },
-    // UnaryExpression(node, {resolved, scopeMap}) {
-    //     if (node.operator === "typeof") {
-    //         if (ast.Reference.is(node.argument) && isAbsolute(node.argument.name)) {
-    //             let declaration = getDeclaration(node.argument, resolved, scopeMap)
-    //             // typeof just gets the type of a referenced value?
-    //             return { type: declaration.type }
-    //         }
-    //         return { type: types.Type }
-    //     }
-    //     else {
-    //         return { type: node.argument.type }
-    //     }
     // },
     // CallExpression(node, {resolved, scopeMap, ancestorsMap, functionFinder, originalMap}) {
     //     if (ast.Reference.is(node.callee)) {
@@ -335,6 +330,8 @@ export default function inferTypes(root: Assembly, options: Options) {
         if (resolved.has(originalNode)) {
             return resolved.get(originalNode)
         }
+
+        // console.log("------ resolve -> " + toCodeString(originalNode))
 
         if (resolveDependenciesFirst) {
             for (let pred of getPredecessors(originalNode, scopes, ancestorsMap)) {

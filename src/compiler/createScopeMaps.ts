@@ -1,6 +1,6 @@
 import { traverse, skip } from "@glas/traverse"
 import { SemanticError } from "./common"
-import { Node, FunctionExpression, Scope, Identifier, Reference, Declaration, VariableDeclaration, Declarator, Pattern, Parameter } from "./ast"
+import { Node, FunctionExpression, Scope, Identifier, Reference, Declaration, VariableDeclaration, Declarator, Pattern, Parameter, Program } from "./ast"
 
 export type NodeMap<T> = {
     get(global: null): T
@@ -77,6 +77,10 @@ export default function createScopeMaps(
             //  do nothing on Parameters, they're handled by their containing functions
             if (Parameter.is(node)) {
                 return
+            }
+            if (Program.is(node)) {
+                // programs declare their id into the global scope, before pushing their own scope
+                declarePattern(node.id)
             }
             //  get the current scope
             let scope = scopes[scopes.length - 1]

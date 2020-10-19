@@ -2,7 +2,6 @@ import * as ast from "./ast";
 import { Node } from "./ast";
 import { memoize } from "./common";
 
-
 const codeToString: { [P in keyof typeof ast]?: (node: InstanceType<typeof ast[P]>) => string} = {
     Identifier(node) {
         return node.name
@@ -11,7 +10,7 @@ const codeToString: { [P in keyof typeof ast]?: (node: InstanceType<typeof ast[P
         return node.name
     },
     Reference(node) {
-        return node.name
+        return node.path ?? node.name
     },
     TypeExpression(node) {
         return s(node.value)
@@ -27,6 +26,9 @@ const codeToString: { [P in keyof typeof ast]?: (node: InstanceType<typeof ast[P
     },
     FunctionExpression(node) {
         return `function ${node.id?.name ?? ''}(${node.params.map(toCodeString).join(',')})`
+    },
+    FunctionType(node) {
+        return `${node.async ? "async " : ""}(${node.params.map(toCodeString).join(',')}) => ${toCodeString(node.returnType)}`
     },
     ClassDeclaration(node) {
         return `class ${node.id.name}`
@@ -52,9 +54,6 @@ const codeToString: { [P in keyof typeof ast]?: (node: InstanceType<typeof ast[P
         }
         return `${value}`
     },
-    // FunctionType(node) {
-    //     return `function(${node.parameters.map(s).join(', ')}) => ${s(node.returnType!)}`
-    // },
     Literal(node) {
         return JSON.stringify(node.value)
     },
@@ -90,6 +89,9 @@ const codeToString: { [P in keyof typeof ast]?: (node: InstanceType<typeof ast[P
     },
     BlockStatement(node) {
         return `{ ${node.body.map(s).join('; ')} }`
+    },
+    ReturnStatement(node) {
+        return `return ${toCodeString(node.argument)}`
     }
 }
 
