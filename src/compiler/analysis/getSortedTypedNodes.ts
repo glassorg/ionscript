@@ -22,7 +22,7 @@ function getReturnStatements(node: FunctionExpression): ReturnStatement[] {
     return statements
 }
 
-export function getAncestorDeclaration(node, scopeMap: ScopeMaps, ancestorMap: Map<Node, Node>, type: (node) => boolean) {
+export function getAncestorDeclarator(node, scopeMap: ScopeMaps, ancestorMap: Map<Node, Node>, type: (node) => boolean) {
     let containingIf = getAncestor(node, ancestorMap, IfStatement.is)!
     let containingIfScope = scopeMap.get(containingIf)
     let containingVarDeclaration = containingIfScope[node.id.name]
@@ -37,7 +37,11 @@ const predecessors: { [P in keyof typeof ast]?: (e: InstanceType<typeof ast[P]>,
     *ConditionalDeclaration(node, scopeMap, ancestorMap) {
         // the conditional declaration will add it's own local conditional assertion to the variable type
         // from the containing scope, so we are dependent on that variable being resolved first.
-        yield getAncestorDeclaration(node, scopeMap, ancestorMap, IfStatement.is)
+        let declarator = getAncestorDeclarator(node, scopeMap, ancestorMap, IfStatement.is)
+        // this may be null if the declarator is a global so is not found
+        if (declarator != null) {
+            yield declarator
+        }
     },
     *ArrayPattern(node) {
         for (let element of node.elements) {
@@ -167,7 +171,8 @@ export default function getSortedTypedNodes(root, scopeMap: ScopeMaps, ancestors
     let edges: [Typed, Typed][] = [];
     function push(from: Typed, to: Typed) {
         if (from == null || to == null) {
-            throw new Error("Edge nodes not be null")
+            debugger
+            throw new Error("Edge nodes may not be null")
         }
         if (from === to) {
             console.error(from)

@@ -1,8 +1,8 @@
 import Reference from "./ast/Reference";
-import { Position, Location } from "./ast";
+import { getGlobalPath } from "./pathFunctions";
 
 function ref(name: string) {
-    return new Reference({ name: `global:${name}` })
+    return new Reference({ name, path: getGlobalPath(name) })
 }
 
 export const Boolean = ref("Boolean")

@@ -15,24 +15,29 @@
 
 # let { a: { b, c: [d, ...e]}, ...f } = { a: { b: 12, c: [true, false], other: 20 } }
 
-import "for/side/effects"
-import "ion/Library"
-    foo
-    bar
-    as importDefault
-    * as importStar
+let object = { a: 1, b: false, ...{ b: true } }
 
-export let double = a =>
-    if a is Number
-        return foo
-    else if a is String
-        return bar
+# let foo = 2
+# let bar = foo
 
-double(2)
+# import "for/side/effects"
+# import "ion/Library"
+#     foo
+#     bar
+#     as importDefault
+#     * as importStar
 
-export default class Vector
+# export let double = a =>
+#     if a is Number
+#         return foo
+#     else if a is String
+#         return bar
 
-console.log(Vector)
+# double(2)
+
+# export default class Vector
+
+# console.log(Vector)
 
 # data struct Vector3
 #     var x: Number = 0

@@ -10,6 +10,9 @@ export default function createRuntime(root: Assembly, options: Options) {
             if (VariableDeclaration.is(node) && node.kind === "type") {
                 return skip
             }
+            if (TypeExpression.is(node)) {
+                return skip
+            }
         },
         leave(node, ancestors, path) {
             //  types here.

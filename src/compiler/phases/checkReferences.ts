@@ -27,6 +27,9 @@ export default function checkReferences(root: Assembly) {
     })
     return traverse(root, {
         leave(node, ancestors) {
+            if (Declarator.is(node)) {
+                return node.patch({ path: getName(node) })
+            }
             if (Reference.is(node)) {
                 let scope = scopes.get(node)
                 if (scope == null) {

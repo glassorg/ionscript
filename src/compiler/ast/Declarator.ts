@@ -14,6 +14,7 @@ import * as Class from './ion/Class';
 export class Declarator implements _Object.Object , Identifier.Identifier , Pattern.Pattern , Node.Node , Typed.Typed {
     readonly location: Location.Location | Null.Null;
     readonly name: String.String;
+    readonly path: String.String | Null.Null;
     readonly type: Type.Type | Null.Null;
     static readonly id = 'Declarator';
     static readonly implements = new Set([
@@ -24,25 +25,30 @@ export class Declarator implements _Object.Object , Identifier.Identifier , Patt
         'Node',
         'Typed'
     ]);
-    constructor({location = null, name, type = null}: {
+    constructor({location = null, name, path = null, type = null}: {
         location?: Location.Location | Null.Null,
         name: String.String,
+        path?: String.String | Null.Null,
         type?: Type.Type | Null.Null
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
             throw new Error('location is not a Location | Null: ' + Class.toString(location));
         if (!String.isString(name))
             throw new Error('name is not a String: ' + Class.toString(name));
+        if (!(String.isString(path) || Null.isNull(path)))
+            throw new Error('path is not a String | Null: ' + Class.toString(path));
         if (!(Type.isType(type) || Null.isNull(type)))
             throw new Error('type is not a Type | Null: ' + Class.toString(type));
         this.location = location;
         this.name = name;
+        this.path = path;
         this.type = type;
         Object.freeze(this);
     }
     patch(properties: {
         location?: Location.Location | Null.Null,
         name?: String.String,
+        path?: String.String | Null.Null,
         type?: Type.Type | Null.Null
     }) {
         return new Declarator({

@@ -106,16 +106,20 @@ Indented Javascript
 
 ## Roadmap
 
-    0.1 Javascript compatible output
-    0.2 Name resolution
-    0.3 Importing environment browser.*, node.*
-    0.4 Type system syntax
-    0.5 Type system checking compile time
-    0.6 Type system checking run time
-    0.7 Importing typescript definition files for external types
-    0.8 Generating output typescript definitions
-    0.9 Structure Classes
-    1.0 Structure Array runtime storage
+    Typescript Implementation
+        Name resolution
+        Type system syntax
+        Type system checking run time
+        Javascript compatible output
+        Structure Classes
+        Structure Array runtime storage
+    
+    Begin Porting to Ionscript
+
+    Importing environment browser.*, node.*
+    Type system checking compile time
+    Importing typescript definition files for external types
+    Generating output typescript definitions
 
 ## Todo
 

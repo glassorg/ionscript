@@ -5,6 +5,8 @@ import toCodeString from "../toCodeString"
 const reassociateLeft = {
     "|": true,
     "&": true,
+    "||": true,
+    "&&": true,
     "+": true,
     "*": true,
 }

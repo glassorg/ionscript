@@ -1,7 +1,6 @@
 import * as fs from "fs";
 import * as np from "path";
 import { traverse } from "@glas/traverse";
-// import { join } from "./pathFunctions";
 import { NodeMap, ScopeMap } from "./createScopeMaps";
 import { Reference, Node, VariableDeclaration, ModuleSpecifier, ImportDeclaration, Declarator, Program, ImportDefaultSpecifier, ImportNamespaceSpecifier, ImportSpecifier, Exportable } from "./ast";
 

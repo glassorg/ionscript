@@ -123,6 +123,9 @@ export default function runtimeTypeChecking(root: Assembly, options: Options) {
                         if (Reference.is(node) && node.name === "ion") {
                             hasIonReference = true
                         }
+                        if (TypeExpression.is(node)) {
+                            return skip
+                        }
                     },
                     leave(node, ancestors, path) {
                         if (VariableDeclaration.is(node)) {

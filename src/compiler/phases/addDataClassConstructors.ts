@@ -102,7 +102,7 @@ export default function addDataClassConstructors(root: Assembly, options: Option
 
     return traverse(root, {
         enter(node) {
-            if (ClassDeclaration.is(node)) {
+            if (ClassDeclaration.is(node) || TypeExpression.is(node)) {
                 return skip
             }
         },

@@ -22,7 +22,7 @@ const codeToString: { [P in keyof typeof ast]?: (node: InstanceType<typeof ast[P
         return "this"
     },
     ObjectExpression(node) {
-        return `{ ${node.properties.map(toCodeString).join(',')} }`
+        return `{ ${node.properties.map(toCodeString).join(', ')} }`
     },
     FunctionExpression(node) {
         return `function ${node.id?.name ?? ''}(${node.params.map(toCodeString).join(',')})`
@@ -92,6 +92,9 @@ const codeToString: { [P in keyof typeof ast]?: (node: InstanceType<typeof ast[P
     },
     ReturnStatement(node) {
         return `return ${toCodeString(node.argument)}`
+    },
+    SpreadElement(node) {
+        return `...${toCodeString(node.argument)}`
     }
 }
 
@@ -100,6 +103,7 @@ const s = memoize(
     function (node: Node) {
         let fn = codeToString[node.constructor.name]
         if (fn == null) {
+            debugger
             throw new Error(`codeToString function not found for type: ${node.constructor.name}`)
         }
         return fn(node)
