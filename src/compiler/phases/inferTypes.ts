@@ -56,6 +56,19 @@ const unaryOperationsType = {
     "-": types.Number,
 }
 
+function getTypeExpression(node: ast.Type | null, resolved: Resolved, scopes: ScopeMaps): ast.TypeExpression | null {
+    if (ast.TypeExpression.is(node)) {
+        return node
+    }
+    if (ast.Reference.is(node)) {
+        let declarator = getDeclarator(node, resolved, scopes)
+        if (declarator != null) {
+            return getTypeExpression(declarator.type, resolved, scopes)
+        }
+    }
+    return null
+}
+
 function getDeclarator(node: ast.Reference, resolved: Resolved, scopes: ScopeMaps): ast.Declarator | null {
     node = resolved.get(node) ?? node
     let scope = scopes.get(node) ?? scopes.get(null)
@@ -166,7 +179,6 @@ export const inferType: {
                 if (ast.TypeExpression.is(arg.type)) {
                     for (let e of splitExpressions(arg.type.value, "&&")) {
                         // ignore everything except member expressions
-                        console.log("SPREAD: " + toCodeString(e))
                         if (ast.BinaryExpression.is(e) && ast.MemberExpression.is(e.left) && ast.DotExpression.is(getLeftMostMemberObject(e.left))) {
                             let { left } = e
                             // remove any other BinaryExpressions with the same left value
@@ -184,6 +196,99 @@ export const inferType: {
         }
         let type = new ast.TypeExpression({ value: combineExpressions(expressions) })
         return { type }
+    },
+    ArrayExpression(node, {resolved, scopeMap, ancestorsMap}) {
+        let expressions: Array<Expression> = [
+            new ast.BinaryExpression({
+                left: new ast.DotExpression({}),
+                operator: "is",
+                right: types.Array
+            })
+        ]
+
+        let length = 0
+        let lengthKnown = true
+        let index = 0
+        for (let p of node.elements) {
+            p = resolved.get(p) ?? p
+            if (ast.Expression.is(p)) {
+                length++
+                expressions.push(new ast.BinaryExpression({
+                    left: new ast.MemberExpression({ object: new ast.DotExpression({}), property: new ast.Literal({ value: index }) }),
+                    operator: "is",
+                    right: p.type!
+                }))
+            }
+            else if (ast.SpreadElement.is(p)) {
+                let arg = p.argument
+                arg = resolved.get(arg) ?? arg
+                let argType = getTypeExpression(arg.type, resolved, scopeMap)
+                if (ast.TypeExpression.is(argType)) {
+                    let foundLength = false
+                    let baseLength = length // save length before we add so we can offset indices
+                    for (let e of splitExpressions(argType.value)) {
+                        // ignore everything except member expressions
+                        if (ast.BinaryExpression.is(e)
+                            && ast.MemberExpression.is(e.left)
+                            && ast.DotExpression.is(e.left.object)
+                        ) {
+                            if (ast.Identifier.is(e.left.property)
+                                && e.left.property.name === "length"
+                                && ast.Literal.is(e.right)
+                                && typeof e.right.value === "number"
+                            ) {
+                                if (e.operator === "==" || e.operator == ">=") {
+                                    if (e.operator === "==") {
+                                        foundLength = true
+                                    }
+                                    length += e.right.value
+                                }
+                            }
+                            //  if length is not known for sure, then we cannot assert index types
+                            //  theoretically... we COULD assert offset from right end of array
+                            if (lengthKnown && e.operator === "is" && ast.Literal.is(e.left.property) && typeof e.left.property.value === "number") {
+                                let { left } = e
+                                // remove any other BinaryExpressions with the same left value
+                                // expressions = expressions.filter(check => !(ast.BinaryExpression.is(check) && toCodeString(check.left) == toCodeString(left)))
+                                // value = combineExpressions()
+                                // need ability to override properties in left type
+                                let newIndex = baseLength + e.left.property.value
+                                // the length must be at least large enough to hold this new index
+                                length = Math.max(length, newIndex + 1)
+                                expressions.push(e.patch({
+                                    left: e.left.patch({
+                                        property: new ast.Literal({
+                                            value: newIndex
+                                        })
+                                    })
+                                }))
+                            }
+                        }
+                    }
+                    if (!foundLength) {
+                        lengthKnown = false
+                    }
+                }
+                else {
+                    console.log("ArrayExpression: Unexpected object type: " + toCodeString(arg.type))
+                }
+            }
+            index++
+        }
+        //  finally, insert a length property as a minimally known value
+        //  if there are spread elements it could be larger
+        expressions.splice(1, 0, new ast.BinaryExpression({
+            left: new ast.MemberExpression({ object: new ast.DotExpression({}), property: new ast.Identifier({ name: "length" }) }),
+            operator: lengthKnown ? "==" : ">=",
+            right: new ast.Literal({ value: length })
+        }))
+        let type = new ast.TypeExpression({ value: combineExpressions(expressions) })
+        console.log(">>>>> ArrayType: " + toCodeString(type))
+        return { type }
+        // Type of ArrayExpression
+        // For now... just Array reference?
+        // we would need to find the common base type of multiple type expressions or references.
+        return { type: types.Array }
     },
     // ConditionalDeclaration(node, {resolved, scopeMap, ancestorsMap}) {
     //     const name = (node.id as ast.Reference).name
@@ -328,12 +433,6 @@ export const inferType: {
         // }
         return { type }
     },
-    ArrayExpression(node) {
-        // Type of ArrayExpression
-        // For now... just Array reference?
-        // we would need to find the common base type of multiple type expressions or references.
-        return { type: types.Array }
-    },
     // CallExpression(node, {resolved, scopeMap, ancestorsMap, functionFinder, originalMap}) {
     //     if (ast.Reference.is(node.callee)) {
     //         let declaration = getDeclaration(node.callee, resolved, scopeMap)
@@ -363,15 +462,16 @@ export const inferType: {
     // },
     MemberExpression(node, {resolved, scopeMap, ancestorsMap}) {
         let object = resolved.get(node.object) ?? node.object
-        let objectType = object.type
-        if (!ast.TypeExpression.is(objectType)) {
-            throw new Error("Expected TypeExpression: " + toCodeString(objectType))
+        let objectType = getTypeExpression(object.type, resolved, scopeMap)
+        if (ast.TypeExpression.is(objectType)) {
+            let property = resolved.get(node.property) ?? node.property
+            let type = getMemberTypeExpression(objectType, property)
+            if (type != null) {
+                return { type }
+            }
         }
-        let property = resolved.get(node.property) ?? node.property
-        let type = getMemberTypeExpression(objectType, property)
-        if (type != null) {
-            return { type }
-        }
+        console.log("MemberExpression Expected TypeExpression: " + toCodeString(objectType))
+        // throw new Error("Expected TypeExpression: " + toCodeString(objectType))
     },
 }
 
