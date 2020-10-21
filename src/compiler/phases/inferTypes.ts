@@ -11,8 +11,9 @@ import simplify from "../analysis/simplify"
 import toCodeString from "../toCodeString"
 import { getModulePath, isGlobalPath } from "../pathFunctions"
 import getLeftMostMemberObject from "../analysis/getLeftMostMemberObject"
-import { splitExpressions } from "../analysis/splitExpressions"
-import { combineExpressions } from "../analysis/combineExpressions"
+import splitExpressions from "../analysis/splitExpressions"
+import combineExpressions from "../analysis/combineExpressions"
+import getMemberTypeExpression from "../analysis/getMemberTypeExpression"
 
 type Resolved = { get<T>(t: T): T }
 
@@ -277,27 +278,25 @@ export const inferType: {
     },
     VariableDeclaration(node, {resolved}) {
         if (node.type == null) {
-            let value = resolved.get(node.value)
+            let value = resolved.get(node.value) ?? node.value
             //  the "type" of a type declaration is the value
             //  otherwise the type is the values type
-            console.log("=====VariableDeclaration " + toCodeString(node))
-            let type: ast.Type = types.Any
+            // console.log("=====VariableDeclaration " + toCodeString(node))
+            let type: ast.Type | undefined
             if (value?.type != null) {
                 type = value?.type
             }
             else if (ast.Type.is(value)) {
                 type = value
             }
-            // console.log("=====VariableDeclaration " + toCodeString(node))
-            // let type = node.kind === "type" ? value : (value?.type ?? types.Any)
-            // return { type }
+            return { type }
         }
     },
     // don't think we need this.
     Declarator(node, {resolved, scopeMap, ancestorsMap}) {
-        console.log("=====Declarator " + toCodeString(node))
         let parent = ancestorsMap.get(node)
         parent = resolved.get(parent) ?? parent
+        // console.log("=====Declarator " + toCodeString(node))
         // console.log("????? ", parent?.type)
         // console.log("parent", parent)
         // resolved.get()
@@ -316,8 +315,7 @@ export const inferType: {
         //     return null
         // }
         let declarator = getDeclarator(node, resolved, scopeMap)
-        console.log(declarator)
-        let type = declarator?.type ?? types.Any
+        let type = declarator?.type // ?? types.Any
         // Infer in chained conditionals here.
         // let ancestors = ancestorsMap.get(node)!
         // // if we are the right side of a A & B conditional then that implies A
@@ -330,11 +328,12 @@ export const inferType: {
         // }
         return { type }
     },
-    // ArrayExpression(node) {
-    //     // Type of ArrayExpression
-    //     // For now... just Array reference?
-    //     // we would need to find the common base type of multiple type expressions or references.
-    // },
+    ArrayExpression(node) {
+        // Type of ArrayExpression
+        // For now... just Array reference?
+        // we would need to find the common base type of multiple type expressions or references.
+        return { type: types.Array }
+    },
     // CallExpression(node, {resolved, scopeMap, ancestorsMap, functionFinder, originalMap}) {
     //     if (ast.Reference.is(node.callee)) {
     //         let declaration = getDeclaration(node.callee, resolved, scopeMap)
@@ -362,48 +361,18 @@ export const inferType: {
     //     }
     //     return { type: calleeType.returnType }
     // },
-    // MemberExpression(node, {resolved, scopeMap, ancestorsMap, functionFinder}) {
-    //     //  TODO: ClassDeclarations need a proper type, which includes static variables or we fix member ref
-    //     //  this node should now have a type
-    //     let objectType = getTypeDefinitionOrClassDeclaration(node.object, resolved, scopeMap)
-    //     let property = resolved.get(node.property) ?? node.property
-    //     // quick lookup if the type is a class reference.
-    //     if (ast.ClassDeclaration.is(objectType) && ast.Id.is(property)) {
-    //         let declaration = objectType.declarations.get(property.name)
-    //         if (declaration != null) {
-    //             return { type: declaration.type }
-    //         }
-    //     }
-    //     // convert to type expression for another attempted lookup
-    //     let typeExpression = getTypeExpression(objectType)
-    //     if (typeExpression == null) {
-    //         console.log("SD:LKFJS:DLFKJDS:FLKJD:FLKJ:FDLKJDFL:KJ", { objectType, resolved: resolved.get(objectType) })
-    //     }
-    //     let type = getMemberTypeExpression(typeExpression, property)
-    //     if (type != null) {
-    //         return { type }
-    //     }
-    //     if (ast.Id.is(property)) {
-    //         // ufcs lookup baby
-    //         let func = functionFinder(typeExpression, property.name)
-    //         if (func != null) {
-    //             let funcDeclaration = getDeclaration(func, resolved, scopeMap) as ast.VariableDeclaration
-    //             let funcValue = funcDeclaration.value as ast.FunctionExpression
-    //             funcValue = resolved.get(funcValue) ?? funcValue
-    //             // convert this into a function call and add the type
-    //             let result = new ast.CallExpression({
-    //                 location: node.location,
-    //                 callee: func,
-    //                 arguments: [
-    //                     new ast.Property({ location: node.object.location, value: node.object})
-    //                 ],
-    //                 type: funcValue.returnType
-    //             })
-    //             return result
-    //         }
-    //     }
-    //     throw SemanticError(`Member '${toCodeString(property)}' not found on ${toCodeString(objectType)}`, node)
-    // },
+    MemberExpression(node, {resolved, scopeMap, ancestorsMap}) {
+        let object = resolved.get(node.object) ?? node.object
+        let objectType = object.type
+        if (!ast.TypeExpression.is(objectType)) {
+            throw new Error("Expected TypeExpression: " + toCodeString(objectType))
+        }
+        let property = resolved.get(node.property) ?? node.property
+        let type = getMemberTypeExpression(objectType, property)
+        if (type != null) {
+            return { type }
+        }
+    },
 }
 
 const typeProperties = ["type", "returnType"]

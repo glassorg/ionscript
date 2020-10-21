@@ -3,7 +3,7 @@ import toCodeString from "../toCodeString";
 import { memoize } from "../common";
 import { traverse } from "@glas/traverse";
 import normalize from "./normalize";
-import { splitExpressions } from "./splitExpressions";
+import splitExpressions from "./splitExpressions";
 
 function find<T>(items: Iterable<T>, predicate: (value: T) => boolean): T | null {
     for (let item of items) {

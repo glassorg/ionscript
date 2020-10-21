@@ -24,6 +24,12 @@ const codeToString: { [P in keyof typeof ast]?: (node: InstanceType<typeof ast[P
     ObjectExpression(node) {
         return `{ ${node.properties.map(toCodeString).join(', ')} }`
     },
+    ArrayExpression(node) {
+        return `[ ${node.elements.map(toCodeString).join(', ')} ]`
+    },
+    Program(node) {
+        return `program ${node.id.name}`
+    },
     FunctionExpression(node) {
         return `function ${node.id?.name ?? ''}(${node.params.map(toCodeString).join(',')})`
     },

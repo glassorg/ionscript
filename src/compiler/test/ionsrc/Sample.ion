@@ -15,7 +15,8 @@
 
 # let { a: { b, c: [d, ...e]}, ...f } = { a: { b: 12, c: [true, false], other: 20 } }
 
-let object = { a: 1, b: false, ...{ b: true } }
+let object = { a: 1 }
+let a = object.a
 
 # let foo = 2
 # let bar = foo

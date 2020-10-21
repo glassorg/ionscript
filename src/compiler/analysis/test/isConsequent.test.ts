@@ -4,8 +4,8 @@ import toCodeString from "../../toCodeString"
 import isConsequent from "../isConsequent"
 import simplify from "../simplify"
 import negateExpression from "../negate"
-import { combineExpressions } from "../combineExpressions"
-import { splitExpressions } from "../splitExpressions"
+import combineExpressions from "../combineExpressions"
+import splitExpressions from "../splitExpressions"
 
 function e(expr: string | number | Expression) {
     if (!Expression.is(expr)) {
