@@ -14,6 +14,7 @@ import getLeftMostMemberObject from "../analysis/getLeftMostMemberObject"
 import splitExpressions from "../analysis/splitExpressions"
 import combineExpressions from "../analysis/combineExpressions"
 import getMemberTypeExpression from "../analysis/getMemberTypeExpression"
+import getFinalStatements from "../analysis/getFinalStatements"
 
 type Resolved = { get<T>(t: T): T }
 
@@ -359,16 +360,21 @@ export const inferType: {
             })
             //  technically, IF the last statement of (every last branch of) a function
             //  is not a return statement then the function could return void.
+            let finalStatements = [...getFinalStatements(func.body)]
+            if (finalStatements.find(s => !ast.ReturnStatement.is(s)) != null) {
+                returnTypes.push(types.Void)
+            }
             if (returnTypes.length > 1) {
-                let value: ast.Expression | null = null
+                let expressions = new Array<Expression>()
                 for (let i = returnTypes.length - 1; i >= 0; i--) {
                     let type = returnTypes[i]
-                    let newNode: Expression = ast.TypeExpression.is(type)
+                    expressions.push(
+                        ast.TypeExpression.is(type)
                         ? type.value
                         : new ast.BinaryExpression({ left: new ast.DotExpression({}), operator: "is", right: type, location: type.location})
-                    value = value != null ? new ast.BinaryExpression({ left: newNode, operator: "|", right: value }) : newNode
+                    )
                 }
-                returnType = simplify(new ast.TypeExpression({ location: func.body.location, value: value! })) as any
+                returnType = simplify(new ast.TypeExpression({ location: func.body.location, value: combineExpressions(expressions, "||") })) as any
             }
             else if (returnTypes.length === 0) {
                 returnType = types.Void
@@ -433,33 +439,21 @@ export const inferType: {
         // }
         return { type }
     },
-    // CallExpression(node, {resolved, scopeMap, ancestorsMap, functionFinder, originalMap}) {
-    //     if (ast.Reference.is(node.callee)) {
-    //         let declaration = getDeclaration(node.callee, resolved, scopeMap)
-    //         if (ast.ClassDeclaration.is(declaration)) {
-    //             // IF the callee references a ClassDeclaration,
-    //             return { type: node.callee }
-    //         }
-    //         if (ast.VariableDeclaration.is(declaration) && ast.FunctionExpression.is(declaration.value)) {
-    //             let func = resolved.get(declaration.value) ?? declaration.value
-    //             return { type: func.returnType }
-    //         }
-    //     }
-    //     let callee = resolved.get(node.callee) ?? node.callee
-    //     let calleeType = callee.type
-    //     let original = originalMap.get(node) as any
-    //     if (ast.MemberExpression.is(original.callee) && ast.Id.is(original.callee.property) && ast.CallExpression.is(callee)) {
-    //         // callee WAS a MemberExpression before but now it is a CallExpression. That means UFCS conversion.
-    //         // now we have to re-add in our original function arguments.
-    //         // callee is a UFCS function reference, so we must convert this call expression.
-    //         return node.patch({ callee: callee.callee, arguments: [...callee.arguments, ...node.arguments] })
-    //     }
-
-    //     if (!ast.FunctionType.is(calleeType)) {
-    //         throw SemanticError("Function expected", node.callee)
-    //     }
-    //     return { type: calleeType.returnType }
-    // },
+    CallExpression(node, {resolved, scopeMap, ancestorsMap, originalMap}) {
+        // if (ast.Reference.is(node.callee)) {
+        //     let declarator = getDeclarator(node.callee, resolved, scopeMap)
+        //     if (ast.ClassDeclaration.is(declarator)) {
+        //         // IF the callee references a ClassDeclaration,
+        //         return { type: node.callee }
+        //     }
+        // }
+        let callee = resolved.get(node.callee) ?? node.callee
+        let calleeType = callee.type
+        if (!ast.FunctionType.is(calleeType)) {
+            throw SemanticError("Function expected", node.callee)
+        }
+        return { type: calleeType.returnType }
+    },
     MemberExpression(node, {resolved, scopeMap, ancestorsMap}) {
         let object = resolved.get(node.object) ?? node.object
         let objectType = getTypeExpression(object.type, resolved, scopeMap)
