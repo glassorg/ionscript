@@ -15,15 +15,17 @@
 
 # let { a: { b, c: [d, ...e]}, ...f } = { a: { b: 12, c: [true, false], other: 20 } }
 
-let foo = (a: Number) =>
-    if a > 0
-        return "foo"
-    else if a < 0
-        return false
-    else
-        foo
+export class Vector1
 
-let bar = foo(12)
+# let foo = (a: Number) =>
+#     if a > 0
+#         return "foo"
+#     else if a < 0
+#         return false
+#     else
+#         foo
+
+# let bar = foo(12)
 
 # import "for/side/effects"
 # import "ion/Library"

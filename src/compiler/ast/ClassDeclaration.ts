@@ -30,6 +30,7 @@ export class ClassDeclaration implements _Object.Object , Declaration.Declaratio
     readonly baseClasses: _Array.Array<Reference.Reference>;
     readonly static: _Array.Array<VariableDeclaration.VariableDeclaration>;
     readonly instance: InstanceDeclarations.InstanceDeclarations;
+    readonly instanceType: Type.Type | Null.Null;
     static readonly id = 'ClassDeclaration';
     static readonly implements = new Set([
         'ClassDeclaration',
@@ -50,7 +51,8 @@ export class ClassDeclaration implements _Object.Object , Declaration.Declaratio
         parameters = [],
         baseClasses = [],
         static: _static,
-        instance
+        instance,
+        instanceType = null
     }: {
         location?: Location.Location | Null.Null,
         type?: Type.Type | Null.Null,
@@ -61,7 +63,8 @@ export class ClassDeclaration implements _Object.Object , Declaration.Declaratio
         parameters?: _Array.Array<Parameter.Parameter>,
         baseClasses?: _Array.Array<Reference.Reference>,
         static: _Array.Array<VariableDeclaration.VariableDeclaration>,
-        instance: InstanceDeclarations.InstanceDeclarations
+        instance: InstanceDeclarations.InstanceDeclarations,
+        instanceType?: Type.Type | Null.Null
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
             throw new Error('location is not a Location | Null: ' + Class.toString(location));
@@ -83,6 +86,8 @@ export class ClassDeclaration implements _Object.Object , Declaration.Declaratio
             throw new Error('static is not a Array: ' + Class.toString(_static));
         if (!InstanceDeclarations.isInstanceDeclarations(instance))
             throw new Error('instance is not a InstanceDeclarations: ' + Class.toString(instance));
+        if (!(Type.isType(instanceType) || Null.isNull(instanceType)))
+            throw new Error('instanceType is not a Type | Null: ' + Class.toString(instanceType));
         this.location = location;
         this.type = type;
         this.export = _export;
@@ -93,6 +98,7 @@ export class ClassDeclaration implements _Object.Object , Declaration.Declaratio
         this.baseClasses = baseClasses;
         this.static = _static;
         this.instance = instance;
+        this.instanceType = instanceType;
         Object.freeze(this);
     }
     patch(properties: {
@@ -105,7 +111,8 @@ export class ClassDeclaration implements _Object.Object , Declaration.Declaratio
         parameters?: _Array.Array<Parameter.Parameter>,
         baseClasses?: _Array.Array<Reference.Reference>,
         static?: _Array.Array<VariableDeclaration.VariableDeclaration>,
-        instance?: InstanceDeclarations.InstanceDeclarations
+        instance?: InstanceDeclarations.InstanceDeclarations,
+        instanceType?: Type.Type | Null.Null
     }) {
         return new ClassDeclaration({
             ...this,

@@ -1,6 +1,6 @@
 import createScopeMaps from "../createScopeMaps";
 import { traverse, remove } from "@glas/traverse";
-import { Assembly, ClassDeclaration, Declaration, Declarator, Exportable, Identifier, ImportDeclaration, Location, MemberExpression, ModuleSpecifier, Node, Program, Reference, ThisExpression, VariableDeclaration } from "../ast";
+import { Assembly, ClassDeclaration, Declaration, Declarator, Exportable, FunctionExpression, Identifier, ImportDeclaration, Location, MemberExpression, ModuleSpecifier, Node, Program, Reference, ThisExpression, VariableDeclaration } from "../ast";
 import { getAncestor, getOriginalDeclarator, memoizeIntern } from "../common";
 import { getGlobalPath, getModulePath } from "../pathFunctions";
 
@@ -15,7 +15,7 @@ export default function checkReferences(root: Assembly) {
         if (Program.is(parent)) {
             name = ""
         }
-        else if (Exportable.is(parent)) {
+        else if (Exportable.is(parent) && parent.export !== 0) {
             if (parent.export === 2) {
                 name = "default"
             }
@@ -27,6 +27,16 @@ export default function checkReferences(root: Assembly) {
     })
     return traverse(root, {
         leave(node, ancestors) {
+            // we also set variable id onto function expressions if they aren't named already
+            if (VariableDeclaration.is(node)) {
+                if (Identifier.is(node.id) && FunctionExpression.is(node.value) && node.value.id == null) {
+                    return node.patch({
+                        value: node.value.patch({
+                            id: node.id
+                        })
+                    })
+                }
+            }
             if (Declarator.is(node)) {
                 return node.patch({ path: getName(node) })
             }

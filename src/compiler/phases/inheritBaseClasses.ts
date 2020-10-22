@@ -85,30 +85,6 @@ export default function inheritBaseClasses(root: Assembly, options: Options) {
             if (ClassDeclaration.is(node) && node.isData) {
                 let declaration = ensureDeclarationsInherited(node, node)
                 return declaration
-                // TODO: Do we really need to track these implements here?
-                // or is there another way later to determine these?
-                // let names = [getUniqueClientName(node.id.name), ...declaration.baseClasses.map(d => getUniqueClientName(d.name))]
-                // let typeNameDeclarations = names.map(name => {
-                //     return new VariableDeclaration({
-                //         location: node.location,
-                //         id: new Identifier({ name }),
-                //         assignable: false,
-                //         value: new Literal({ value: true })
-                //     })
-                // })
-                // return declaration.patch({
-                //     // _implements: names,
-                //     declarations: new Map([
-                //         ...declaration.declarations.values(),
-                //         ...typeNameDeclarations,
-                //         new VariableDeclaration({
-                //             location: node.location,
-                //             id: new Identifier({ name: "classId" }),
-                //             assignable: false,
-                //             value: new Literal({ value: getUniqueClientName(node.id.name) })
-                //         })
-                //     ].map(d => [d.id.name, d])),
-                // })
             }
         }
     })

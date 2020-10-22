@@ -120,6 +120,9 @@ export function clone(value) {
     if (Array.isArray(value)) {
         return value.map(clone)
     }
+    if (Node.is(value)) {
+        return new (value.constructor as any)(value)
+    }
     let newValues = {}
     for (let name in value) {
         newValues[name] = clone(value[name])

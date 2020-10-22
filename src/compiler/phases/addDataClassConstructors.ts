@@ -2,6 +2,9 @@ import { Options } from "../Compiler";
 import { traverse, skip } from "@glas/traverse"
 import { VariableDeclaration, Identifier, Literal, Assembly, ClassDeclaration, Declaration, Reference, Node, Declarator, FunctionExpression, BlockStatement, AssignmentPattern, ObjectPattern, ObjectExpression, Parameter, Property, ExpressionStatement, AssignmentStatement, MemberExpression, ThisExpression, IfStatement, DotExpression, Statement, Expression, Type, TypeExpression, BinaryExpression, UnaryExpression, ThrowStatement, CallExpression } from "../ast";
 import { replaceNodes } from "./runtimeTypeChecking";
+import { clone } from "../common";
+import combineExpressions from "../analysis/combineExpressions";
+import * as types from "../types";
 
 function toTypeCheck(type: Type, value: Reference) {
     if (Reference.is(type)) {
@@ -14,16 +17,18 @@ function toTypeCheck(type: Type, value: Reference) {
     return replaceNodes(type, DotExpression.is, value)
 }
 
-function createDataClassConstructor(instanceVariables: VariableDeclaration[], isStruct: boolean, options: Options) {
+function createDataClassConstructor(node: ClassDeclaration, instanceVariables: VariableDeclaration[], isStruct: boolean, options: Options) {
     return new VariableDeclaration({
         kind: "let",
-        id: new Declarator({ name: "constructor" }),
+        instance: true,
+        id: new Declarator({ location: node.id.location, name: "constructor" }),
         value: new FunctionExpression({
+            returnType: new Reference(node.id),
             params: isStruct ?
                 instanceVariables.map(v => {
                     return new Parameter({
-                        id: v.id,
-                        value: v.value
+                        id: clone(v.id),
+                        value: clone(v.value),
                     })
                 })
             : [
@@ -32,17 +37,39 @@ function createDataClassConstructor(instanceVariables: VariableDeclaration[], is
                         left: new ObjectPattern({
                             properties: instanceVariables.map(v => {
                                 return new Property({
+                                    location: v.location,
                                     kind: "init",
                                     shorthand: true,
-                                    key: v.id as Declarator,
+                                    key: clone(v.id) as Declarator,
                                     value: !v.value ? v.id : new AssignmentPattern({
-                                        left: v.id,
-                                        right: v.value
+                                        location: v.location,
+                                        left: clone(v.id),
+                                        right: clone(v.value)
                                     }),
                                 })
                             })
                         }),
                         right: new ObjectExpression({ properties: [] })
+                    }),
+                    type: new TypeExpression({
+                        value: combineExpressions(
+                            [
+                                new BinaryExpression({
+                                    left: new DotExpression({}),
+                                    operator: "is",
+                                    right: types.Object,
+                                }),
+                                // TODO: Make these variable types optional...
+                                ...instanceVariables.map(v => new BinaryExpression({
+                                    left: new MemberExpression({
+                                        object: new DotExpression({}),
+                                        property: new Identifier(v.id as Declarator)
+                                    }),
+                                    operator: "is",
+                                    right: v.type ?? types.Any,
+                                }))
+                            ]
+                        )
                     })
                 })
             ],
@@ -54,13 +81,13 @@ function createDataClassConstructor(instanceVariables: VariableDeclaration[], is
                             test: new UnaryExpression({
                                 prefix: true,
                                 operator: "!",
-                                argument: toTypeCheck(v.type, new Reference(v.id as Declarator)),
+                                argument: toTypeCheck(clone(v.type), new Reference(v.id as Declarator)),
                             }),
                             consequent: new BlockStatement({
                                 body: [
                                     new ThrowStatement({
                                         argument: new CallExpression({
-                                            callee: new Reference({ name: "Error" }),
+                                            callee: new Reference({ location: v.location, name: "Error" }),
                                             arguments: [
                                                 new Literal({ value: `Invalid value for ${(v.id as Declarator).name}`})
                                             ]
@@ -83,7 +110,7 @@ function createDataClassConstructor(instanceVariables: VariableDeclaration[], is
                         new ExpressionStatement({
                             expression: new CallExpression({
                                 callee: new MemberExpression({
-                                    object: new Reference({ name: "Object" }),
+                                    object: new Reference({ location: node.id.location, name: "Object" }),
                                     property: new Identifier({ name: "freeze" }),
                                 }),
                                 arguments: [
@@ -111,7 +138,7 @@ export default function addDataClassConstructors(root: Assembly, options: Option
                 return node.patch({
                     instance: node.instance.patch({
                         declarations: [
-                            createDataClassConstructor([...node.instance.declarations.values()].filter(a => a.kind === "var"), node.isStruct, options),
+                            createDataClassConstructor(node, [...node.instance.declarations.values()].filter(a => a.kind === "var"), node.isStruct, options),
                             ...node.instance.declarations,
                         ]
                     })

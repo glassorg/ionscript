@@ -15,4 +15,5 @@ export
         # so that the static statements are within scope for them
         # but the instance declarations are NOT within scope from static declarations
         var instance: InstanceDeclarations
+        var instanceType: Type | Null = null
         # var meta: Array<KeyValuePair> = []

@@ -3,6 +3,7 @@ import { traverse, skip, replace } from "@glas/traverse";
 import Assembly from "../ast/Assembly";
 import { AssignmentStatement, BinaryExpression, BlockStatement, CallExpression, ClassDeclaration, Declarator, DotExpression, Expression, ExpressionStatement, FunctionExpression, Identifier, InstanceDeclarations, Literal, MemberExpression, ObjectExpression, Parameter, Property, Reference, ReturnStatement, ThisExpression, TypeExpression, VariableDeclaration } from "../ast";
 import { replaceNodes } from "./runtimeTypeChecking";
+import { typeProperties } from "./inferTypes";
 
 export default function createRuntime(root: Assembly, options: Options) {
     return traverse(root, {
@@ -18,9 +19,7 @@ export default function createRuntime(root: Assembly, options: Options) {
             //  types here.
             if (TypeExpression.is(node)) {
                 let last = path[path.length - 1]
-                if (last === "type" || last === "returnType") {
-                    //  an Expression is not a valid "Type", so we return null
-                    //  if this is just a type property on the parent.
+                if (typeProperties.has(last)) {
                     return null
                 }
                 return node.value
@@ -101,7 +100,8 @@ export default function createRuntime(root: Assembly, options: Options) {
                         result = result.patch({
                             instance: new InstanceDeclarations({
                                 declarations: newInstances
-                            })
+                            }),
+                            instanceType: null
                         })
                     }
                 }
