@@ -53,14 +53,16 @@ export default function checkReferences(root: Assembly) {
                 else {
                     let declaration = ancestors[ancestors.length - 1]
                     if (VariableDeclaration.is(declaration)) {
-                        if (declaration.instance) {
+                        let cls = getAncestor(declaration, ancestorsMap, ClassDeclaration.is)
+                        if (declaration.instance && cls!.instance.declarations.find(d => (d.id as Declarator).name === node.name)) {
                             // add implied this. to instance property references
+                            console.log({ node })
                             return new MemberExpression({
                                 object: new ThisExpression({}),
                                 property: new Identifier(node)
                             })
                         }
-                        else if (declaration.static) {
+                        else if (declaration.static && cls!.static.find(d => (d.id as Declarator).name === node.name)) {
                             //  add implied Class. to static property references
                             let classDeclaration = getAncestor(node, ancestorsMap, ClassDeclaration.is)
                             // declaratorAncestors[declaratorAncestors.length - 3] as ClassDeclaration

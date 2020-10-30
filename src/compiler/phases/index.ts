@@ -12,6 +12,7 @@ import inheritBaseClasses from "./inheritBaseClasses"
 import createConditionalDeclarations from "./createConditionalDeclarations"
 import inferTypes from "./inferTypes"
 import addDataClassConstructors from "./addDataClassConstructors"
+import addTypedStructArrays from "./addTypedStructArrays"
 
 export default [
     parsing,
@@ -24,6 +25,7 @@ export default [
     checkReferences,
     inferTypes,
     runtimeTypeChecking,
+    addTypedStructArrays,
     createRuntime,
     toEsTree,
     codegen,

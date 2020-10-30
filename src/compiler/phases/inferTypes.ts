@@ -479,7 +479,7 @@ export const inferType: {
                 //  is not a return statement then the function could return void.
                 let finalStatements = [...getFinalStatements(func.body)]
                 if (finalStatements.find(s => !ast.ReturnStatement.is(s)) != null) {
-                    returnTypes.push(types.Void)
+                    returnTypes.push(types.Undefined)
                 }
                 if (returnTypes.length > 1) {
                     let expressions = new Array<Expression>()
@@ -494,7 +494,7 @@ export const inferType: {
                     returnType = simplify(new ast.TypeExpression({ location: func.body.location, value: combineExpressions(expressions, "||") })) as any
                 }
                 else if (returnTypes.length === 0) {
-                    returnType = types.Void
+                    returnType = types.Undefined
                 }
                 else if (returnTypes.length === 1) {
                     returnType = returnTypes[0]
@@ -545,6 +545,7 @@ export const inferType: {
     CallExpression(node, {resolved, scopeMap, ancestorsMap, originalMap}) {
         let callee = resolved.get(node.callee) ?? node.callee
         let calleeType = getFunctionType(callee.type!, resolved, scopeMap)
+        // console.log("......... " + toCodeString(calleeType))
         if (!ast.FunctionType.is(calleeType)) {
             return
         }

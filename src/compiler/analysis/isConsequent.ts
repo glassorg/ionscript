@@ -1,5 +1,6 @@
-import { Expression, BinaryExpression, Literal, TypeExpression } from "../ast";
+import { Expression, BinaryExpression, Literal, TypeExpression, Reference } from "../ast";
 import toCodeString from "../toCodeString";
+import { IsType } from "./isType";
 
 type Maybe = true | false | null
 //  a  \  b |  true   false   null
@@ -41,7 +42,7 @@ function same(a: Maybe, b: Maybe): Maybe {
  * false if 'b' is necessarily false
  * null if we cannot determine
  */
-export default function isConsequent(a: Expression, b: Expression): true | false | null {
+export default function isConsequent(a: Expression, b: Expression, isType: IsType): true | false | null {
     if (TypeExpression.is(a)) {
         a = a.value
     }
@@ -54,6 +55,12 @@ export default function isConsequent(a: Expression, b: Expression): true | false
     if (BinaryExpression.is(a)) {
         if (BinaryExpression.is(b)) {
             if (toCodeString(a.left) === toCodeString(b.left)) {
+                if (Reference.is(a.right) && Reference.is(b.right)) {
+                    if (a.operator === "is" && b.operator === "is") {
+                        // use our isType to see if we know that a is b
+                        return isType(a.right, b.right)
+                    }
+                }
                 if (Literal.is(a.right) && Literal.is(b.right)) {
                     let ar = a.right.value!
                     let br = b.right.value!
@@ -160,16 +167,16 @@ export default function isConsequent(a: Expression, b: Expression): true | false
         }
     }
     if (BinaryExpression.is(a) && a.operator === "||") {
-        return same(isConsequent(a.left, b), isConsequent(a.right, b))
+        return same(isConsequent(a.left, b, isType), isConsequent(a.right, b, isType))
     }
     if (BinaryExpression.is(b) && b.operator === "&&") {
-        return min(isConsequent(a, b.left), isConsequent(a, b.right))
+        return min(isConsequent(a, b.left, isType), isConsequent(a, b.right, isType))
     }
     if (BinaryExpression.is(b) && b.operator === "||") {
-        return max(isConsequent(a, b.left), isConsequent(a, b.right))
+        return max(isConsequent(a, b.left, isType), isConsequent(a, b.right, isType))
     }
     if (BinaryExpression.is(a) && a.operator === "&&") {
-        return max(isConsequent(a.left, b), isConsequent(a.right, b))
+        return max(isConsequent(a.left, b, isType), isConsequent(a.right, b, isType))
     }
     return null
 }

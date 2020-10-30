@@ -139,33 +139,9 @@ Indented Javascript
     X Write data classes.
     X add static baseClasses to data classes.
         add runtime type checking for data classes... is function
-      Type Declarations, port pre-existing system from Ion develop branch
+    X Type Declarations, port pre-existing system from Ion develop branch
       .is function on Classes
-
-## Compile Time Type Checking Design
-
-Integer[] & .length == 10
-Integer[] & { length: 10 }
-Foo & Bar
-
-what if a check is comparing against a locally scoped value?
-that is perfectly acceptable from a runtime type check point of view.
-
-function outerScope(outerVariable) {
-    type MyType = Integer & . < outerVariable
-    let innerFunction(foo: MyType) {
-        return foo * 2
-    }
-
-    return innerFunction
-}
-
-// now we cannot type check this function because it uses hidden scoped values.
-export let myFunction = outerScope(12)
-
-so... we do need an analysis phase.
-let's convert EVERY identifier and reference into a unique (absolutely pathed) value.
-then we can use simple toString comparisons on some values to verify type
+      Implement Struct Typed Arrays getter/setters
 
 ### Absolute Path
 

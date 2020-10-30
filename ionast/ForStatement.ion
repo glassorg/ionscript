@@ -4,6 +4,7 @@ import
 
 export
     class ForStatement extends Statement
-        var left: VariableDeclaration
-        var right: Expression
+        var init: VariableDeclaration | Null = null
+        var test: Expression | Null = null
+        var update: Expression | Null = null
         var body: BlockStatement

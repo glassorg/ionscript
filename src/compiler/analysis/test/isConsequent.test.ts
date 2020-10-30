@@ -6,10 +6,15 @@ import simplify from "../simplify"
 import negateExpression from "../negate"
 import combineExpressions from "../combineExpressions"
 import splitExpressions from "../splitExpressions"
+import { createIsType } from "../isType"
+import * as t from "../../types"
 
+function e(expr: string): Reference
+function e(expr: number): Literal
+function e(expr: string | number | Expression): Expression
 function e(expr: string | number | Expression) {
     if (!Expression.is(expr)) {
-        expr = typeof expr === 'string' ? new Reference({ name: expr }) : new Literal({ value: expr })
+        expr = typeof expr === 'string' ? new Reference({ name: expr, path: `/${expr}` }) : new Literal({ value: expr })
     }
     return expr
 }
@@ -55,9 +60,17 @@ function eq(A: E, B: E) {
 function is(A: E, B: E) {
     return b(A, "is", B)
 }
+let Animal = e("Animal")
+let Dog = e("Dog")
+let Cat = e("Cat")
+let isType = createIsType([
+    [Animal, t.Object],
+    [Cat, t.Object, Animal],
+    [Dog, t.Object, Animal],
+])
 function testConsequent(a: Expression, b: Expression, ab_expected: true | false | null, ba_expected: true | false | null) {
-    const ab_actual = isConsequent(a, b)
-    const ba_actual = isConsequent(b, a)
+    const ab_actual = isConsequent(a, b, isType)
+    const ba_actual = isConsequent(b, a, isType)
     assert.equal(ab_actual, ab_expected, `\n${toCodeString(a)} => ${toCodeString(b)}, expected ${ab_expected}, actual: ${ab_actual}`)
     assert.equal(ba_actual, ba_expected, `\n${toCodeString(b)} => ${toCodeString(a)}, expected ${ba_expected}, actual: ${ba_actual}`)
 }
@@ -89,9 +102,26 @@ testConsequent(
     null    // although conceptually, != x implies > x | < x, our analysis does not recognize this.
 )
 
-testConsequent(b("foo", "is", "Bar"), b("foo", "isnt", "Bar"), false, false)
-testConsequent(b("foo", "is", "Bar"), b("foo", "is", "Bar"), true, true)
-testConsequent(b("foo", "is", "Bar"), b("foo", "is", "Fuz"), null, null)
+//  TODO: Next, check some of the is logic using our isType checks
+
+testConsequent(b("foo", "is", Dog), b("foo", "isnt", Dog), false, false)
+testConsequent(b("foo", "is", Cat), b("foo", "is", Cat), true, true)
+testConsequent(b("foo", "is", Cat), b("foo", "is", Dog), null, null)
+testConsequent(b("foo", "is", Cat), b("foo", "is", Animal), true, null)
+testConsequent(b("foo", "is", Dog), b("foo", "is", Animal), true, null)
+testConsequent(b("foo", "is", Dog), b("foo", "is", t.Object), true, null)
+testConsequent(b("foo", "is", Dog), b("foo", "is", t.Boolean), false, false)
+testConsequent(b("foo", "is", Dog), b("foo", "is", t.String), false, false)
+testConsequent(b("foo", "is", Dog), b("foo", "is", t.RegExp), false, false)
+testConsequent(b("foo", "is", Dog), b("foo", "is", t.Array), false, false)
+
+testConsequent(
+    b(b("foo", "is", Cat), "&&", b("foo", "is", Dog)),
+    b(b("foo", "is", Cat), "||", b("foo", "is", Dog)),
+    true,
+    null
+)
+
 testConsequent(
     b(b("foo", "is", "Bar"), "||", b("foo", "is", "Baz")),
     b("foo", "is", "Bar"),

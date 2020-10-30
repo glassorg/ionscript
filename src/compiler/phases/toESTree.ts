@@ -1,6 +1,6 @@
 import { Options } from "../Compiler"
 import { traverse, skip, replace } from "@glas/traverse"
-import { BinaryExpression, CallExpression, Exportable, FunctionExpression, Identifier, ImportDeclaration, Literal, Node, Parameter, Program, RegularExpression, SwitchCase, TypeExpression } from "../ast"
+import { BinaryExpression, CallExpression, Exportable, FunctionExpression, Identifier, ImportDeclaration, Literal, Node, Parameter, Program, RegularExpression, SwitchCase, TypeExpression, UnaryExpression } from "../ast"
 import Position from "../ast/Position"
 import VariableDeclaration from "../ast/VariableDeclaration"
 import Reference from "../ast/Reference"
@@ -94,6 +94,10 @@ export default function toEsTree(root: Map<string, any>, options: Options) {
                 }
                 else {
                     result = { ...node, ...changes, type: node.constructor.name }
+                }
+                //  convert UnaryExpressions to UpdateExpressions if they use ++ or --
+                if (UnaryExpression.is(node) && (node.operator === "++" || node.operator === "--")) {
+                    result.type = "UpdateExpression"
                 }
                 // Add computed to MemberExpressions with Expressions as their property.
                 if (MemberExpression.is(node) && Expression.is(node.property)) {

@@ -15,7 +15,20 @@
 
 # let { a: { b, c: [d, ...e]}, ...f } = { a: { b: 12, c: [true, false], other: 20 } }
 
-export class Vector1
+export data struct Vector
+    var x: Number = 0
+    var y: Number = 0
+
+export data struct Vertex
+    var color: Number = 0
+    var position: Vector
+
+# let vector = new Vector()
+
+# TODO: struct class signatures
+# ALSO: Convenient Type structure for representing a child with an optional type
+# for instance { x?: Number, y?: Number }
+# (.x is Number || .x is Undefined) && (.y is Number || .y is Undefined)
 
 # let foo = (a: Number) =>
 #     if a > 0

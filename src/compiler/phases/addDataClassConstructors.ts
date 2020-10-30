@@ -5,6 +5,7 @@ import { replaceNodes } from "./runtimeTypeChecking";
 import { clone } from "../common";
 import combineExpressions from "../analysis/combineExpressions";
 import * as types from "../types";
+import toCodeString from "../toCodeString";
 
 function toTypeCheck(type: Type, value: Reference) {
     if (Reference.is(type)) {
@@ -59,15 +60,34 @@ function createDataClassConstructor(node: ClassDeclaration, instanceVariables: V
                                     operator: "is",
                                     right: types.Object,
                                 }),
-                                // TODO: Make these variable types optional...
-                                ...instanceVariables.map(v => new BinaryExpression({
-                                    left: new MemberExpression({
-                                        object: new DotExpression({}),
-                                        property: new Identifier(v.id as Declarator)
-                                    }),
-                                    operator: "is",
-                                    right: v.type ?? types.Any,
-                                }))
+                                // Make these variable types optional...
+                                ...instanceVariables.map(v => {
+                                    let e = new BinaryExpression({
+                                        left: new MemberExpression({
+                                            object: new DotExpression({}),
+                                            property: new Identifier(v.id as Declarator)
+                                        }),
+                                        operator: "is",
+                                        right: v.type ?? types.Any,
+                                    })
+                                    // if this type is optional, then we add Undefined as an optional value
+                                    let optional = v.type != null && toCodeString(v.type) !== toCodeString(types.Any) && v.value != null
+                                    if (optional) {
+                                        e = new BinaryExpression({
+                                            left: e,
+                                            operator: "||",
+                                            right: new BinaryExpression({
+                                                left: new MemberExpression({
+                                                    object: new DotExpression({}),
+                                                    property: new Identifier(v.id as Declarator)
+                                                }),
+                                                operator: "is",
+                                                right: types.Undefined,
+                                            })
+                                        })
+                                    }
+                                    return e
+                                })
                             ]
                         )
                     })

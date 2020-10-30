@@ -3,6 +3,7 @@ This file was generated from ion source. Do not edit.
 */
 import * as _Object from './ion/Object';
 import * as Declaration from './Declaration';
+import * as Expression from './Expression';
 import * as Statement from './Statement';
 import * as Exportable from './Exportable';
 import * as Typed from './Typed';
@@ -19,7 +20,7 @@ import * as Reference from './Reference';
 import * as VariableDeclaration from './VariableDeclaration';
 import * as InstanceDeclarations from './InstanceDeclarations';
 import * as Class from './ion/Class';
-export class ClassDeclaration implements _Object.Object , Declaration.Declaration , Statement.Statement , Exportable.Exportable , Typed.Typed , Node.Node {
+export class ClassDeclaration implements _Object.Object , Declaration.Declaration , Expression.Expression , Statement.Statement , Exportable.Exportable , Typed.Typed , Node.Node {
     readonly location: Location.Location | Null.Null;
     readonly type: Type.Type | Null.Null;
     readonly export: Integer.Integer;
@@ -36,6 +37,7 @@ export class ClassDeclaration implements _Object.Object , Declaration.Declaratio
         'ClassDeclaration',
         'ion_Object',
         'Declaration',
+        'Expression',
         'Statement',
         'Exportable',
         'Typed',

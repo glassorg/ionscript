@@ -84,11 +84,16 @@ export function getOriginalDeclarator(declarator: Declarator, scopes: NodeMap<Sc
     return declarator
 }
 
-export function getDeclarator(ref: Reference, scopes: NodeMap<ScopeMap>, ancestors: Map<Node, Node>, traverseReferences = false) {
+export function getDeclarator(ref: Reference, scopes: NodeMap<ScopeMap>, ancestors: Map<Node, Node>, traverseReferences = false, throwError = true) {
     let scope = scopes.get(ref)
     let declarator = scope[ref.name]
     if (declarator == null) {
-        throw SemanticError(`${ref.name} declarator not found`, ref)
+        if (throwError) {
+            throw SemanticError(`${ref.name} declarator not found`, ref)
+        }
+        else {
+            return null
+        }
     }
     return traverseReferences ? getOriginalDeclarator(declarator, scopes, ancestors) : declarator
 }
@@ -102,6 +107,11 @@ export function getAncestor<T>(node: Node, ancestors: Map<Node, Node>, predicate
         node = ancestor as any
     }
     return null
+}
+
+export function getOriginalDeclaration<T>(ref: Reference, scopes: NodeMap<ScopeMap>, ancestors: Map<Node, Node>, predicate: (a) => a is T): T | null {
+    let declarator = getDeclarator(ref, scopes, ancestors, true, false)
+    return declarator != null ? getAncestor<T>(declarator, ancestors, predicate) : null
 }
 
 export function clone(value) {
