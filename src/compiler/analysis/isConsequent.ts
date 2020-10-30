@@ -1,4 +1,4 @@
-import { Expression, BinaryExpression, Literal, TypeExpression, Reference } from "../ast";
+import { Expression, BinaryExpression, Literal, TypeExpression, Reference, DotExpression } from "../ast";
 import toCodeString from "../toCodeString";
 import { IsType } from "./isType";
 

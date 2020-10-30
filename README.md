@@ -141,7 +141,7 @@ Indented Javascript
         add runtime type checking for data classes... is function
     X Type Declarations, port pre-existing system from Ion develop branch
       .is function on Classes
-      Implement Struct Typed Arrays getter/setters
+    X Implement Struct Typed Arrays getter/setters
 
 ### Absolute Path
 

@@ -114,7 +114,16 @@ function getFieldInfos(cls: ClassDeclaration, scopes: NodeMap<ScopeMap>, ancesto
 function createTypedArrayDeclaration(cls: ClassDeclaration, fields: FieldInfo[], actualFields: ActualField[], sizeInBytes: number, options: Options) {
     function createFieldGetterOrSetter(field: FieldInfo, setFrom?: Expression) {
         if (Reference.is(field.type)) {
-            let subfields = field.subfields!.map(field => createFieldGetterOrSetter(field, setFrom))
+            let { name } = field
+            // field.name
+            let subfields = field.subfields!.map(
+                field => createFieldGetterOrSetter(
+                    field,
+                    setFrom
+                        ? new MemberExpression({ object: setFrom, property: new Identifier({ name })})
+                        : setFrom
+                )
+            )
             return setFrom ? subfields : new CallExpression({ new: true, callee: field.type, arguments: subfields })
         }
         let actualField = actualFields[field.actualField]
