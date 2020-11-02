@@ -1,8 +1,11 @@
 import { Options } from "../Compiler";
 import { traverse, skip } from "@glas/traverse"
-import { Assembly, AssignmentStatement, BinaryExpression, BlockStatement, CallExpression, ClassDeclaration, Declarator, DotExpression, Expression, ExpressionStatement, ForStatement, FunctionExpression, Identifier, InstanceDeclarations, Literal, MemberExpression, Node, Parameter, Reference, ReturnStatement, ThisExpression, Type, TypeExpression, UnaryExpression, VariableDeclaration, YieldExpression } from "../ast";
+import { Assembly, AssignmentStatement, BinaryExpression, BlockStatement, CallExpression, ClassDeclaration, Declarator, DotExpression, Expression, ExpressionStatement, ForStatement, FunctionExpression, Identifier, InstanceDeclarations, Literal, MemberExpression, Node, Parameter, Reference, ReturnStatement, ThisExpression, Type, TypeExpression, UnaryExpression, Variable, VariableDeclaration, YieldExpression } from "../ast";
 import createScopeMaps, { NodeMap, ScopeMap } from "../createScopeMaps";
 import { getOriginalDeclaration, getOriginalDeclarator, SemanticError } from "../common";
+import toCodeString from "../toCodeString";
+import { IntegerTypes } from "../types";
+import isConsequent from "../analysis/isConsequent";
 
 /*
 export data struct Vector
@@ -31,13 +34,28 @@ let fieldTypes = {
     UInt8: 1,
 }
 type FieldType = keyof typeof fieldTypes
-type FieldInfo = { offset: number, type: FieldType | Reference, subfields?: FieldInfo[], name: string, actualField: number, actualOffset: number }
+type FieldInfo = { offset: number, type: FieldType | Reference, subfields?: FieldInfo[], name: string, path: string, actualField: number, actualOffset: number }
 // let's start out WITHOUT recursion, then add that after
-function getFieldType(type: Type, scopes: NodeMap<ScopeMap>, ancestors: Map<Node,Node>): FieldType | Reference {
+function getFieldType(type: Type | null, scopes: NodeMap<ScopeMap>, ancestors: Map<Node,Node>): FieldType | Reference {
     if (Reference.is(type)) {
         let fieldClass = getOriginalDeclaration(type, scopes, ancestors, ClassDeclaration.is)
         if (fieldClass != null) {
             return type
+        }
+        let variableDeclaration = getOriginalDeclaration(type, scopes, ancestors, VariableDeclaration.is)
+        if (variableDeclaration != null) {
+            if (variableDeclaration.kind !== "type") {
+                throw SemanticError("Expected a type declaration", type)
+            }
+            type = variableDeclaration.value
+        }
+    }
+    if (TypeExpression.is(type)) {
+        for (let name in IntegerTypes) {
+            let integerType = IntegerTypes[name]
+            if (isConsequent(type, integerType)) {
+                return name as any
+            }
         }
     }
     return "Float64"
@@ -68,7 +86,7 @@ function assignActualFields(
                 assignActualFields(field.subfields!, actualFields)
             }
             else {
-                let actualField = { name: field.name, type: field.type, offset: field.offset, stride: -1 }
+                let actualField = { name: field.path, type: field.type, offset: field.offset, stride: -1 }
                 actualFields.push(actualField)
             }
         }
@@ -79,7 +97,7 @@ function assignActualFields(
     return actualFields
 }
 
-function getFieldInfos(cls: ClassDeclaration, scopes: NodeMap<ScopeMap>, ancestors: Map<Node,Node>, offset: number): [Array<FieldInfo>, number] {
+function getFieldInfos(cls: ClassDeclaration, scopes: NodeMap<ScopeMap>, ancestors: Map<Node,Node>, offset: number, path: Array<string> = []): [Array<FieldInfo>, number] {
     let fields = new Array<FieldInfo>()
     for (let d of cls.instance.declarations) {
         if (d.kind === "var") {
@@ -97,11 +115,11 @@ function getFieldInfos(cls: ClassDeclaration, scopes: NodeMap<ScopeMap>, ancesto
                 if (!fieldClass.isData || !fieldClass.isStruct) {
                     throw SemanticError(`Data struct fields can only be Numbers or data structs`, fieldClass.id)
                 }
-                let result = getFieldInfos(fieldClass, scopes, ancestors, offset)
+                let result = getFieldInfos(fieldClass, scopes, ancestors, offset, path.concat(name))
                 subfields = result[0]
                 offset = result[1]
             }
-            fields.push({ name, offset, type, subfields, actualField: 0, actualOffset: 0 })
+            fields.push({ name, path: (path.concat(name)).join('_'), offset, type, subfields, actualField: 0, actualOffset: 0 })
             if (!Reference.is(type)) {
                 let fieldSize = fieldTypes[type]
                 offset += fieldSize
@@ -350,8 +368,8 @@ export default function addTypedStructArrays(root: Assembly, options: Options) {
                 }
 
                 // calculate stride for each actual field
-                console.log("==========> ", JSON.stringify(fields, null, 2), actualFields)
-                console.log({ largestTypeBytes, naturalSize, paddedSize })
+                // console.log("==========> ", JSON.stringify(fields, null, 2), actualFields)
+                console.log({ largestTypeBytes, naturalSize, paddedSize, actualFields })
                 // TODO: Next, actually create the getter/setters using these fields and offsets.
                 return node.patch({
                     static: [...node.static, createTypedArrayDeclaration(node, fields, actualFields, paddedSize, options)]

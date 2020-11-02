@@ -15,12 +15,14 @@
 
 # let { a: { b, c: [d, ...e]}, ...f } = { a: { b: 12, c: [true, false], other: 20 } }
 
+type UInt8 = Integer & >= 0 & <= 255
+
 export data struct Vector
-    var x: Number = 0
-    var y: Number = 0
+    var x: UInt8 = 0
+    var y: UInt8 = 0
 
 export data struct Vertex
-    var color: Number = 0
+    var color: Integer = 0
     var position: Vector
 
 # let vector = new Vector()

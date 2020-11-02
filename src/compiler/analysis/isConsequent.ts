@@ -42,7 +42,7 @@ function same(a: Maybe, b: Maybe): Maybe {
  * false if 'b' is necessarily false
  * null if we cannot determine
  */
-export default function isConsequent(a: Expression, b: Expression, isType: IsType): true | false | null {
+export default function isConsequent(a: Expression, b: Expression, isType: IsType = (a, b) => a.path === b.path): true | false | null {
     if (TypeExpression.is(a)) {
         a = a.value
     }

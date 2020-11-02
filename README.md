@@ -121,6 +121,10 @@ Indented Javascript
     Importing typescript definition files for external types
     Generating output typescript definitions
 
+    Typed Meta Data
+        Conditional Meta data removal basd on Debug/Release build
+        Inline Unit Tests using meta data ideally
+
 ## Todo
 
     X ClassDeclaration
