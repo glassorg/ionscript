@@ -20,7 +20,7 @@ export default [
     fixImports,
     inheritBaseClasses,
     controlFlowToExpressions,
-    // createConditionalDeclarations,
+    createConditionalDeclarations,
     addDataClassConstructors,
     checkReferences,
     inferTypes,

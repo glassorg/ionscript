@@ -17,31 +17,35 @@ export default function createConditionalDeclarations(root: Assembly) {
                 let newConsequents = new Array<ConditionalDeclaration>()
                 let newAlternates = node.alternate != null ? new Array<ConditionalDeclaration>() : null
                 for (let name of refs) {
+                    let { location } = node.test
                     newConsequents.push(new ConditionalDeclaration({
                         kind: "conditional",
-                        location: node.test.location,
-                        id: new Declarator({ name })
+                        location,
+                        id: new Declarator({ name, location })
                     }))
                     if (newAlternates) {
                         newAlternates.push(new ConditionalDeclaration({
                             kind: "conditional",
                             negate: true,
-                            location: node.test.location,
-                            id: new Declarator({ name })
+                            location,
+                            id: new Declarator({ name, location })
                         }))
                     }
                 }
-                let consequent = new BlockStatement({ body: [...newConsequents, ...node.consequent.body] })
+                let { location } = node
+                let consequent = new BlockStatement({ location, body: [...newConsequents, ...node.consequent.body] })
                 let alternate = node.alternate
                 if (IfStatement.is(alternate)) {
                     //  we must convert ifs to block statements so our scoped variable
                     //  won't interfere with it scoping the same named variable.
                     alternate = new BlockStatement({
+                        location,
                         body: [alternate]
                     })
                 }
                 if (BlockStatement.is(alternate)) {
                     alternate = alternate.patch({
+                        location,
                         body: [...newAlternates!, ...alternate.body]
                     })
                 }

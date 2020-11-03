@@ -23,9 +23,6 @@ const simplify = memoize(function(e: Expression): Expression {
     e = normalize(e)
     if (TypeExpression.is(e)) {
         let value = simplify(e.value)
-        if (BinaryExpression.is(value) && DotExpression.is(value.left) && value.operator === "is" && (Reference.is(value.right) || FunctionType.is(value.right))) {
-            return value.right
-        }
         if (e.value !== value) {
             e = e.patch({ value })
         }

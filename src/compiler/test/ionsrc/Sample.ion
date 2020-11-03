@@ -15,15 +15,24 @@
 
 # let { a: { b, c: [d, ...e]}, ...f } = { a: { b: 12, c: [true, false], other: 20 } }
 
-type UInt8 = Integer & >= 0 & <= 255
+let a: String | Number = 10
+if a is String
+    a
+else
+    if a < 10
+        a
+    else
+        a
 
-export data struct Vector
-    var x: UInt8 = 0
-    var y: UInt8 = 0
+# type UInt8 = Integer & >= 0 & <= 255
 
-export data struct Vertex
-    var color: Integer = 0
-    var position: Vector
+# export data struct Vector
+#     var x: UInt8 = 0
+#     var y: UInt8 = 0
+
+# export data struct Vertex
+#     var color: Integer = 0
+#     var position: Vector
 
 # let vector = new Vector()
 

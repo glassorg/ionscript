@@ -4,9 +4,9 @@ import { Assembly, Node, Typed, Expression } from "../ast"
 import * as ast from "../ast"
 import * as types from "../types"
 import createScopeMaps, { ScopeMaps } from "../createScopeMaps"
-import getSortedTypedNodes, { getPredecessors } from "../analysis/getSortedTypedNodes"
+import getSortedTypedNodes, { getContainingIfTestAndOriginalDeclarator, getPredecessors } from "../analysis/getSortedTypedNodes"
 import evaluate from "../analysis/evaluate"
-import { getAncestor, getOriginalDeclarator, SemanticError } from "../common"
+import { getAncestor, getOriginalDeclaration, getOriginalDeclarator, SemanticError } from "../common"
 import simplify from "../analysis/simplify"
 import toCodeString from "../toCodeString"
 import { getModulePath, isGlobalPath } from "../pathFunctions"
@@ -15,6 +15,10 @@ import splitExpressions from "../analysis/splitExpressions"
 import combineExpressions from "../analysis/combineExpressions"
 import getMemberTypeExpression from "../analysis/getMemberTypeExpression"
 import getFinalStatements from "../analysis/getFinalStatements"
+import and, { simplifyType } from "../analysis/combineTypeExpression"
+import negate from "../analysis/negate"
+import { assert } from "console"
+import { Type } from "../.."
 
 type Resolved = { get<T>(t: T): T }
 
@@ -64,6 +68,27 @@ function is(type: ast.Type, left: Expression = new ast.DotExpression({})) {
         operator: "is",
         right: type
     })
+}
+
+function createCombinedType(type: ast.Expression, name: String, knownTrueExpression: ast.Expression | null, location: ast.Location): ast.Type {
+    // let ancestorDeclaration = resolved.get(getAncestorDeclaration(node, scopeMap, ancestorsMap, ast.IfStatement.is))
+    // now we convert the node assert to a type expression (by replacing variable name references to DotExpressions) so we can combine it.
+    let found = 0
+    let assertType = knownTrueExpression == null ? null :traverse(knownTrueExpression, {
+        leave(node) {
+            if (ast.Reference.is(node) && node.name === name) {
+                found++
+                return new ast.DotExpression({})
+            }
+        }
+    })
+    // didn't find any means the expression was irrelevant to the type so we can ignore it
+    if (found === 0) {
+        return type
+    }
+    let combinedType = and(type, assertType)!
+    // console.log("???? assertType", toCodeString(assertType), "combined", toCodeString(combinedType))
+    return simplifyType(new ast.TypeExpression({ location, value: combinedType }))
 }
 
 /**
@@ -209,6 +234,23 @@ function getDeclarator(node: ast.Reference, resolved: Resolved, scopes: ScopeMap
 //     }
 //     return type;
 // }
+
+function toTypeExpression(type: ast.Type | null): ast.TypeExpression | null {
+    if (ast.TypeExpression.is(type)) {
+        return type
+    }
+    if (ast.Reference.is(type)) {
+        return new ast.TypeExpression({
+            value: new ast.BinaryExpression({
+                left: new ast.DotExpression({}),
+                operator: "is",
+                right: type
+            })
+        })
+    }
+    return null
+    // throw new Error("getTypeExpression not implemented for " + type.constructor.name)
+}
 
 export const inferType: {
     [P in keyof typeof ast]?: (node: InstanceType<typeof ast[P]>, props: InferContext) => any
@@ -375,17 +417,35 @@ export const inferType: {
         // we would need to find the common base type of multiple type expressions or references.
         return { type: types.Array }
     },
-    // ConditionalDeclaration(node, {resolved, scopeMap, ancestorsMap}) {
-    //     const name = (node.id as ast.Reference).name
-    //     let ancestors = ancestorsMap.get(node)!
-    //     let containingIf = getLast(ancestors, ast.IfStatement.is)!
-    //     let ancestorDeclaration = resolved.get(getAncestorDeclaration(node, scopeMap, ancestorsMap, ast.IfStatement.is))
-    //     let assertion = containingIf.test
-    //     if (node.negate) {
-    //         assertion = negateExpression(assertion)
-    //     }
-    //     return { type: createCombinedTypeExpression(ancestorDeclaration.type!, name, assertion, node.location!) }
-    // },
+    ConditionalDeclaration(node, {resolved, scopeMap, ancestorsMap}) {
+        const name = (node.id as ast.Reference).name
+        let [newKnownType, containingVarDeclarator] = getContainingIfTestAndOriginalDeclarator(node, scopeMap, ancestorsMap)
+        newKnownType = resolved.get(newKnownType) ?? newKnownType!
+        containingVarDeclarator = resolved.get(containingVarDeclarator) ?? containingVarDeclarator!
+        console.log(' ===> ' + name, containingVarDeclarator, " parent: " + ancestorsMap.get(containingVarDeclarator)?.constructor.name)
+        console.log(' should have a type: ' + toCodeString(containingVarDeclarator?.type))
+        let alreadyKnownType = toTypeExpression(containingVarDeclarator?.type)
+        if (node.negate) {
+            newKnownType = negate(newKnownType)
+        }
+        // console.log("========> " + toCodeString(assertion) + "      " + name)
+        // console.log("TYPE: ", containingVarDeclarator.type)
+        let type = newKnownType
+        if (alreadyKnownType != null) {
+            type = createCombinedType(alreadyKnownType, name, newKnownType, node.location!)
+        }
+        // console.log("+++++ ", {
+        //     name,
+        //     known: toCodeString(alreadyKnownType),
+        //     assertion: toCodeString(newKnownType),
+        //     newType: type,
+        // } )
+        if (!ast.Type.is(type)) {
+            type = new ast.TypeExpression({ value: type })
+        }
+        return { type }
+        // return { type: createCombinedTypeExpression(alreadyKnownType, name, newKnownType, node.location!) }
+    },
     ClassDeclaration(node, {resolved, ancestorsMap, scopeMap}) {
         // calculate a TypeExpression that can be used to compare these instances
         let instanceExpressions = new Array<Expression>()

@@ -2,7 +2,7 @@ import * as fs from "fs";
 import * as np from "path";
 import { traverse } from "@glas/traverse";
 import { NodeMap, ScopeMap } from "./createScopeMaps";
-import { Reference, Node, VariableDeclaration, ModuleSpecifier, ImportDeclaration, Declarator, Program, ImportDefaultSpecifier, ImportNamespaceSpecifier, ImportSpecifier, Exportable } from "./ast";
+import { Reference, Node, VariableDeclaration, ModuleSpecifier, ImportDeclaration, Declarator, Program, ImportDefaultSpecifier, ImportNamespaceSpecifier, ImportSpecifier, Exportable, Declaration } from "./ast";
 
 export function getNodesOfType<T>(root, predicate: (node) => node is T) {
     let nodes = new Array<T>()
@@ -43,7 +43,7 @@ export function isValidId(name: string) {
 //  Miscelaneous Functions
 ////////////////////////////////////////////////////////////////////////////////
 
-export function getOriginalDeclarator(declarator: Declarator, scopes: NodeMap<ScopeMap>, ancestors: Map<Node, Node>) {
+export function getOriginalDeclarator(declarator: Declarator, scopes: NodeMap<ScopeMap>, ancestors: Map<Node, Node>): Declarator | null {
     let parent = ancestors.get(declarator)
     if (ModuleSpecifier.is(parent)) {
         let importDeclaration = ancestors.get(parent) as ImportDeclaration
@@ -109,7 +109,7 @@ export function getAncestor<T>(node: Node, ancestors: Map<Node, Node>, predicate
     return null
 }
 
-export function getOriginalDeclaration<T>(ref: Reference, scopes: NodeMap<ScopeMap>, ancestors: Map<Node, Node>, predicate: (a) => a is T): T | null {
+export function getOriginalDeclaration<T = Declaration>(ref: Reference, scopes: NodeMap<ScopeMap>, ancestors: Map<Node, Node>, predicate: (a) => a is T = Declaration.is as any): T | null {
     let declarator = getDeclarator(ref, scopes, ancestors, true, false)
     return declarator != null ? getAncestor<T>(declarator, ancestors, predicate) : null
 }

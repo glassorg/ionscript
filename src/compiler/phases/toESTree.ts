@@ -48,7 +48,7 @@ export default function toEsTree(root: Map<string, any>, options: Options) {
                     let values = { ...node, ...changes }
                     result = {
                         type: "VariableDeclaration",
-                        kind: node.kind === "var" ? "let" : "const",
+                        kind: node.kind === "conditional" ? node.kind : node.kind === "var" ? "let" : "const",
                         declarations: [{
                             type: "VariableDeclarator",
                             id: values.id,

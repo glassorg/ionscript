@@ -22,11 +22,12 @@ function getReturnStatements(node: FunctionExpression): ReturnStatement[] {
     return statements
 }
 
-export function getAncestorDeclarator(node, scopeMap: ScopeMaps, ancestorMap: Map<Node, Node>, type: (node) => boolean) {
+export function getContainingIfTestAndOriginalDeclarator(node: ast.ConditionalDeclaration, scopeMap: ScopeMaps, ancestorMap: Map<Node, Node>): [Expression, ast.Declarator | null] {
     let containingIf = getAncestor(node, ancestorMap, IfStatement.is)!
-    let containingIfScope = scopeMap.get(containingIf)
-    let containingVarDeclaration = containingIfScope[node.id.name]
-    return containingVarDeclaration
+    let containingIfScope = scopeMap.get(containingIf)!
+    let name = (node.id as ast.Reference).name
+    let containingVarDeclarator = containingIfScope[name] ?? null
+    return [containingIf.test, containingVarDeclarator]
 }
 
 export function getPredecessors(node, scopeMap: ScopeMaps, ancestorMap: Map<Node, Node>): Iterable<Typed> {
@@ -37,10 +38,12 @@ const predecessors: { [P in keyof typeof ast]?: (e: InstanceType<typeof ast[P]>,
     *ConditionalDeclaration(node, scopeMap, ancestorMap) {
         // the conditional declaration will add it's own local conditional assertion to the variable type
         // from the containing scope, so we are dependent on that variable being resolved first.
-        let declarator = getAncestorDeclarator(node, scopeMap, ancestorMap, IfStatement.is)
-        // this may be null if the declarator is a global so is not found
-        if (declarator != null) {
-            yield declarator
+        let [containingIfTest, containingVarDeclarator] = getContainingIfTestAndOriginalDeclarator(node, scopeMap, ancestorMap)
+        if (containingIfTest) {
+            yield containingIfTest
+        }
+        if (containingVarDeclarator) {
+            yield containingVarDeclarator
         }
     },
     *ArrayPattern(node) {
@@ -67,6 +70,10 @@ const predecessors: { [P in keyof typeof ast]?: (e: InstanceType<typeof ast[P]>,
         yield node.argument
     },
     *Declarator(node, scopeMap, ancestorMap) {
+        let parent = ancestorMap.get(node)
+        if (Typed.is(parent)) {
+            yield parent
+        }
     },
     *Literal(node, scopeMap, ancestorMap) {
         if (node.type) {
