@@ -98,6 +98,18 @@ export function getDeclarator(ref: Reference, scopes: NodeMap<ScopeMap>, ancesto
     return traverseReferences ? getOriginalDeclarator(declarator, scopes, ancestors) : declarator
 }
 
+/**
+ * Returns an array of self and ancestors where 0 == self and length - 1 = root
+ */
+export function getAncestorsAndSelfList(node: Node | undefined, ancestorsMap: Map<Node,Node>) {
+    let ancestorsList = new Array<Node>()
+    while (node != null) {
+        ancestorsList.push(node)
+        node = ancestorsMap.get(node)
+    }
+    return ancestorsList
+}
+
 export function getAncestor<T>(node: Node, ancestors: Map<Node, Node>, predicate: (a) => a is T): T | null {
     while (node != null) {
         let ancestor = ancestors.get(node)

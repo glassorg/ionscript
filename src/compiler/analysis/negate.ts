@@ -50,8 +50,8 @@ const negate = memoize(function (e: Expression): Expression {
             })
         }
         if (e.operator === "&&" || e.operator === "||") {
-            //  !(A && B) => !A || !B
-            //  !(A || B) => !A && !B
+            // !(A && B) => !A || !B
+            // !(A || B) => !A && !B
             return e.patch({
                 left: negate(e.left),
                 operator: e.operator === "&&" ? "||" : "&&",

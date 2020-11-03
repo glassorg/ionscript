@@ -16,7 +16,7 @@ export function normalizeExpressions(node: Expression) {
     return node
 }
 
-export function simplifyType(type: Type) {
+export function simplifyType(type: Type | Expression | null) {
     if (Expression.is(type)) {
         type = simplify(type)
     }
@@ -26,10 +26,19 @@ export function simplifyType(type: Type) {
             return value.right
         }
     }
+    else if (Expression.is(type)) {
+        type = new TypeExpression({ value: type })
+    }
     return type
 }
 
-export default function and(left: Expression, right: Expression): Expression | null {
+export default function and(left: Expression | null, right: Expression | null): Expression | null {
+    if (left == null) {
+        return right
+    }
+    if (right == null) {
+        return left
+    }
     left = simplify(normalizeExpressions(left))
     right = simplify(normalizeExpressions(right))
     if (left == null) {

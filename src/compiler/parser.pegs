@@ -478,14 +478,14 @@ EqualityExpression
     { return buildBinaryExpression(head, tail) }
 
 LogicalAndOperator
-    = "&"
+    = "&&"
 
 LogicalAndExpression
     = head:EqualityExpression tail:(_ LogicalAndOperator _ EqualityExpression)*
     { return buildBinaryExpression(head, tail) }
 
 LogicalOrOperator
-    = "|" / XorToken
+    = "||" / XorToken
 
 LogicalOrExpression
     = head:LogicalAndExpression tail:(_ LogicalOrOperator _ LogicalAndExpression)*
@@ -499,9 +499,9 @@ ConditionalExpression
         body:(
             _ ConditionalOperator _ consequent:ConditionalExpression
             _ ':' _ alternate:ConditionalExpression
-            { return [consequent,alternate] }
+            { return {consequent,alternate} }
         )?
-    { return body ? node('ConditionalExpression', { test, body }) : test }
+    { return body ? node('ConditionalExpression', { test, ...body }) : test }
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Functions

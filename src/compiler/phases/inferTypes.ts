@@ -6,7 +6,7 @@ import * as types from "../types"
 import createScopeMaps, { ScopeMaps } from "../createScopeMaps"
 import getSortedTypedNodes, { getContainingIfTestAndOriginalDeclarator, getPredecessors } from "../analysis/getSortedTypedNodes"
 import evaluate from "../analysis/evaluate"
-import { getAncestor, getOriginalDeclaration, getOriginalDeclarator, SemanticError } from "../common"
+import { getAncestor, getAncestorsAndSelfList, getOriginalDeclaration, getOriginalDeclarator, SemanticError } from "../common"
 import simplify from "../analysis/simplify"
 import toCodeString from "../toCodeString"
 import { getModulePath, isGlobalPath } from "../pathFunctions"
@@ -17,8 +17,6 @@ import getMemberTypeExpression from "../analysis/getMemberTypeExpression"
 import getFinalStatements from "../analysis/getFinalStatements"
 import and, { simplifyType } from "../analysis/combineTypeExpression"
 import negate from "../analysis/negate"
-import { assert } from "console"
-import { Type } from "../.."
 
 type Resolved = { get<T>(t: T): T }
 
@@ -70,11 +68,10 @@ function is(type: ast.Type, left: Expression = new ast.DotExpression({})) {
     })
 }
 
-function createCombinedType(type: ast.Expression, name: String, knownTrueExpression: ast.Expression | null, location: ast.Location): ast.Type {
-    // let ancestorDeclaration = resolved.get(getAncestorDeclaration(node, scopeMap, ancestorsMap, ast.IfStatement.is))
-    // now we convert the node assert to a type expression (by replacing variable name references to DotExpressions) so we can combine it.
+function getImpliedType(type: ast.Type | null, assertion: ast.Expression, name: string): ast.Type | null {
+    type = toTypeExpression(type)
     let found = 0
-    let assertType = knownTrueExpression == null ? null :traverse(knownTrueExpression, {
+    let assertType = assertion == null ? null :traverse(assertion, {
         leave(node) {
             if (ast.Reference.is(node) && node.name === name) {
                 found++
@@ -83,12 +80,11 @@ function createCombinedType(type: ast.Expression, name: String, knownTrueExpress
         }
     })
     // didn't find any means the expression was irrelevant to the type so we can ignore it
-    if (found === 0) {
-        return type
+    if (found > 0) {
+        type = and(type, assertType)!
     }
-    let combinedType = and(type, assertType)!
-    // console.log("???? assertType", toCodeString(assertType), "combined", toCodeString(combinedType))
-    return simplifyType(new ast.TypeExpression({ location, value: combinedType }))
+    type = simplifyType(type)
+    return type
 }
 
 /**
@@ -200,40 +196,53 @@ function getDeclarator(node: ast.Reference, resolved: Resolved, scopes: ScopeMap
     }
 }
 
-// function getChainedConditionalTypeAssertion(
-//     ancestors: Map<Node, Node>,
-//     resolved: Resolved,
-//     type: ast.Type,
-//     node: ast.Reference,
-//     operator: string,
-//     negate: boolean
-// ) {
-//     let binaryExpressionIndex = getLastIndex(ancestors, node => ast.BinaryExpression.is(node) && node.operator === operator);
-//     if (binaryExpressionIndex >= 0) {
-//         let parent = ancestors[binaryExpressionIndex] as ast.BinaryExpression;
-//         parent = resolved.get(parent) ?? parent;
-//         if (parent.operator === operator) {
-//             //  check if we are the right side.
-//             //  the parent expression cannot have been resolved yet so we don't have to use resolved.
-//             if (parent.right === (ancestors[binaryExpressionIndex + 1] ?? node)) {
-//                 // OK, now we just have to check the left side and find a reference with same name.
-//                 // we can then definitely assert that the left expression is true
-//                 let assertion = parent.left
-//                 if (negate) {
-//                     assertion = negateExpression(assertion)
-//                 }
-//                 let result = createCombinedTypeExpression(type, node.name, assertion, node.location!) as any;
-//                 // console.log({
-//                 //     type: toCodeString(type),
-//                 //     parentLeft: toCodeString(parent.left),
-//                 //     result: toCodeString(result)
-//                 // })
-//                 type = result
-//             }
-//         }
-//     }
-//     return type;
-// }
+function getChainedConditionalTypeAssertion(
+    ancestorsMap: Map<Node, Node>,
+    resolved: Resolved,
+    type: ast.Type | null,
+    node: ast.Reference,
+    operator: "&&" | "||" | "?",
+    negateValue?: boolean
+) {
+    let alist = getAncestorsAndSelfList(node, ancestorsMap)
+    let expressionIndex = alist.findIndex(node =>  {
+        if (operator === "?") {
+            return ast.ConditionalExpression.is(node)
+        }
+        return ast.BinaryExpression.is(node) && node.operator === operator
+    })
+    if (expressionIndex >= 0) {
+        let parent = alist[expressionIndex];
+        parent = resolved.get(parent) ?? parent;
+        if (ast.BinaryExpression.is(parent)) {
+            //  check if we are the right side.
+            //  the parent expression cannot have been resolved yet so we don't have to use resolved.
+            if (parent.right === alist[expressionIndex - 1]) {
+                // OK, now we just have to check the left side and find a reference with same name.
+                // we can then definitely assert that the left expression is true
+                let assertion = parent.left
+                if (negateValue) {
+                    assertion = negate(assertion)
+                }
+                return getImpliedType(type, assertion, node.name)
+            }
+        }
+        else if (ast.ConditionalExpression.is(parent)) {
+            let isConsequent = parent.consequent === alist[expressionIndex - 1]
+            let isAlternate = parent.alternate === alist[expressionIndex - 1]
+            // type is only implied if we are in the consequent or alternate path
+            //  otherwise we are in the test which implies nothing
+            if (isConsequent || isAlternate) {
+                let assertion = parent.test
+                if (isAlternate) {
+                    assertion = negate(assertion)
+                }
+                return getImpliedType(type, assertion, node.name)
+            }
+        }
+    }
+    return type;
+}
 
 function toTypeExpression(type: ast.Type | null): ast.TypeExpression | null {
     if (ast.TypeExpression.is(type)) {
@@ -422,29 +431,13 @@ export const inferType: {
         let [newKnownType, containingVarDeclarator] = getContainingIfTestAndOriginalDeclarator(node, scopeMap, ancestorsMap)
         newKnownType = resolved.get(newKnownType) ?? newKnownType!
         containingVarDeclarator = resolved.get(containingVarDeclarator) ?? containingVarDeclarator!
-        console.log(' ===> ' + name, containingVarDeclarator, " parent: " + ancestorsMap.get(containingVarDeclarator)?.constructor.name)
-        console.log(' should have a type: ' + toCodeString(containingVarDeclarator?.type))
-        let alreadyKnownType = toTypeExpression(containingVarDeclarator?.type)
+        // console.log(' ===> ' + name, containingVarDeclarator, " parent: " + ancestorsMap.get(containingVarDeclarator)?.constructor.name)
+        // console.log(' should have a type: ' + toCodeString(containingVarDeclarator?.type))
         if (node.negate) {
             newKnownType = negate(newKnownType)
         }
-        // console.log("========> " + toCodeString(assertion) + "      " + name)
-        // console.log("TYPE: ", containingVarDeclarator.type)
-        let type = newKnownType
-        if (alreadyKnownType != null) {
-            type = createCombinedType(alreadyKnownType, name, newKnownType, node.location!)
-        }
-        // console.log("+++++ ", {
-        //     name,
-        //     known: toCodeString(alreadyKnownType),
-        //     assertion: toCodeString(newKnownType),
-        //     newType: type,
-        // } )
-        if (!ast.Type.is(type)) {
-            type = new ast.TypeExpression({ value: type })
-        }
+        let type = getImpliedType(containingVarDeclarator?.type, newKnownType, name)
         return { type }
-        // return { type: createCombinedTypeExpression(alreadyKnownType, name, newKnownType, node.location!) }
     },
     ClassDeclaration(node, {resolved, ancestorsMap, scopeMap}) {
         // calculate a TypeExpression that can be used to compare these instances
@@ -589,17 +582,21 @@ export const inferType: {
     },
     Reference(node, {resolved, scopeMap, ancestorsMap}) {
         let declarator = getDeclarator(node, resolved, scopeMap)
-        let type = declarator?.type // ?? types.Any
+        let type = declarator?.type ?? null
+        if (type == null) {
+            // check if this is a reference to a global type
+            let globalType = types[node.name]
+            if (globalType?.path === node.path) {
+                type = globalType
+            }
+        }
         // Infer in chained conditionals here.
-        // let ancestors = ancestorsMap.get(node)!
-        // // if we are the right side of a A & B conditional then that implies A
-        // type = getChainedConditionalTypeAssertion(ancestors, resolved, type, node, "&", false);
-        // // if we are the right side of a A | B optional then that implies not A
-        // type = getChainedConditionalTypeAssertion(ancestors, resolved, type, node, "|", true);
-        // if (type == null) {
-        //     console.error("Reference type not resolved", { declaration: declarator })
-        //     throw new Error("Reference type not resolved")
-        // }
+        // if we are the right side of a A & B conditional then that implies A
+        type = getChainedConditionalTypeAssertion(ancestorsMap, resolved, type, node, "&&", false);
+        // if we are the right side of a A | B optional then that implies not A
+        type = getChainedConditionalTypeAssertion(ancestorsMap, resolved, type, node, "||", true);
+        // if we are a consequent or alternate of an A ? B : C conditional that implies either A or not A
+        type = getChainedConditionalTypeAssertion(ancestorsMap, resolved, type, node, "?");
         return { type }
     },
     CallExpression(node, {resolved, scopeMap, ancestorsMap, originalMap}) {
