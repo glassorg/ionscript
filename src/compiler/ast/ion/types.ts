@@ -39,6 +39,7 @@ export type Identifier_Identifier_or_ion_Null_Null = Identifier.Identifier | Nul
 export type ion_String_String_or_ion_Null_Null = String.String | Null.Null;
 export type Expression_Expression_or_SpreadElement_SpreadElement = Expression.Expression | SpreadElement.SpreadElement;
 export type VariableDeclaration_VariableDeclaration_or_ion_Null_Null = VariableDeclaration.VariableDeclaration | Null.Null;
+export type Type_Type_or_SpreadElement_SpreadElement = Type.Type | SpreadElement.SpreadElement;
 export type IfStatement_IfStatement_or_ion_Null_Null = IfStatement.IfStatement | Null.Null;
 export type BlockStatement_BlockStatement_or_ion_types_IfStatement_IfStatement_or_ion_Null_Null = BlockStatement.BlockStatement | (IfStatement.IfStatement | Null.Null);
 export type ion_Boolean_Boolean_or_ion_Null_Null = Boolean.Boolean | Null.Null;

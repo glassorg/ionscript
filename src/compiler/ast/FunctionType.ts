@@ -9,12 +9,13 @@ import * as Node from './Node';
 import * as Location from './Location';
 import * as Null from './ion/Null';
 import * as _Array from './ion/Array';
+import * as SpreadElement from './SpreadElement';
 import * as Boolean from './ion/Boolean';
 import * as Class from './ion/Class';
 export class FunctionType implements _Object.Object , Type.Type , Expression.Expression , Typed.Typed , Node.Node {
     readonly location: Location.Location | Null.Null;
     readonly type: Type.Type | Null.Null;
-    readonly params: _Array.Array<Type.Type>;
+    readonly params: _Array.Array<Type.Type | SpreadElement.SpreadElement>;
     readonly async: Boolean.Boolean;
     readonly returnType: Type.Type | Null.Null;
     static readonly id = 'FunctionType';
@@ -35,7 +36,7 @@ export class FunctionType implements _Object.Object , Type.Type , Expression.Exp
     }: {
         location?: Location.Location | Null.Null,
         type?: Type.Type | Null.Null,
-        params: _Array.Array<Type.Type>,
+        params: _Array.Array<Type.Type | SpreadElement.SpreadElement>,
         async?: Boolean.Boolean,
         returnType?: Type.Type | Null.Null
     }) {
@@ -59,7 +60,7 @@ export class FunctionType implements _Object.Object , Type.Type , Expression.Exp
     patch(properties: {
         location?: Location.Location | Null.Null,
         type?: Type.Type | Null.Null,
-        params?: _Array.Array<Type.Type>,
+        params?: _Array.Array<Type.Type | SpreadElement.SpreadElement>,
         async?: Boolean.Boolean,
         returnType?: Type.Type | Null.Null
     }) {

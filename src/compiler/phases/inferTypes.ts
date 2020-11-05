@@ -281,15 +281,15 @@ export const inferType: {
         }
         return { type }
     },
+    RegularExpression(node) {
+        return { type: types.RegExp }
+    },
     Literal(node) {
         // literals are their own type
         let literalType = literalTypes[typeof node.value]!
         let baseType: ast.TypeExpression
         if (Number.isInteger(node.value)) {
             literalType = types.Integer
-        }
-        else if (node.value?.constructor === RegExp) {
-            literalType = types.RegExp
         }
         let type = toTypeExpression(
             and(
@@ -498,8 +498,6 @@ export const inferType: {
             ])
         })
 
-        // console.log(">>>>> instance " + toCodeString(instanceType))
-        // console.log("<<<<< static   " + toCodeString(type))
         return { instanceType, type }
     },
     Parameter(node, c) {
@@ -565,7 +563,16 @@ export const inferType: {
             }
         }
         // we also need to infer the function signature type
-        let type = func.type != null ? func.type : new ast.FunctionType({ params: func.params.map(p => c.getResolved(p)?.type ?? null), returnType })
+        let type = func.type != null
+            ? func.type
+            : new ast.FunctionType({
+                params: func.params.map(
+                    p => {
+                        let ptype = c.getResolved(p)?.type ?? null
+                        return ast.RestElement.is(p.id) ? new ast.SpreadElement({ location: p.location, argument: ptype ?? types.Array }) : ptype
+                    }
+                ), returnType
+            })
         // console.log(`11111 FunctionExpression resolved type: ${toCodeString(type)} returnType: ${toCodeString(returnType)}`)
         return { returnType, type }
     },
@@ -590,7 +597,6 @@ export const inferType: {
                             }
                         ))
                     })
-                    console.log(">>>>>>> " + toCodeString(type))
                 }
             }
             else if (ast.Type.is(value)) {
@@ -634,27 +640,32 @@ export const inferType: {
             // we don't know the type of the function so we won't type check
             return
         }
-        console.log("......... CHECK PARAMETERS! " + toCodeString(calleeType))
+
+        // console.log("......... CHECK PARAMETERS! " + toCodeString(calleeType))
         for (let i = 0; i < node.arguments.length; i++) {
             let arg = c.getResolved(node.arguments[i])
             if (Expression.is(arg)) {
                 // get callee type
-                let paramType = calleeType.params[i]
+                let paramType: ast.Type | ast.SpreadElement | null = calleeType.params[i]
                 if (paramType == null) {
-                    // TODO: Handle Spread Element Types in FunctionTypes
-                    // let last = calleeType.params[calleeType.params.length - 1]
-                    // if (ast.SpreadElement.is(last)) {
-                    //     paramType = last.
-                    // }
+                    let lastType = calleeType.params[calleeType.params.length - 1]
+                    if (!ast.SpreadElement.is(lastType)) {
+                        throw SemanticError(`Target function only accepts ${calleeType.params.length} argument${calleeType.params.length === 1 ? '' : 's'}`, arg)
+                    }
+                    paramType = lastType
                 }
-                if (paramType != null) {
+                if (ast.SpreadElement.is(paramType)) {
+                    let restType = paramType.argument as ast.Reference
+                    paramType = restType.arguments?.[0] ?? null
+                }
+                if (paramType != null && arg.type != null) {
                     let check = c.isConsequent(toTypeExpression(arg.type)!, toTypeExpression(paramType)!)
                     if (check === false) {
                         //  we only throw an error if we KNOW that a value is invalid.
                         //  if it only might be invalid then we
                         throw SemanticError(`Argument of type (${toCodeString(arg.type)}) is not valid for expected parameter type (${toCodeString(paramType)})`, arg)
                     }
-                    console.log("(" + check + ") >>>>> " + toCodeString(arg) + " type " + toCodeString(arg.type) + " ::: " + toCodeString(paramType))
+                    // console.log("(" + check + ") >>>>> " + toCodeString(arg) + " type " + toCodeString(arg.type) + " ::: " + toCodeString(paramType))
                 }
             }
         }

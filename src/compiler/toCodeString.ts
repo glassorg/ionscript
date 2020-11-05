@@ -101,6 +101,12 @@ const codeToString: { [P in keyof typeof ast]?: (node: InstanceType<typeof ast[P
     },
     SpreadElement(node) {
         return `...${toCodeString(node.argument)}`
+    },
+    RestElement(node) {
+        return `...${toCodeString(node.argument)}`
+    },
+    RegularExpression(node) {
+        return `/${node.pattern}/${node.flags}`
     }
 }
 

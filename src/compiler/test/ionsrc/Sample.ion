@@ -17,11 +17,9 @@
 
 let logNumber = (a: Number & > 20, ...rest: Array<String>) =>
 # var foo = "foo"
-# TODO: rest parameters
-# TODO: finish function call parameter types
 # TODO: check assignments to variables.
 
-true ? logNumber(foo) : 12
+true ? logNumber(foo, "fuck", "shit") : 12
 
 # let a: String | Number = 10
 # a is Number && a < 10 ? logNumber(a) : a
