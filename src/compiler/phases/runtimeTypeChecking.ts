@@ -29,16 +29,22 @@ function typeCheckOrThrow(value: Expression, type: Type, name: string): Statemen
     })
 }
 
+/**
+ * Replaces nodes but returns original if none were replaced.
+ */
 export function replaceNodes(root, match: (a) => boolean, replacement) {
-    return traverse(
+    let replaceCount = 0
+    let result = traverse(
         root, {
             leave(node) {
                 if (match(node)) {
+                    replaceCount++
                     return replacement
                 }
             }
         }
     )
+    return replaceCount > 0 ? result : root
 }
 
 function replaceTypedVarsWithProperties(clas: ClassDeclaration, options: Options) {

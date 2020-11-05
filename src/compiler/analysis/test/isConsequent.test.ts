@@ -115,6 +115,19 @@ testConsequent(
     false,
 )
 
+testConsequent(
+    and(
+        b("foo", "is", t.Number),
+        b("foo", ">", 10),
+    ),
+    and(
+        b("foo", "is", t.Integer),
+        b("foo", "==", 9),
+    ),
+    false,
+    false,
+)
+
 testConsequent(b("foo", "is", Dog), b("foo", "isnt", Dog), false, false)
 testConsequent(b("foo", "is", Cat), b("foo", "is", Cat), true, true)
 testConsequent(b("foo", "is", Cat), b("foo", "is", Dog), null, null)

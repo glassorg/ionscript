@@ -19,11 +19,11 @@
 # var foo = "foo"
 # foo = 12
 class Vector
-    var x: Number
+    var x: Number & > 10
     var y: Number
 
 let v = new Vector()
-v.x = 12
+# v.x = 9
 # v.x = "foo"
 
 # TODO: infer type for MemberExpression

@@ -1,6 +1,10 @@
 import { TypeExpression, Identifier, Expression, BinaryExpression, Reference, MemberExpression, DotExpression } from "../ast";
+import { replaceNodes } from "../phases/runtimeTypeChecking";
 import toCodeString from "../toCodeString";
+import combineExpressions from "./combineExpressions";
 import simplify from "./simplify";
+import splitExpressions from "./splitExpressions";
+import { traverse } from "@glas/traverse";
 
 export function combine(left: Expression | null, operator: string, right: Expression | null) {
     if (left == null) {
@@ -12,27 +16,30 @@ export function combine(left: Expression | null, operator: string, right: Expres
     return new BinaryExpression({ left, operator, right })
 }
 
-export function getMemberExpression(e: Expression, member: Identifier | Expression | TypeExpression): Expression | null {
-    console.log("---------" + toCodeString(e))
-    if (BinaryExpression.is(e)) {
-        if (e.operator === "is") {
-            if (MemberExpression.is(e.left) && DotExpression.is(e.left.object)) {
-                let dotProperty = e.left.property
+function findAndReplaceMembers(e: Expression, member: Identifier | Expression): Expression | null {
+    let count = 0
+    let result = traverse(e, {
+        leave(node) {
+            if (MemberExpression.is(node.left) && DotExpression.is(node.left.object)) {
+                let dotProperty = node.left.property
                 if (toCodeString(dotProperty) === toCodeString(member)) {
+                    count++
                     // return the same expression, but remove the member expression so
                     //  .foo is Bar => . is Bar
-                    return e.patch({ left: e.left.object })
+                    return node.patch({ left: node.left.object })
                 }
-            }
+            }            
         }
-        if (e.operator === "&&" || e.operator === "||") {
-            let left = getMemberExpression(e.left, member)
-            let right = getMemberExpression(e.right, member)
-            return combine(left, e.operator, right)
-        }
-    }
+    })
+    return count > 0 ? result : null
+}
 
-    return null
+export function getMemberExpression(e: Expression, member: Identifier | Expression | TypeExpression): Expression | null {
+    // must combine all member expression values
+    let terms = [...splitExpressions(e)].map(e => {
+        return findAndReplaceMembers(e, member)
+    }).filter(e => e != null) as Expression[]
+    return combineExpressions(terms)
 }
 
 export default function getMemberTypeExpression(t: TypeExpression, member: Identifier | Expression | TypeExpression) {

@@ -16,6 +16,7 @@ import getMemberTypeExpression from "../analysis/getMemberTypeExpression"
 import getFinalStatements from "../analysis/getFinalStatements"
 import and, { simplifyType } from "../analysis/combineTypeExpression"
 import negate from "../analysis/negate"
+import { replaceNodes } from "./runtimeTypeChecking"
 
 type Resolved = { get<T>(t: T): T }
 
@@ -97,7 +98,6 @@ function getType(node: ast.Type | null, c: InferContext): ast.Type | null {
                 return declaration.instanceType
             }
             let result = getType(declarator.type, c)
-            // console.log("???????? ", node, result)
             return result
         }
     }
@@ -469,13 +469,19 @@ export const inferType: {
             for (let d of declarations) {
                 d = c.getResolved(d)
                 if (ast.VariableDeclaration.is(d)) {
+                    let dotMember = new ast.MemberExpression({ object: new ast.DotExpression({}), property: d.id })
                     switch (d.kind) {
                         case "var":
-                            yield is(d.type!, new ast.MemberExpression({ object: new ast.DotExpression({}), property: d.id }))
+                            if (ast.TypeExpression.is(d.type)) {
+                                yield* [...splitExpressions(d.type.value)].map(term => replaceNodes(term, ast.DotExpression.is, dotMember))
+                            }
+                            else {
+                                yield is(d.type!, dotMember)
+                            }
                             break;
                         case "let":
                             yield new ast.BinaryExpression({
-                                left: new ast.MemberExpression({ object: new ast.DotExpression({}), property: d.id }),
+                                left: dotMember,
                                 operator: "==",
                                 right: d.value!
                             })
@@ -632,7 +638,6 @@ export const inferType: {
     AssignmentStatement(node, c) {
         let left = c.getResolved(node.left)
         let right = c.getResolved(node.right)
-        // console.log({ left: left.type, right: right.type })
         if (left.type != null && right.type != null) {
             let check = c.isConsequent(toTypeExpression(right.type)!, toTypeExpression(left.type)!)
             if (check === false) {
@@ -684,7 +689,6 @@ export const inferType: {
     MemberExpression(node, c) {
         let object = c.getResolved(node.object)
         let objectType = getType(object.type, c)
-        // console.log("========= ", toCodeString(node), objectType)
         if (ast.TypeExpression.is(objectType)) {
             let property = c.getResolved(node.property)
             let type = getMemberTypeExpression(objectType, property)
