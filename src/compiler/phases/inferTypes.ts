@@ -582,8 +582,10 @@ export const inferType: {
         return { returnType, type }
     },
     VariableDeclaration(node, c) {
+        let value = c.getResolved(node.value)
+        console.log('111111111')
         if (node.type == null) {
-            let value = c.getResolved(node.value)
+            console.log('222222')
             //  the "type" of a type declaration is the value
             //  otherwise the type is the values type
             let type: ast.Type | undefined
@@ -608,6 +610,16 @@ export const inferType: {
                 type = value
             }
             return { type }
+        }
+        else if (value?.type != null) {
+            console.log("!!!!!!!!!!!!!!!!!!!!")
+            // the variable has a type, so let's double check that the value type matches it.
+            let check = c.isConsequent(toTypeExpression(value.type)!, toTypeExpression(node.type)!)
+            if (check === false) {
+                //  we only throw an error if we KNOW that a value is invalid.
+                //  if it only might be invalid then we
+                throw SemanticError(`Cannot assign type (${toCodeString(value.type)}) to type (${toCodeString(node.type)})`, node.value)
+            }
         }
     },
     Declarator(node, c) {
@@ -779,21 +791,19 @@ export default function inferTypes(root: Assembly, options: Options) {
         currentNode = evaluate(currentNode, resolved, scopes)
         sc.setResolved(originalNode, currentNode)
         // then try to infer types
-        if (currentNode.type == null) {
-            let func = inferType[currentNode.constructor.name]
-            let changes = func?.(currentNode, sc)
-            if (changes != null) {
-                if (Typed.is(changes)) {
-                    // we track these so they don't get properties merged later but are returned as is.
-                    customConvertedNodes.add(changes)
-                    currentNode = changes
-                }
-                else {
-                    currentNode = currentNode.patch(changes)
-                }
+        let func = inferType[currentNode.constructor.name]
+        let changes = func?.(currentNode, sc)
+        if (changes != null) {
+            if (Typed.is(changes)) {
+                // we track these so they don't get properties merged later but are returned as is.
+                customConvertedNodes.add(changes)
+                currentNode = changes
             }
-            sc.setResolved(originalNode, currentNode)
+            else {
+                currentNode = currentNode.patch(changes)
+            }
         }
+        sc.setResolved(originalNode, currentNode)
         // if (ast.Declaration.is(currentNode) && isAbsolute(currentNode.id.name)) {
         //     let name = currentNode.id.name
         //     let code = toCodeString(currentNode.type!)

@@ -23,12 +23,12 @@ class Vector
     var y: Number
 
 let v = new Vector()
-# v.x = 9
+# let value: Integer & < 10 = 12
+# v.x = value
 # v.x = "foo"
 
-# TODO: infer type for MemberExpression
-# TODO: check assignments to variables/properties
 # TODO: add conditional declarations to implied consequent from return statements
+# !!!! DONE WITH basic type inference for now
 
 # true ? logNumber(foo, "fuck", "shit") : 12
 
