@@ -1,5 +1,5 @@
 import { traverse, skip } from "@glas/traverse"
-import { getAncestor, getAncestorsAndSelfList, SemanticError } from "./common"
+import { getAncestor, getAncestorsAndSelfList, getOriginalDeclaration, SemanticError } from "./common"
 import { Node, FunctionExpression, Scope, Identifier, Reference, Declaration, VariableDeclaration, Declarator, Pattern, Parameter, Program, ClassDeclaration, ExpressionStatement, Expression } from "./ast"
 import * as types from "./types"
 import { createIsType, IsType } from "./analysis/isType"
@@ -55,11 +55,17 @@ export class ScopeContext {
     getDeclarator(node: Reference)
     getDeclarator(node: Node, name: string)
     getDeclarator(node: Node, name?: string) {
-        if (name == null) {
-            if (!Reference.is(node)) {
-                throw new Error()
+        if (name == null && Reference.is(node)) {
+            let result = this.getScope(node)?.[node.name]
+            if (result == null && node.path != null) {
+                // check global scope
+                let global = this.scopes.get(null)
+                result = global[node.path]
             }
-            name = node.name
+            return result
+        }
+        if (name == null) {
+            throw new Error()
         }
         return this.getScope(node)?.[name]
     }
@@ -102,6 +108,10 @@ export default function createScopeMaps(
         identifiers.add(node.name)
         let scope: any = scopes[scopes.length - 1]
         scope[node.name as any] = node
+        if (node.path) {
+            // if path, put into global scope
+            global[node.path as any] = node
+        }
     }
 
     function declarePattern(node: Pattern) {

@@ -592,7 +592,7 @@ OutlineCallExpression
     { return node("CallExpression", { ...call, arguments: [...call.arguments, ...args] }) }
 
 OutlineNewExpression
-    = NewToken _ callee:MemberExpressionNoCall args:(InlineArguments / OutlineArguments)
+    = NewToken _ callee:MemberExpressionNoCall args:(@InlineArguments EOL / OutlineArguments)
     { return node("CallExpression", { new: true, callee, arguments: args }) }
 
 InlineExpression

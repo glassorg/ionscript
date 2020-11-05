@@ -15,11 +15,22 @@
 
 # let { a: { b, c: [d, ...e]}, ...f } = { a: { b: 12, c: [true, false], other: 20 } }
 
-let logNumber = (a: Number & > 20, ...rest: Array<String>) =>
+# let logNumber = (a: Number & > 20, ...rest: Array<String>) =>
 # var foo = "foo"
-# TODO: check assignments to variables.
+# foo = 12
+class Vector
+    var x: Number
+    var y: Number
 
-true ? logNumber(foo, "fuck", "shit") : 12
+let v = new Vector()
+v.x = 12
+# v.x = "foo"
+
+# TODO: infer type for MemberExpression
+# TODO: check assignments to variables/properties
+# TODO: add conditional declarations to implied consequent from return statements
+
+# true ? logNumber(foo, "fuck", "shit") : 12
 
 # let a: String | Number = 10
 # a is Number && a < 10 ? logNumber(a) : a

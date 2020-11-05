@@ -13,6 +13,7 @@ export function combine(left: Expression | null, operator: string, right: Expres
 }
 
 export function getMemberExpression(e: Expression, member: Identifier | Expression | TypeExpression): Expression | null {
+    console.log("---------" + toCodeString(e))
     if (BinaryExpression.is(e)) {
         if (e.operator === "is") {
             if (MemberExpression.is(e.left) && DotExpression.is(e.left.object)) {

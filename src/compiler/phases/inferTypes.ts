@@ -3,13 +3,12 @@ import { traverse, skip } from "@glas/traverse"
 import { Assembly, Node, Typed, Expression } from "../ast"
 import * as ast from "../ast"
 import * as types from "../types"
-import createScopeMaps, { ScopeContext, ScopeMaps } from "../createScopeMaps"
+import { ScopeContext, ScopeMaps } from "../createScopeMaps"
 import getSortedTypedNodes, { getContainingIfTestAndOriginalDeclarator, getPredecessors } from "../analysis/getSortedTypedNodes"
 import evaluate from "../analysis/evaluate"
-import { getAncestor, getAncestorsAndSelfList, SemanticError } from "../common"
+import { getAncestorsAndSelfList, SemanticError } from "../common"
 import simplify from "../analysis/simplify"
 import toCodeString from "../toCodeString"
-import { getModulePath, isGlobalPath } from "../pathFunctions"
 import getLeftMostMemberObject from "../analysis/getLeftMostMemberObject"
 import splitExpressions from "../analysis/splitExpressions"
 import combineExpressions from "../analysis/combineExpressions"
@@ -17,7 +16,6 @@ import getMemberTypeExpression from "../analysis/getMemberTypeExpression"
 import getFinalStatements from "../analysis/getFinalStatements"
 import and, { simplifyType } from "../analysis/combineTypeExpression"
 import negate from "../analysis/negate"
-import isConsequent from "../analysis/isConsequent"
 
 type Resolved = { get<T>(t: T): T }
 
@@ -91,9 +89,16 @@ function getImpliedType(type: ast.Type | null, assertion: ast.Expression, name: 
  */
 function getType(node: ast.Type | null, c: InferContext): ast.Type | null {
     if (ast.Reference.is(node)) {
-        let declarator = getDeclarator(node, c.resolved, c.scopes)
+        let declarator = getDeclarator(node, c)
         if (declarator != null) {
-            return getType(declarator.type, c)
+            let declaration = c.getResolved(c.getParent(declarator))
+            if (ast.ClassDeclaration.is(declaration)) {
+                // we want a type and that type will be the instanceType
+                return declaration.instanceType
+            }
+            let result = getType(declarator.type, c)
+            // console.log("???????? ", node, result)
+            return result
         }
     }
     if (ast.Type.is(node)) {
@@ -102,11 +107,11 @@ function getType(node: ast.Type | null, c: InferContext): ast.Type | null {
     return null
 }
 
-function getClassDeclaration(node: ast.Reference, resolved: Resolved, scopes: ScopeMaps, ancestors: Map<Node,Node>) {
-    let declarator = getDeclarator(node, resolved, scopes)
+function getClassDeclaration(node: ast.Reference, c: InferContext) {
+    let declarator = getDeclarator(node, c)
     if (declarator) {
-        let baseDeclaration = ancestors.get(declarator)
-        baseDeclaration = resolved.get(baseDeclaration) ?? baseDeclaration
+        let baseDeclaration = c.getParent(declarator)
+        baseDeclaration = c.getResolved(baseDeclaration)
         if (ast.ClassDeclaration.is(baseDeclaration)) {
             return baseDeclaration
         }
@@ -134,7 +139,7 @@ function getFunctionType(node: ast.Type, c: InferContext) {
     return null
 }
 
-function getConstructorType(node: ast.ClassDeclaration, resolved: Resolved, scopes: ScopeMaps, ancestors: Map<Node,Node>, returnType: ast.Reference | null = null) : ast.FunctionType | null {
+function getConstructorType(node: ast.ClassDeclaration, c: InferContext, returnType: ast.Reference | null = null) : ast.FunctionType | null {
     // if (node.isData) {
     //     console.log("------ not implemented data constructor types")
     //     // crap... we cannot actually
@@ -145,14 +150,14 @@ function getConstructorType(node: ast.ClassDeclaration, resolved: Resolved, scop
     //  constructors can be inherited from base classes when not specified in subclasses
     let returnDefault = returnType == null
     if (returnType == null) {
-        returnType = new ast.Reference({ name: node.id.path! })
+        returnType = new ast.Reference(node.id)
     }
     let ctor = node.instance.declarations.find(d => ast.VariableDeclaration.is(d) && (d.id as ast.Declarator).name === "constructor")
     if (ctor == null) {
         for (let base of node.baseClasses) {
-            let baseDeclaration = getClassDeclaration(base, resolved, scopes, ancestors)
+            let baseDeclaration = getClassDeclaration(base, c)
             if (baseDeclaration != null) {
-                let baseType = getConstructorType(baseDeclaration, resolved, scopes, ancestors, returnType)
+                let baseType = getConstructorType(baseDeclaration, c, returnType)
                 if (baseType != null) {
                     return baseType.patch({ returnType })
                 }
@@ -162,7 +167,7 @@ function getConstructorType(node: ast.ClassDeclaration, resolved: Resolved, scop
     else {
         // return the type of the ctor.
         let { value } = ctor
-        value = resolved.get(value) ?? value
+        value = c.getResolved(value)
         if (value != null && ast.FunctionType.is(value?.type)) {
             return value.type
         }
@@ -171,22 +176,18 @@ function getConstructorType(node: ast.ClassDeclaration, resolved: Resolved, scop
     // default constructor
     return returnDefault ? new ast.FunctionType({
         params: [],
-        returnType: new ast.Reference({ name: node.id.path! })
+        returnType: new ast.Reference(node.id)
     }) : null
 }
 
-function getDeclarator(node: ast.Reference, resolved: Resolved, scopes: ScopeMaps): ast.Declarator | null {
-    node = resolved.get(node) ?? node
-    let scope = scopes.get(node) ?? scopes.get(null)
-    if (scope == null) {
-        console.log("No scope found for ", node)
+function getDeclarator(node: ast.Reference, c: InferContext): ast.Declarator | null {
+    node = c.getResolved(node)
+    let referencedNode = c.getDeclarator(node)
+    if (ast.Reference.is(referencedNode)) {
+        return c.getResolved(getDeclarator(referencedNode, c))
     }
-    let referencedNode = resolved.get(scope[node.name]) ?? scope[node.name]
-    if (ast.Declarator.is(referencedNode)) {
-        return referencedNode
-    }
-    else if (ast.Reference.is(referencedNode)) {
-        return getDeclarator(referencedNode, resolved, scopes)
+    else if (ast.Declarator.is(referencedNode)) {
+        return c.getResolved(referencedNode)
     }
     else {
         return null
@@ -234,7 +235,6 @@ function getChainedConditionalTypeAssertion(
                 if (isAlternate) {
                     assertion = negate(assertion)
                 }
-                // console.log(`44444 getImpliedType: type: ${toCodeString(type)}, assertion: ${toCodeString(assertion)}`)
                 return getImpliedType(type, assertion, node.name)
             }
         }
@@ -456,7 +456,7 @@ export const inferType: {
         // with normal (non-data) classes, we should combine actual instanceType from class 
         for (let base of node.baseClasses) {
             if (!node.isData) {
-                let baseDeclaration = getClassDeclaration(base, c.resolved, c.scopes, c.ancestors)
+                let baseDeclaration = getClassDeclaration(base, c)
                 if (baseDeclaration != null) {
                     instanceExpressions.push(baseDeclaration.instanceType!)
                     // SKIP adding the reference is check beneath since this already contains it
@@ -491,7 +491,7 @@ export const inferType: {
         let type = new ast.TypeExpression({
             location: node.location,
             value: combineExpressions([
-                is(getConstructorType(node, c.resolved, c.scopes, c.ancestors)!),
+                is(getConstructorType(node, c)!),
                 is(types.Class),
                 is(types.Function),
                 ...getAssertions(node.static)
@@ -573,7 +573,6 @@ export const inferType: {
                     }
                 ), returnType
             })
-        // console.log(`11111 FunctionExpression resolved type: ${toCodeString(type)} returnType: ${toCodeString(returnType)}`)
         return { returnType, type }
     },
     VariableDeclaration(node, c) {
@@ -602,19 +601,17 @@ export const inferType: {
             else if (ast.Type.is(value)) {
                 type = value
             }
-            // console.log(`222222 VariableDeclaration resolved type: ${toCodeString(type)}`)
             return { type }
         }
     },
     Declarator(node, c) {
         let parent = c.getResolved(c.getParent(node))
         if (Typed.is(parent)) {
-            // console.log(`333333 Declarator resolved type: ${toCodeString(parent.type)}`)
             return { type: parent.type }
         }
     },
     Reference(node, c) {
-        let declarator = getDeclarator(node, c.resolved, c.scopes)
+        let declarator = getDeclarator(node, c)
         let type = declarator?.type ?? null
         if (type == null) {
             // check if this is a reference to a global type
@@ -632,11 +629,24 @@ export const inferType: {
         type = getChainedConditionalTypeAssertion(c, type, node, "?");
         return { type }
     },
+    AssignmentStatement(node, c) {
+        let left = c.getResolved(node.left)
+        let right = c.getResolved(node.right)
+        // console.log({ left: left.type, right: right.type })
+        if (left.type != null && right.type != null) {
+            let check = c.isConsequent(toTypeExpression(right.type)!, toTypeExpression(left.type)!)
+            if (check === false) {
+                //  we only throw an error if we KNOW that a value is invalid.
+                //  if it only might be invalid then we
+                throw SemanticError(`Cannot assign type (${toCodeString(right.type)}) to type (${toCodeString(left.type)})`, left)
+            }
+        }
+    },
     CallExpression(node, c) {
         let callee = c.getResolved(node.callee)
-        // console.log({callee})
         let calleeType = getFunctionType(callee.type!, c)
         if (!ast.FunctionType.is(calleeType)) {
+
             // we don't know the type of the function so we won't type check
             return
         }
@@ -674,6 +684,7 @@ export const inferType: {
     MemberExpression(node, c) {
         let object = c.getResolved(node.object)
         let objectType = getType(object.type, c)
+        // console.log("========= ", toCodeString(node), objectType)
         if (ast.TypeExpression.is(objectType)) {
             let property = c.getResolved(node.property)
             let type = getMemberTypeExpression(objectType, property)

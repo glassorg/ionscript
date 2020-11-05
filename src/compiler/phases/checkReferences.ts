@@ -7,7 +7,6 @@ import toCodeString from "../toCodeString";
 import * as types from "../types";
 
 export default function checkReferences(root: Assembly) {
-    debugger
     let ancestorsMap = new Map<Node, Node>()
     let scopes = createScopeMaps(root, { ancestorsMap })
     let getName = memoizeIntern((d: Declarator) => {
