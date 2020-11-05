@@ -1,13 +1,45 @@
-import { Analysis, IfStatement, BinaryExpression, BlockStatement, Expression, Reference, VariableDeclaration, ConditionalDeclaration, DotExpression, Identifier, Assembly, Declarator } from "../ast";
-import { traverse, skip } from "@glas/traverse";
+import { IfStatement, BlockStatement, Reference, ConditionalDeclaration, Assembly, Declarator, ReturnStatement, ThrowStatement } from "../ast";
+import { traverse } from "@glas/traverse";
 import { getNodesOfType } from "../common";
-// import { conditionalChainToBinaryExpression } from "./createConditionalChains";
 
 export default function createConditionalDeclarations(root: Assembly) {
+    // first we need to find any IfStatements with consequent returns or throws that don't have a
+    root = traverse(root, {
+        leave(node, ancestors) {
+            if (BlockStatement.is(node)) {
+                let { body } = node
+                for (let i = body.length - 1; i >= 0; i--) {
+                    let statement = body[i]
+                    if (IfStatement.is(statement) && statement.alternate == null) {
+                        let last = statement.consequent.body[statement.consequent.body.length - 1]
+                        if (ReturnStatement.is(last) || ThrowStatement.is(last)) {
+                            // we need to add everything that follows as implied
+                            let remainder = body.slice(i + 1)
+                            if (remainder.length > 0) {
+                                body = [
+                                    ...body.slice(0, i),
+                                    statement.patch({
+                                        alternate: new BlockStatement({
+                                            location: statement.location,
+                                            body: remainder
+                                        })
+                                    })
+                                ]
+                            }
+                        }
+                    }
+                }
+                if (body !== node.body) {
+                    return node.patch({ body })
+                }
+            }
+        }
+    })
+
     return traverse(root, {
         enter(node) {
         },
-        leave(node) {
+        leave(node, ancestors) {
             if (IfStatement.is(node) && node.consequent.body.length > 0) {
                 //  find all unique named references
                 //  create a new ConditionalDeclaration for each, replacing named refs with DotExpression

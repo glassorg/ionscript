@@ -15,20 +15,22 @@
 
 # let { a: { b, c: [d, ...e]}, ...f } = { a: { b: 12, c: [true, false], other: 20 } }
 
-# let logNumber = (a: Number & > 20, ...rest: Array<String>) =>
+let logNumber = (a: Number | String) =>
+    if a is String
+        return 12
+    if a < 10
+        return 20
+    return a
 # var foo = "foo"
 # foo = 12
-class Vector
-    var x: Number & > 10
-    var y: Number
+# class Vector
+#     var x: Number & > 10
+#     var y: Number
 
-let v = new Vector()
-# let value: Integer & < 10 = 12
+# let v = new Vector()
+# var value: Integer & < 10 = 5
 # v.x = value
 # v.x = "foo"
-
-# TODO: add conditional declarations to implied consequent from return statements
-# !!!! DONE WITH basic type inference for now
 
 # true ? logNumber(foo, "fuck", "shit") : 12
 

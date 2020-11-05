@@ -583,9 +583,7 @@ export const inferType: {
     },
     VariableDeclaration(node, c) {
         let value = c.getResolved(node.value)
-        console.log('111111111')
         if (node.type == null) {
-            console.log('222222')
             //  the "type" of a type declaration is the value
             //  otherwise the type is the values type
             let type: ast.Type | undefined
@@ -612,7 +610,6 @@ export const inferType: {
             return { type }
         }
         else if (value?.type != null) {
-            console.log("!!!!!!!!!!!!!!!!!!!!")
             // the variable has a type, so let's double check that the value type matches it.
             let check = c.isConsequent(toTypeExpression(value.type)!, toTypeExpression(node.type)!)
             if (check === false) {
