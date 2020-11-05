@@ -11,9 +11,6 @@ const ignoreProperties: {[name:string]:boolean} = {
 }
 
 function ignore(property, value) {
-    if (property == null) {
-        debugger
-    }
     if (value == null) {
         return true
     }

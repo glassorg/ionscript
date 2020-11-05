@@ -1,10 +1,13 @@
 import createScopeMaps from "../createScopeMaps";
 import { traverse, remove } from "@glas/traverse";
-import { Assembly, ClassDeclaration, Declaration, Declarator, Exportable, FunctionExpression, Identifier, ImportDeclaration, Location, MemberExpression, ModuleSpecifier, Node, Program, Reference, ThisExpression, VariableDeclaration } from "../ast";
-import { getAncestor, getOriginalDeclarator, memoizeIntern } from "../common";
+import { Assembly, ClassDeclaration, Declaration, Declarator, Exportable, FunctionExpression, Identifier, ImportDeclaration, Location, MemberExpression, ModuleSpecifier, Node, Program, Reference, RestElement, ThisExpression, VariableDeclaration } from "../ast";
+import { getAncestor, getOriginalDeclarator, memoizeIntern, SemanticError } from "../common";
 import { getGlobalPath, getModulePath } from "../pathFunctions";
+import toCodeString from "../toCodeString";
+import * as types from "../types";
 
 export default function checkReferences(root: Assembly) {
+    debugger
     let ancestorsMap = new Map<Node, Node>()
     let scopes = createScopeMaps(root, { ancestorsMap })
     let getName = memoizeIntern((d: Declarator) => {
@@ -43,7 +46,12 @@ export default function checkReferences(root: Assembly) {
             if (Reference.is(node)) {
                 let scope = scopes.get(node)
                 if (scope == null) {
-                    console.log("scope not found for: ", node)
+                    //  we might have been mutated by a changed template sub-reference
+                    //  so we will use our unmutated ancestors scope if needed
+                    scope = scopes.get(ancestors[ancestors.length - 1])
+                    if (scope == null) {
+                        console.log("scope not found for: ", node)
+                    }
                 }
                 let declarator = scope[node.name]
                 if (declarator == null) {
@@ -75,6 +83,25 @@ export default function checkReferences(root: Assembly) {
                     return node.patch({ path: getName(declarator) })
                 }
             }
+            // semantic checks.
+            if (FunctionExpression.is(node)) {
+                // check that only a single RestElement max and is final arg
+                for (let i = 0; i < node.params.length; i++) {
+                    let param = node.params[i]
+                    if (RestElement.is(param.id)) {
+                        // must be last parameter
+                        if (i + 1 < node.params.length) {
+                            throw SemanticError(`Rest element must be final parameter`, param)
+                        }
+                        let { type } = param
+                        if (type) {
+                            if (!Reference.is(type) || type.path !== types.Array.path) {
+                                throw SemanticError(`Rest element type must be an Array`, type)
+                            }
+                        }
+                    }
+                }
+            }            
         }
     })
 }

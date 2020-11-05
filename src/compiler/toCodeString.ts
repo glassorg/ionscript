@@ -109,7 +109,6 @@ const s = memoize(
     function (node: Node) {
         let fn = codeToString[node.constructor.name]
         if (fn == null) {
-            debugger
             throw new Error(`codeToString function not found for type: ${node.constructor.name}`)
         }
         return fn(node)

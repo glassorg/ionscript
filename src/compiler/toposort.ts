@@ -34,7 +34,6 @@ export default function(edges){
     function visit(node, i, predecessors) {
       if (predecessors.indexOf(node) >= 0) {
         console.log({ predecessors: predecessors.map(toCodeString) })
-        debugger
         throw new Error('Cyclic dependency: ' + toCodeString(node))
       }
   

@@ -19,6 +19,7 @@ import * as Boolean from './Boolean';
 import * as Number from './Number';
 import * as Property from '../Property';
 import * as RestElement from '../RestElement';
+import * as _Array from './Array';
 import * as CatchClause from '../CatchClause';
 import * as Integer from './Integer';
 import * as Class from './Class';
@@ -48,6 +49,7 @@ export type Expression_Expression_or_Identifier_Identifier = Expression.Expressi
 export type Property_Property_or_SpreadElement_SpreadElement = Property.Property | SpreadElement.SpreadElement;
 export type Property_Property_or_RestElement_RestElement = Property.Property | RestElement.RestElement;
 export type Expression_Expression_or_Pattern_Pattern = Expression.Expression | Pattern.Pattern;
+export type ion_types____TemplateReference____or_ion_Null_Null = _Array.Array<Type.Type> | Null.Null;
 export type BlockStatement_BlockStatement_or_ion_Null_Null = BlockStatement.BlockStatement | Null.Null;
 export type CatchClause_CatchClause_or_ion_Null_Null = CatchClause.CatchClause | Null.Null;
 export type ion_Integer_Integer___gte_0_ = Integer.Integer;

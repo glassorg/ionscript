@@ -45,7 +45,7 @@ export default function inheritBaseClasses(root: Assembly, options: Options) {
                 }
             }
             for (let baseClass of classDeclaration.baseClasses) {
-                let declarator = getDeclarator(baseClass, scopes, ancestorsMap, true)
+                let declarator = getDeclarator(baseClass, scopes, ancestorsMap, true)!
                 let baseDeclaration = ancestorsMap.get(declarator) as ClassDeclaration
                 if (!ClassDeclaration.is(baseDeclaration)) {
                     throw SemanticError(`Not a class declaration`, baseClass)

@@ -1,6 +1,7 @@
 import { Expression, BinaryExpression, Literal, TypeExpression, Reference, DotExpression } from "../ast";
 import toCodeString from "../toCodeString";
 import { IsType } from "./isType";
+import splitExpressions from "./splitExpressions";
 
 type Maybe = true | false | null
 //  a  \  b |  true   false   null
@@ -166,17 +167,38 @@ export default function isConsequent(a: Expression, b: Expression, isType: IsTyp
             }
         }
     }
+
+    //  A & B & C => C & D & E
+    //  if any term on the left results in a false on the right then false (not consequent)
+    //  if all terms on the right are true based on any term on the left then true (consequent)
+    //  otherwise null (unknown)
+    if (BinaryExpression.is(b) && b.operator === "&&" || BinaryExpression.is(a) && a.operator === "&&") {
+        let allTrue = true
+        for (let bTerm of splitExpressions(b, "&&")) {
+            let bTermResult: boolean | null = null
+            for (let aTerm of splitExpressions(a, "&&")) {
+                let aTermResult = isConsequent(aTerm, bTerm, isType)
+                if (aTermResult === false) {
+                    return false
+                }
+                if (aTermResult === true) {
+                    bTermResult = true
+                    break
+                }
+            }
+            if (bTermResult !== true) {
+                allTrue = false
+            }
+        }
+        return allTrue || null
+    }
+
+    //  A & B => C & D
     if (BinaryExpression.is(a) && a.operator === "||") {
         return same(isConsequent(a.left, b, isType), isConsequent(a.right, b, isType))
     }
-    if (BinaryExpression.is(b) && b.operator === "&&") {
-        return min(isConsequent(a, b.left, isType), isConsequent(a, b.right, isType))
-    }
     if (BinaryExpression.is(b) && b.operator === "||") {
         return max(isConsequent(a, b.left, isType), isConsequent(a, b.right, isType))
-    }
-    if (BinaryExpression.is(a) && a.operator === "&&") {
-        return max(isConsequent(a.left, b, isType), isConsequent(a.right, b, isType))
     }
     return null
 }

@@ -27,27 +27,3 @@ export default function assemblyToAnalysis(root: Assembly, options: Options): An
     //  And finally create the new Analysis scope
     return new Analysis({ declarations })
 }
-
-/*
-
-//  for analysis... we need every reference that can be to be an absolute reference
-//  a ScopeMap can be used to locate references
-
-We have to convert all declarations into single declarations.
-ImportDeclaration
-    ImportNamespaceSpecifier *
-    ImportDefaultSpecifier *
-    ImportSpecifier *
-VariableDeclaration
-    VariableDeclarator +
-
-//  We just have to remove all imports and convert any references to imports into absolute references.
-//  We want to do that anyways, so that we can remove direct external references and use module.export style member expressions.
-//  That makes circular dependency import errors less likely.
-//  So next step:
-//  TODO TONIGHT:
-//      Implement createScopeMap
-//      Find references to imported declarations
-//      Replace them with absolute references
-
-*/

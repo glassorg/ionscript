@@ -24,6 +24,7 @@ export default [
     addDataClassConstructors,
     checkReferences,
     inferTypes,
+
     addTypedStructArrays,
     runtimeTypeChecking,
     createRuntime,

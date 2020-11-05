@@ -1,11 +1,11 @@
-import { Reference } from "../ast"
+import { Identifier } from "../ast"
 import * as t from "../types"
 
 //  key = type, value = all types implemented by this type
 class TypeData {
     baseType: string
     types: Set<string>
-    constructor(baseType: Reference, ...types: Reference[]) {
+    constructor(baseType: Identifier, ...types: Identifier[]) {
         this.baseType = baseType.path!.toString()
         this.types = new Set(types.map(type => type.path!.toString()))
         this.types.add(this.baseType)
@@ -13,7 +13,7 @@ class TypeData {
 }
 
 //  type, [baseType], ...otherBaseTypesTheMainTypeImplements
-let baseTypes: Reference[][] = [
+let baseTypes: Identifier[][] = [
     [t.Boolean],
     [t.String],
     [t.Number],
@@ -32,7 +32,7 @@ let baseTypes: Reference[][] = [
     [t.Type, t.Object],
 ]
 
-function getTypeMap(types: Reference[][]) {
+function getTypeMap(types: Identifier[][]) {
     let typeMap = new Map<string,TypeData>()
     for (let typeArray of types) {
         let [type, baseType = type, ...types] = typeArray
@@ -57,11 +57,11 @@ function getTypeMap(types: Reference[][]) {
     return typeMap
 }
 
-export type IsType = (isInstanceOfThisType: Reference, anInstanceOfThisType: Reference) => boolean | null
+export type IsType = (isInstanceOfThisType: Identifier, anInstanceOfThisType: Identifier) => boolean | null
 
-export function createIsType(types: Reference[][]): IsType {
+export function createIsType(types: Identifier[][]): IsType {
     let typeMap = getTypeMap([...baseTypes, ...types])
-    return (checkIfType: Reference, isInstanceOfOtherType: Reference): boolean | null => {
+    return (checkIfType: Identifier, isInstanceOfOtherType: Identifier): boolean | null => {
         let checkPath = checkIfType.path!.toString()
         let otherPath = isInstanceOfOtherType.path!.toString()
         let checkData = typeMap.get(checkPath)

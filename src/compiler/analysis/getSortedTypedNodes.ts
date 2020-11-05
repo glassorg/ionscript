@@ -178,7 +178,6 @@ export default function getSortedTypedNodes(root, scopeMap: ScopeMaps, ancestors
     let edges: [Typed, Typed][] = [];
     function push(from: Typed, to: Typed) {
         if (from == null || to == null) {
-            debugger
             throw new Error("Edge nodes may not be null")
         }
         if (from === to) {

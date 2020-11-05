@@ -147,9 +147,10 @@ Indented Javascript
       .is function on Classes
     X Implement Struct Typed Arrays getter/setters
     X Implement conditional declaration types for if/else statements
-      Implement conditional declaration types for conditional expressions
+    X Implement conditional declaration types for conditional expressions
       Type check function calls and throw error if we know they are wrong
-      Type check other things
+        Function call parameters
+        Assignment to typed variables
 
 ### Absolute Path
 

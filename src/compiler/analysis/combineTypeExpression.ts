@@ -41,11 +41,5 @@ export default function and(left: Expression | null, right: Expression | null): 
     }
     left = simplify(normalizeExpressions(left))
     right = simplify(normalizeExpressions(right))
-    if (left == null) {
-        return right
-    }
-    if (right == null) {
-        return left
-    }
     return simplify(new BinaryExpression({ left, operator: "&&", right }))
 }

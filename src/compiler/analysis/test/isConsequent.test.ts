@@ -102,7 +102,18 @@ testConsequent(
     null    // although conceptually, != x implies > x | < x, our analysis does not recognize this.
 )
 
-//  TODO: Next, check some of the is logic using our isType checks
+testConsequent(
+    and(
+        b("foo", "is", t.Number),
+        b("foo", "==", 12),
+    ),
+    and(
+        b("foo", "is", t.Number),
+        b("foo", "<", 10),
+    ),
+    false,
+    false,
+)
 
 testConsequent(b("foo", "is", Dog), b("foo", "isnt", Dog), false, false)
 testConsequent(b("foo", "is", Cat), b("foo", "is", Cat), true, true)
@@ -140,12 +151,14 @@ testConsequent(
     true,
     null
 )
+
 testConsequent(
     b(b("foo", ">", 0), "&&", b("foo", "<", 10)),
     b(b("foo", ">", 1), "&&", b("foo", "<", 8)),
     null,
     true
 )
+
 testConsequent(
     b(b("foo", ">", 0), "||", b("foo", "<", 10)),
     b(b("foo", ">", 1), "||", b("foo", "<", 8)),

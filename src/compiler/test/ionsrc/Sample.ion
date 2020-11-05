@@ -15,8 +15,16 @@
 
 # let { a: { b, c: [d, ...e]}, ...f } = { a: { b: 12, c: [true, false], other: 20 } }
 
-let a: String | Number = 10
-a is Number && a < 10 ? a : a
+let logNumber = (a: Number & > 20, ...rest: Array<String>) =>
+# var foo = "foo"
+# TODO: rest parameters
+# TODO: finish function call parameter types
+# TODO: check assignments to variables.
+
+true ? logNumber(foo) : 12
+
+# let a: String | Number = 10
+# a is Number && a < 10 ? logNumber(a) : a
 
 # type UInt8 = Integer & >= 0 & <= 255
 
@@ -30,8 +38,7 @@ a is Number && a < 10 ? a : a
 
 # let vector = new Vector()
 
-# TODO: struct class signatures
-# ALSO: Convenient Type structure for representing a child with an optional type
+# TODO: Convenient Type structure for representing a child with an optional type
 # for instance { x?: Number, y?: Number }
 # (.x is Number || .x is Undefined) && (.y is Number || .y is Undefined)
 

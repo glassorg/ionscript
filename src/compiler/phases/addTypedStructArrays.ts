@@ -350,6 +350,11 @@ export default function addTypedStructArrays(root: Assembly, options: Options) {
     let ancestors = new Map<Node,Node>()
     let scopes = createScopeMaps(root, { ancestorsMap: ancestors })
     return traverse(root, {
+        enter(node) {
+            if (TypeExpression.is(node)) {
+                return skip
+            }
+        },
         leave(node) {
             if (ClassDeclaration.is(node) && node.isStruct && node.isData) {
                 let [fields,naturalSize] = getFieldInfos(node, scopes, ancestors, 0)
@@ -370,7 +375,6 @@ export default function addTypedStructArrays(root: Assembly, options: Options) {
                 // calculate stride for each actual field
                 // console.log("==========> ", JSON.stringify(fields, null, 2), actualFields)
                 console.log({ largestTypeBytes, naturalSize, paddedSize, actualFields })
-                // TODO: Next, actually create the getter/setters using these fields and offsets.
                 return node.patch({
                     static: [...node.static, createTypedArrayDeclaration(node, fields, actualFields, paddedSize, options)]
                 })
