@@ -70,7 +70,8 @@ function format(html: string) {
 }
 
 export function create(outputPath: string) {
-    let style = readFileSync("node_modules/jsondiffpatch/public/formatters-styles/html.css")
+    let stylePath = require.resolve("jsondiffpatch/public/formatters-styles/html.css")
+    let style = readFileSync(stylePath)
     // console.log(style)
     // let outputToStyle = np.relative(np.dirname(outputPath), "node_modules/jsondiffpatch/dist/formatters-styles/html.css")
     let passes: [string[],object][] = []

@@ -1,27 +1,28 @@
 import { Options } from "../Compiler"
 import { traverse, skip, remove } from "@glas/traverse"
-import { ArrayExpression, BinaryExpression, BlockStatement, CallExpression, Declarator, Expression, ExpressionStatement, FunctionExpression, Identifier, Literal, MemberExpression, ObjectExpression, OutlineOperation, Parameter, Program, Property, Reference, ReturnStatement, SpreadElement, Statement } from "../ast"
+import { ArrayExpression, BinaryExpression, BlockStatement, CallExpression, Declarator, Expression, ExpressionStatement, FunctionExpression, Identifier, Literal, MemberExpression, Node, ObjectExpression, OutlineOperation, Parameter, Program, Property, Reference, ReturnStatement, SpreadElement, Statement } from "../ast"
 import Assembly from "../ast/Assembly"
-import { SemanticError } from "../common"
 import ArrowFunctionExpression from "../ast/ArrowFunctionExpression"
 import PropertyStatement from "../ast/PropertyStatement"
 import AssignmentStatement from "../ast/AssignmentStatement"
 
-const containerName = "$"
-const containerRef = new Reference({ name: containerName })
-const containerId = new Declarator({ name: containerName })
-
 function convertExpressionWithNestedStatements(node) {
+    const { location } = node
+    const containerName = "$"
+    const containerRef = new Reference({ location, name: containerName })
+    const containerId = new Declarator({ location, name: containerName })
     const isObjectExpression = ObjectExpression.is(node)
     const isMap = isObjectExpression && node.isMap
     const isArrayExpression = ArrayExpression.is(node)
     const isSet = isArrayExpression && node.isSet
     if (isObjectExpression && node.properties.find(Statement.is)) {
         return new CallExpression({
+            location,
             callee: new ArrowFunctionExpression({
-                params: [ new Parameter({ id: containerId }) ],
+                params: [ new Parameter({ location, id: containerId }) ],
                 expression: false,
                 body: new BlockStatement({
+                    location,
                     body: traverse(node.properties, {
                         enter(e) {
                             //  don't traverse into call expressions
@@ -47,9 +48,11 @@ function convertExpressionWithNestedStatements(node) {
                                     }
                                     return new ExpressionStatement({
                                         expression: new CallExpression({
+                                            location,
                                             callee: new MemberExpression({
+                                                location,
                                                 object: containerRef,
-                                                property: new Identifier({ name: "set" })
+                                                property: new Identifier({ location, name: "set" })
                                             }),
                                             arguments: [e.key as Expression, e.value as Expression]
                                         })
@@ -57,7 +60,9 @@ function convertExpressionWithNestedStatements(node) {
                                 }
                                 else {
                                     return new AssignmentStatement({
+                                        location,
                                         left: new MemberExpression({
+                                            location,
                                             object: containerRef,
                                             property: e.key,
                                         }),
@@ -67,35 +72,40 @@ function convertExpressionWithNestedStatements(node) {
                                 }
                             }
                         }
-                    }).concat([ new ReturnStatement({ argument: containerRef })])
+                    }).concat([ new ReturnStatement({ location, argument: containerRef })])
                 })
             }),
             arguments: [
                 isMap
-                    ? new CallExpression({ new: true, callee: new Reference({ name: "Map"}), arguments: []})
-                    : new ObjectExpression({ properties: [] })
+                    ? new CallExpression({ location, new: true, callee: new Reference({ location, name: "Map"}), arguments: []})
+                    : new ObjectExpression({ location, properties: [] })
             ]
         })
     }
     else if (isMap) {
         return new CallExpression({
+            location,
             new: true,
-            callee: new Reference({ name: "Map" }),
+            callee: new Reference({ location, name: "Map" }),
             arguments: [
                 new ArrayExpression({
-                    elements: node.properties.map(({ key, value }) => new ArrayExpression({ elements: [ key, value ]}))
+                    location,
+                    elements: node.properties.map(({ key, value }) => new ArrayExpression({ location, elements: [ key, value ]}))
                 })
             ]
         })
     }
     else if (isArrayExpression && node.elements.find(Statement.is)) {
-        const push = new Identifier({ name: isSet ? "add" : "push" })
+        const push = new Identifier({ location, name: isSet ? "add" : "push" })
         const mergePushElementsWithNext = new Array<Expression | SpreadElement>()
         return new CallExpression({
+            location,
             callee: new ArrowFunctionExpression({
-                params: [ new Parameter({ id: containerId }) ],
+                location,
+                params: [ new Parameter({ location, id: containerId }) ],
                 expression: false,
                 body: new BlockStatement({
+                    location,
                     body: traverse(node.elements, {
                         enter(e) {
                             //  don't traverse into call expressions
@@ -127,30 +137,33 @@ function convertExpressionWithNestedStatements(node) {
                                     return remove
                                 }
                                 let expression = new CallExpression({
+                                    location,
                                     callee: new MemberExpression({
+                                        location,
                                         object: containerRef,
                                         property: push
                                     }),
                                     arguments: [...mergePushElementsWithNext, e]
                                 })
                                 mergePushElementsWithNext.length = 0
-                                return statement ? new ExpressionStatement({ expression }) : expression
+                                return statement ? new ExpressionStatement({ location, expression }) : expression
                             }
                         }
-                    }).concat([ new ReturnStatement({ argument: containerRef })])
+                    }).concat([ new ReturnStatement({ location, argument: containerRef })])
                 })
             }),
             arguments: [
                 isSet
-                ? new CallExpression({ new: true, callee: new Reference({ name: "Set"}), arguments: []})
-                : new ArrayExpression({ elements: [] })
+                ? new CallExpression({ location, new: true, callee: new Reference({ location, name: "Set"}), arguments: []})
+                : new ArrayExpression({ location, elements: [] })
             ]
         })
     }
     else if (isSet) {
         return new CallExpression({
+            location,
             new: true,
-            callee: new Reference({ name: "Set" }),
+            callee: new Reference({ location, name: "Set" }),
             arguments: [ node.patch({ isSet: false }) ]
         })
     }
@@ -161,33 +174,39 @@ export default function controlFlowToExpressions(root: Assembly, options: Option
         enter(node) {
         },
         leave(node) {
+            let { location } = node
             if (CallExpression.is(node) && node.arguments.find(Statement.is)) {
                 return node.patch({
                     arguments: [
                         new SpreadElement({
-                            argument: convertExpressionWithNestedStatements(new ArrayExpression({ elements: node.arguments }))!
+                            location,
+                            argument: convertExpressionWithNestedStatements(new ArrayExpression({ location, elements: node.arguments }))!
                         })
                     ]
                 })
             }
             if (OutlineOperation.is(node)) {
                 let { operator } = node
-                let operands = new ArrayExpression({ elements: node.operands })
+                let operands = new ArrayExpression({ location, elements: node.operands })
                 return new CallExpression({
+                    location,
                     callee: new MemberExpression({
+                        location,
                         object: convertExpressionWithNestedStatements(operands) ?? operands,
-                        property: new Identifier({ name: "reduce" })
+                        property: new Identifier({ location, name: "reduce" })
                     }),
                     arguments: [
                         new ArrowFunctionExpression({
+                            location,
                             params: [
-                                new Parameter({ id:  new Declarator({ name: "a"}) }),
-                                new Parameter({ id:  new Declarator({ name: "c"}) }),
+                                new Parameter({ location, id:  new Declarator({ location, name: "a"}) }),
+                                new Parameter({ location, id:  new Declarator({ location, name: "c"}) }),
                             ],
                             body: new BinaryExpression({
-                                left: new Reference({ name: "a"}),
+                                location,
+                                left: new Reference({ location, name: "a"}),
                                 operator,
-                                right: new Reference({ name: "c"})
+                                right: new Reference({ location, name: "c"})
                             }),
                             expression: true
                         })

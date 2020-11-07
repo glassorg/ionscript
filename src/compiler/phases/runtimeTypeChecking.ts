@@ -143,7 +143,7 @@ export default function runtimeTypeChecking(root: Assembly, options: Options) {
                                         : new CallExpression({
                                             new: true,
                                             callee: new MemberExpression({
-                                                object: new Reference({ name: "ion" }),
+                                                object: new Reference({ name: "is" }),
                                                 property: new Identifier({ name: "Type" })
                                             }),
                                             arguments: [
@@ -170,12 +170,13 @@ export default function runtimeTypeChecking(root: Assembly, options: Options) {
                                     body: node.body.patch({
                                         body: [
                                             ...typedParams.map(p => typeCheckOrThrow(new Reference(p.id as Reference), p.type!, (p.id as Reference).name)),
-                                            ...node.body.body
+                                            ...node.body.body,
                                         ]
                                     })
                                 })
                             }
                         }
+
                         if (ClassDeclaration.is(node) && !node.isData) {
                             // first find any typed vars we need to create symbols for
                             //  handle typed variables by adding symbols to use for storing values

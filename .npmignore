@@ -1,0 +1,8 @@
+ionast
+dist
+ionsrc
+tsconfig.json
+watch.sh
+test
+src
+output.html

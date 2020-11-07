@@ -103,26 +103,7 @@ export default function toEsTree(root: Map<string, any>, options: Options) {
                 if (MemberExpression.is(node) && Expression.is(node.property)) {
                     result.computed = true
                 }
-                // handle exports
-                if (Exportable.is(node) && node.export > 0) {
-                    if (ImportDeclaration.is(node)) {
-                        result = replace({
-                            type: "ExpressionStatement",
-                            expression: { type: "Literal", value: "Fuck" },
-                        }, {
-                            type: "ExpressionStatement",
-                            expression: { type: "Literal", value: "You" },
-                        })
-                    }
-                    else {
-                        result = {
-                            type: node.export === 2 ? "ExportDefaultDeclaration" : "ExportNamedDeclaration",
-                            declaration: result,
-                            specifiers: [],
-                            source: null,
-                        }
-                    }
-                }
+
                 if (BinaryExpression.is(node)) {
                     result.operator = operatorMap[node.operator] ?? node.operator
                 }
@@ -138,7 +119,7 @@ export default function toEsTree(root: Map<string, any>, options: Options) {
                     let values = { ...node, ...changes }
                     let declarations = [...values.instance.declarations, ...values.static]
                     let originals = [...node.instance.declarations, ...node.static]
-                    return {
+                    result = {
                         type: "ClassDeclaration",
                         id: values.id,
                         superClass: values.baseClasses[0],
@@ -167,6 +148,26 @@ export default function toEsTree(root: Map<string, any>, options: Options) {
                                     static: original.static
                                 }
                             }).filter(value => value != null)
+                        }
+                    }
+                }
+                // finally, handle exports
+                if (Exportable.is(node) && node.export > 0) {
+                    if (ImportDeclaration.is(node)) {
+                        result = replace({
+                            type: "ExpressionStatement",
+                            expression: { type: "Literal", value: "Fuck" },
+                        }, {
+                            type: "ExpressionStatement",
+                            expression: { type: "Literal", value: "You" },
+                        })
+                    }
+                    else {
+                        result = {
+                            type: node.export === 2 ? "ExportDefaultDeclaration" : "ExportNamedDeclaration",
+                            declaration: result,
+                            specifiers: [],
+                            source: null,
                         }
                     }
                 }

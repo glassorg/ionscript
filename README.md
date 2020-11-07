@@ -148,9 +148,12 @@ Indented Javascript
     X Implement Struct Typed Arrays getter/setters
     X Implement conditional declaration types for if/else statements
     X Implement conditional declaration types for conditional expressions
-      Type check function calls and throw error if we know they are wrong
-        Function call parameters
-        Assignment to typed variables
+    X Type check function calls and throw error if we know they are wrong
+    X   Function call parameters
+    X   Assignment to typed variables
+    X Change extension to .is
+    X Change compiler to isc
+      Build local test projects
 
 ### Absolute Path
 

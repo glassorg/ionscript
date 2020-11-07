@@ -13,15 +13,16 @@ import createConditionalDeclarations from "./createConditionalDeclarations"
 import inferTypes from "./inferTypes"
 import addDataClassConstructors from "./addDataClassConstructors"
 import addTypedStructArrays from "./addTypedStructArrays"
+import toModuleFiles from "./toModuleFiles"
 
 export default [
     parsing,
-    semanticAnalysis,
-    fixImports,
-    inheritBaseClasses,
+    // semanticAnalysis,
+    // fixImports,
+    // inheritBaseClasses,
     controlFlowToExpressions,
-    createConditionalDeclarations,
-    addDataClassConstructors,
+    // createConditionalDeclarations,
+    // addDataClassConstructors,
     checkReferences,
     inferTypes,
 
@@ -30,5 +31,6 @@ export default [
     createRuntime,
     toEsTree,
     codegen,
+    toModuleFiles,
     writeFiles,
 ]

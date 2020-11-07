@@ -21,6 +21,8 @@
     "deploy": "yarn build && yarn publish --patch"
   },
   "dependencies": {
+    "@babel/core": "^7.12.3",
+    "@babel/plugin-transform-modules-commonjs": "^7.12.1",
     "@glas/ion": "0.1.8",
     "@glas/test": "^1.0.3",
     "@glas/traverse": "^1.0.4",

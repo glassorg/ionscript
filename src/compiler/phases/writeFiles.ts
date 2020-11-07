@@ -1,13 +1,11 @@
-import { join } from "path";
+import { join, sep } from "path";
 import { write } from "../common";
 import { Options } from "../Compiler";
-import Assembly from "../ast/Assembly";
 
-const extension = ".js"
 export default function writeFiles(output, options: Options) {
     for (let path of output.modules.keys()) {
         let content = output.modules.get(path) as string
-        write(join(options.output, path) + extension, content)
+        write(join(options.output, path.slice(path.indexOf(sep) + 1)), content)
     }
     return null
 }

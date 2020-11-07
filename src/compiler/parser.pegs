@@ -385,7 +385,7 @@ ConstrainedType
 
 Constraint
     = right:Literal
-    { return node('BinaryExpression', { left: node('DotExpression'), operator: '==', right }) }
+    { return node('BinaryExpression', { left: node('DotExpression'), operator: ast.RegularExpression.is(right) ? 'is' : '==', right }) }
     / left:MemberExpression? _ operator:(">=" / "<=" / ">" / "<" / "==" / "!=" / "is") _ right:MemberExpression
     { return node('BinaryExpression', { left: left || node('DotExpression'), operator, right }) }
     / right:(FunctionType / Reference /* Regex */)
@@ -801,7 +801,7 @@ Literal
     / StringLiteral
     // / CharLiteral
     / NullLiteral
-    / RegularExpressionLiteral
+    / RegularExpression
 
 NumericLiteral
     = HexIntegerLiteral
@@ -853,7 +853,7 @@ OutlineStringLiteral
 //  Regular Expressions
 ////////////////////////////////////////////////////////////////////////////////
 
-RegularExpressionLiteral
+RegularExpression
     = "/" pattern:$((("\\" .) / [^/])+)  "/" flags:$([a-z]*)
     { return node("RegularExpression", {pattern, flags }) }
 

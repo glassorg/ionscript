@@ -1,7 +1,7 @@
 import { Options } from "../Compiler";
 import { traverse, skip, replace } from "@glas/traverse";
 import Assembly from "../ast/Assembly";
-import { AssignmentStatement, BinaryExpression, BlockStatement, CallExpression, ClassDeclaration, Declarator, DotExpression, Expression, ExpressionStatement, FunctionExpression, Identifier, InstanceDeclarations, Literal, MemberExpression, ObjectExpression, Parameter, Property, Reference, ReturnStatement, ThisExpression, TypeExpression, VariableDeclaration } from "../ast";
+import { AssignmentStatement, BinaryExpression, BlockStatement, CallExpression, ClassDeclaration, Declarator, DotExpression, Expression, ExpressionStatement, FunctionExpression, Identifier, ImportDeclaration, ImportDefaultSpecifier, InstanceDeclarations, Literal, MemberExpression, ObjectExpression, Parameter, Program, Property, Reference, RegularExpression, ReturnStatement, ThisExpression, TypeExpression, VariableDeclaration } from "../ast";
 import { replaceNodes } from "./runtimeTypeChecking";
 import { typeProperties } from "./inferTypes";
 
@@ -11,11 +11,28 @@ export default function createRuntime(root: Assembly, options: Options) {
             if (VariableDeclaration.is(node) && node.kind === "type") {
                 return skip
             }
-            if (TypeExpression.is(node)) {
-                return skip
-            }
+            // cannot skip TypeExprssions as we need to convert 'is' operators within them to is calls.
+            // if (TypeExpression.is(node)) {
+            //     return skip
+            // }
         },
         leave(node, ancestors, path) {
+            if (Program.is(node)) {
+                // insert an import of ionscript 'is'
+                return node.patch({
+                    body: [
+                        new ImportDeclaration({
+                            specifiers: [
+                                new ImportDefaultSpecifier({
+                                    local: new Declarator({ name: "is" })
+                                })
+                            ],
+                            source: new Literal({ value: "ionscript" })
+                        }),
+                        ...node.body
+                    ]
+                })
+            }
             //  types here.
             if (TypeExpression.is(node)) {
                 let last = path[path.length - 1]
@@ -28,12 +45,9 @@ export default function createRuntime(root: Assembly, options: Options) {
                 return new Reference({ name: "value" })
             }
             if (BinaryExpression.is(node) && node.operator === "is") {
-                if (Reference.is(node.right)) {
+                if (Reference.is(node.right) || RegularExpression.is(node.right)) {
                     return new CallExpression({
-                        callee: new MemberExpression({
-                            object: new Reference({ name: "ion" }),
-                            property: new Identifier({ name: "is" })
-                        }),
+                        callee: new Reference({ name: "is" }),
                         arguments: [ node.left, node.right ],
                     })
                 }

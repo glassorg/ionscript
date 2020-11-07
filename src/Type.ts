@@ -1,4 +1,3 @@
-import * as symbols from "./symbols"
 
 export default class Type {
 
@@ -8,7 +7,6 @@ export default class Type {
     constructor(name: string, is: (a, type) => boolean) {
         this.name = name
         this.is = is
-        this[symbols.is] = is
     }
 
     toString() {

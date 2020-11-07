@@ -232,7 +232,7 @@ export function difference(a: Set<any>, b: Set<any>) {
 //  File operations
 ////////////////////////////////////////////////////////////////////////////////
 
-const ionExt = '.ion'
+const ionExt = '.is'
 
 export function findPackage(dir = process.cwd()) {
     let checkFilename = np.join(dir, "package.json")

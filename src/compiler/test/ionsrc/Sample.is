@@ -15,12 +15,26 @@
 
 # let { a: { b, c: [d, ...e]}, ...f } = { a: { b: 12, c: [true, false], other: 20 } }
 
-let logNumber = (a: Number | String) =>
-    if a is String
-        return 12
-    if a < 10
-        return 20
-    return a
+# type ShortName = String & .length > 0 & .length < 100 & == .trim()
+
+let foo = (a: 1 | /foo*/) =>
+    a
+
+# console.log()
+#     for i in [1,2,3]
+#         if i > 1
+#             i * 2
+
+# export class Person
+# var name: ShortName
+
+# let logNumber = (a: Number | String) =>
+#     if a is String
+#         return 12
+#     if a < 10
+#         return 20
+#     return a
+
 # var foo = "foo"
 # foo = 12
 # class Vector
