@@ -2,7 +2,7 @@ import createScopeMaps from "../createScopeMaps";
 import { traverse, remove } from "@glas/traverse";
 import { Assembly, ClassDeclaration, Declaration, Declarator, Exportable, FunctionExpression, Identifier, ImportDeclaration, Location, MemberExpression, ModuleSpecifier, Node, Program, Reference, RestElement, ThisExpression, VariableDeclaration } from "../ast";
 import { getAncestor, getOriginalDeclarator, memoizeIntern, SemanticError } from "../common";
-import { getGlobalPath, getModulePath } from "../pathFunctions";
+import { getGlobalReference, getModulePath } from "../pathFunctions";
 import toCodeString from "../toCodeString";
 import * as types from "../types";
 
@@ -55,7 +55,7 @@ export default function checkReferences(root: Assembly) {
                 let declarator = scope[node.name]
                 if (declarator == null) {
                     // if we cannot find a declarator then this must be a global reference
-                    return node.patch({ path: getGlobalPath(node.name) })
+                    return getGlobalReference(node)
                 }
                 else {
                     let declaration = ancestors[ancestors.length - 1]

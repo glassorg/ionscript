@@ -4,6 +4,8 @@ import { traverse } from "@glas/traverse";
 import { NodeMap, ScopeMap } from "./createScopeMaps";
 import { Reference, Node, VariableDeclaration, ModuleSpecifier, ImportDeclaration, Declarator, Program, ImportDefaultSpecifier, ImportNamespaceSpecifier, ImportSpecifier, Exportable, Declaration } from "./ast";
 
+export const runtimeModuleName = "ionscript"
+
 export function getNodesOfType<T>(root, predicate: (node) => node is T) {
     let nodes = new Array<T>()
     traverse(root, {

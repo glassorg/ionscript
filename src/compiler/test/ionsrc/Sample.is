@@ -17,6 +17,8 @@
 
 # type ShortName = String & .length > 0 & .length < 100 & == .trim()
 
+# a is Null
+
 let foo = (a: 1 | /foo*/) =>
     a
 

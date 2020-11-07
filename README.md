@@ -139,12 +139,9 @@ Indented Javascript
     X Type checks on class properties
     X Design way for known good types to bypass checks => remove automatic type checks on release
     X Check Types on function call
-      is function for normal classes
     X Write data classes.
     X add static baseClasses to data classes.
-        add runtime type checking for data classes... is function
     X Type Declarations, port pre-existing system from Ion develop branch
-      .is function on Classes
     X Implement Struct Typed Arrays getter/setters
     X Implement conditional declaration types for if/else statements
     X Implement conditional declaration types for conditional expressions
@@ -153,7 +150,12 @@ Indented Javascript
     X   Assignment to typed variables
     X Change extension to .is
     X Change compiler to isc
-      Build local test projects
+    X Runtime type checking
+    X   type checking for normal classes handled by ionscript.is function using instanceof
+    X   is function for data classes
+    X reconvert ionscript import to use .is not function
+    X Null, Undefined referenced automatically in ionscript
+    - smart import of ionscript
 
 ### Absolute Path
 

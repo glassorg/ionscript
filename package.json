@@ -15,7 +15,7 @@
     "buildAst": "ionc src/compiler/ast ionast",
     "watch": "./watch.sh",
     "test": "gtest lib # echo should be just guild test, todo: fix this",
-    "watchGrammar": "nodemon -w src/compiler/parser.pegs -x yarn run buildGrammar",
+    "watchGrammar": "nodemon -w src/compiler/parser.pegs -i src,lib -e pegs -x yarn run buildGrammar",
     "buildGrammar": "pegs src/compiler/parser.pegs lib/compiler/parser.js",
     "debug": "node --inspect-brk node_modules/@glas/test/gtest.js lib",
     "deploy": "yarn build && yarn publish --patch"

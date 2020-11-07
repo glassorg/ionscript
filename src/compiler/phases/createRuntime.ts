@@ -1,9 +1,11 @@
 import { Options } from "../Compiler";
 import { traverse, skip, replace } from "@glas/traverse";
 import Assembly from "../ast/Assembly";
-import { AssignmentStatement, BinaryExpression, BlockStatement, CallExpression, ClassDeclaration, Declarator, DotExpression, Expression, ExpressionStatement, FunctionExpression, Identifier, ImportDeclaration, ImportDefaultSpecifier, InstanceDeclarations, Literal, MemberExpression, ObjectExpression, Parameter, Program, Property, Reference, RegularExpression, ReturnStatement, ThisExpression, TypeExpression, VariableDeclaration } from "../ast";
+import { ArrayExpression, AssignmentStatement, BinaryExpression, BlockStatement, CallExpression, ClassDeclaration, Declarator, DotExpression, Expression, ExpressionStatement, FunctionExpression, Identifier, ImportDeclaration, ImportDefaultSpecifier, ImportNamespaceSpecifier, InstanceDeclarations, Literal, MemberExpression, ObjectExpression, Parameter, Program, Property, Reference, RegularExpression, ReturnStatement, ThisExpression, TypeExpression, VariableDeclaration } from "../ast";
 import { replaceNodes } from "./runtimeTypeChecking";
 import { typeProperties } from "./inferTypes";
+import { runtimeModuleName } from "../common";
+import createTypeCheck from "../../createTypeCheck";
 
 export default function createRuntime(root: Assembly, options: Options) {
     return traverse(root, {
@@ -18,16 +20,16 @@ export default function createRuntime(root: Assembly, options: Options) {
         },
         leave(node, ancestors, path) {
             if (Program.is(node)) {
-                // insert an import of ionscript 'is'
+                // insert an import of ionscript
                 return node.patch({
                     body: [
                         new ImportDeclaration({
                             specifiers: [
-                                new ImportDefaultSpecifier({
-                                    local: new Declarator({ name: "is" })
+                                new ImportNamespaceSpecifier({
+                                    local: new Declarator({ name: runtimeModuleName })
                                 })
                             ],
-                            source: new Literal({ value: "ionscript" })
+                            source: new Literal({ value: runtimeModuleName })
                         }),
                         ...node.body
                     ]
@@ -45,9 +47,12 @@ export default function createRuntime(root: Assembly, options: Options) {
                 return new Reference({ name: "value" })
             }
             if (BinaryExpression.is(node) && node.operator === "is") {
-                if (Reference.is(node.right) || RegularExpression.is(node.right)) {
+                if (Reference.is(node.right) || RegularExpression.is(node.right) || MemberExpression.is(node.right)) {
                     return new CallExpression({
-                        callee: new Reference({ name: "is" }),
+                        callee: new MemberExpression({
+                            object: new Reference({ name: runtimeModuleName }),
+                            property: new Identifier({ name: "is" }),
+                        }),
                         arguments: [ node.left, node.right ],
                     })
                 }
@@ -134,7 +139,25 @@ export default function createRuntime(root: Assembly, options: Options) {
                             value: new CallExpression({
                                 new: true,
                                 callee: new Reference({ name: "Set"}),
-                                arguments: node.baseClasses
+                                arguments: [
+                                    new ArrayExpression({
+                                        elements: node.baseClasses
+                                    })
+                                ]
+                            })
+                        })
+                    )
+                    staticVarsWithDefaults.push(
+                        new VariableDeclaration({
+                            static: new Identifier({ name: "static" }),
+                            kind: "var",
+                            id: new Declarator({ name: "is" }),
+                            value: new CallExpression({
+                                callee: new MemberExpression({
+                                    object: new Reference({ name: runtimeModuleName }),
+                                    property: new Identifier({ name: createTypeCheck.name.valueOf() }),
+                                }),
+                                arguments: [ new Reference(node.id) ],
                             })
                         })
                     )

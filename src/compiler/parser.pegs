@@ -360,7 +360,7 @@ TemplateParameters
     = "<" _ head:Parameter tail:(_ ',' _ @Parameter)* _ ">" { return [head, ...tail] }
 
 Extends
-    = ExtendsToken _ head:TemplateReference tail:(_ "," _ @TemplateReference)*
+    = ExtendsToken _ head:Reference tail:(_ "," _ @Reference)*
     { return [head, ...tail] }
 
 ////////////////////////////////////////////////////////////////////////////////

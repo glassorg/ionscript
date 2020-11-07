@@ -2,7 +2,7 @@ import { Options } from "../Compiler"
 import { traverse, skip, replace } from "@glas/traverse"
 import Assembly from "../ast/Assembly"
 import { AssignmentStatement, BinaryExpression, BlockStatement, CallExpression, ClassDeclaration, Declaration, Declarator, DotExpression, Expression, ExpressionStatement, FunctionExpression, Identifier, IfStatement, ImportDeclaration, ImportNamespaceSpecifier, InstanceDeclarations, Literal, MemberExpression, ObjectExpression, Parameter, Program, Property, Reference, ReturnStatement, Statement, ThisExpression, ThrowStatement, Type, TypeExpression, UnaryExpression, VariableDeclaration } from "../ast"
-import { getLast } from "../common"
+import { getLast, runtimeModuleName } from "../common"
 
 // let Vector_x = Symbol("Vector_x")
 function getSymbolName(c: ClassDeclaration, d: VariableDeclaration) {
@@ -123,12 +123,12 @@ export default function runtimeTypeChecking(root: Assembly, options: Options) {
         },
         leave(node) {
             if (Program.is(node)) {
-                let hasIonReference = false
+                // let hasIonReference = false
                 let result = traverse(node, {
                     enter(node) {
-                        if (Reference.is(node) && node.name === "ion") {
-                            hasIonReference = true
-                        }
+                        // if (Reference.is(node) && node.name === runtimeModuleName) {
+                        //     hasIonReference = true
+                        // }
                         if (TypeExpression.is(node)) {
                             return skip
                         }
@@ -143,7 +143,7 @@ export default function runtimeTypeChecking(root: Assembly, options: Options) {
                                         : new CallExpression({
                                             new: true,
                                             callee: new MemberExpression({
-                                                object: new Reference({ name: "is" }),
+                                                object: new Reference({ name: runtimeModuleName }),
                                                 property: new Identifier({ name: "Type" })
                                             }),
                                             arguments: [
@@ -202,21 +202,21 @@ export default function runtimeTypeChecking(root: Assembly, options: Options) {
                         }
                     }
                 })
-                if (hasIonReference) {
-                    result = result.patch({
-                        body: [
-                            new ImportDeclaration({
-                                specifiers: [
-                                    new ImportNamespaceSpecifier({
-                                        local: new Declarator({ name: "ion" })
-                                    })
-                                ],
-                                source: new Literal({ value: "ion" }),
-                            }),
-                            ...result.body
-                        ]
-                    })
-                }
+                // if (hasIonReference) {
+                //     result = result.patch({
+                //         body: [
+                //             new ImportDeclaration({
+                //                 specifiers: [
+                //                     new ImportNamespaceSpecifier({
+                //                         local: new Declarator({ name: runtimeModuleName })
+                //                     })
+                //                 ],
+                //                 source: new Literal({ value: runtimeModuleName }),
+                //             }),
+                //             ...result.body
+                //         ]
+                //     })
+                // }
                 return result
             }
         }

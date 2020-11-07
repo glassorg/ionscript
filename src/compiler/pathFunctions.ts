@@ -1,15 +1,36 @@
+import Null from "../Null"
+import Undefined from "../Undefined"
 // // absolute path related functions
 // import np from "path"
 
-import { Location } from "./ast"
+import { Identifier, Location, MemberExpression, Reference } from "./ast"
+import { runtimeModuleName } from "./common"
 
 // const ROOT_CHARACTER = ":"
 // const PATH_SEPARATOR = "/"
 // const EXPORT_SEPARATOR = "#"
 // const DEFAULT_EXPORT = "default"
 
+const ionGlobals = new Set([
+    Undefined.name,
+    Null.name,
+])
+
 const globalPrefix = "global:"
+export function getGlobalReference(node: Reference) {
+    let { location } = node
+    // check if name is exported by ionscript runtime, 
+    if (ionGlobals.has(node.name)) {
+        return new MemberExpression({
+            object: new Reference({ location, name: runtimeModuleName }),
+            property: new Identifier({ location, name: node.name }),
+        })
+    }
+    return node.patch({ path: getGlobalPath(node.name) })
+}
 export function getGlobalPath(name: string) {
+    //  check first and see if this name is exported by our runtime module
+    //  if so, we import it from there.
     return `${globalPrefix}${name}`
 }
 export function isGlobalPath(path: string) {

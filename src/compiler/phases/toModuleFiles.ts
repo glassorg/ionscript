@@ -2,7 +2,14 @@ import { Options } from "../Compiler";
 import * as babel from "@babel/core";
 
 const babel_options = {
-    plugins: ["@babel/plugin-transform-modules-commonjs"]
+    plugins: [
+        [
+            "@babel/plugin-transform-modules-commonjs",
+            {
+               noInterop: true,
+            }
+        ]
+    ]
 }
 
 export default function toModuleFiles(output, options: Options) {
