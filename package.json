@@ -1,6 +1,6 @@
 {
   "name": "ionscript",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Indented Javascript",
   "main": "lib/index.js",
   "repository": "https://github.com/glassorg/ionscript.git",
