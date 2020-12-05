@@ -325,6 +325,7 @@ export const inferType: {
                 }))
             }
             else {
+                // Spread Element
                 let arg = c.getResolved(p.argument)
                 if (ast.TypeExpression.is(arg.type)) {
                     for (let e of splitExpressions(arg.type.value, "&&")) {
@@ -338,9 +339,6 @@ export const inferType: {
                             expressions.push(e)
                         }
                     }
-                }
-                else {
-                    throw new Error("Unexpected object type: " + toCodeString(arg.type))
                 }
             }
         }
@@ -363,11 +361,13 @@ export const inferType: {
             p = c.getResolved(p)
             if (ast.Expression.is(p)) {
                 length++
-                expressions.push(new ast.BinaryExpression({
-                    left: new ast.MemberExpression({ object: new ast.DotExpression({}), property: new ast.Literal({ value: index }) }),
-                    operator: "is",
-                    right: p.type!
-                }))
+                if (p.type) {
+                    expressions.push(new ast.BinaryExpression({
+                        left: new ast.MemberExpression({ object: new ast.DotExpression({}), property: new ast.Literal({ value: index }) }),
+                        operator: "is",
+                        right: p.type
+                    }))
+                }
             }
             else if (ast.SpreadElement.is(p)) {
                 let arg = c.getResolved(p.argument)

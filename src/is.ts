@@ -1,7 +1,4 @@
 import * as symbols from "./symbols"
-import Type from "./Type";
-import Null from "./Null";
-import Undefined from "./Undefined";
 
 export default function is(instance, type) {
     //  if the type has an is function we call it

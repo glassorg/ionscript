@@ -56,6 +56,9 @@ export {
     default as DotExpression
 } from './DotExpression';
 export {
+    default as ElementExpression
+} from './ElementExpression';
+export {
     default as Exportable
 } from './Exportable';
 export {

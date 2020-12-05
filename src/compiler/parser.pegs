@@ -551,6 +551,7 @@ OutlineExpressionStartsThisLine
     / OutlineFunction
     / OutlineArrayExpression
     / OutlineObjectExpression
+    / OutlineJSXElementExpression
     // / OutlineMapExpression
     / OutlineCallExpression
     / OutlineNewExpression
@@ -623,6 +624,7 @@ PrimaryExpression
     / GroupExpression
     / InlineArrayExpression
     / InlineObjectExpression
+    / InlineJSXElementExpression
     // / InlineMapExpression
 
 GroupExpression
@@ -712,6 +714,68 @@ InlineArrayExpression
     { return node("ArrayExpression", { elements:elements || [] }) }
     / "|" _ elements:ArrayElements? _ "|"
     { return node("ArrayExpression", { elements:elements || [], isSet: true }) }
+
+////////////////////////////////////////////////////////////////////////////////
+//  JSX @see https://facebook.github.io/jsx/
+////////////////////////////////////////////////////////////////////////////////
+
+JSXName
+    = object:Reference property:( "." @Identifier)?
+    { return property ? node("MemberExpression", { object, property }) : object }
+
+JSXAttributeName
+    = JSXName
+
+JSXElementName
+    = JSXName
+
+JSXAttribute
+    = key:JSXAttributeName value:JSXAttributeInitializer?
+    { return node("Property", { key, value: value ?? node("Literal", { value: true }) }) }
+
+JSXAttributeInitializer
+    = "=" _ @JSXAttributeValue
+
+JSXAttributeValue
+    = StringLiteral
+    / "{" _ @InlineExpression _ "}"
+
+JSXSpreadAttribute
+    = "{" _ @InlineSpreadElement _ "}"
+
+JSXAttributes
+    = (_ @(JSXAttribute / JSXSpreadAttribute))+
+
+InlineJSXElementSelfClosing
+    = "<" _ kind:JSXElementName _ properties:JSXAttributes? _ "/>"
+    { return node("ElementExpression", { kind, properties: properties ?? [], children: [] }) }
+
+InlineJSXElementOpen
+    = "<" _ kind:JSXElementName _ properties:JSXAttributes? _ ">"
+    { return node("ElementExpression", { kind, properties: properties ?? [], children: [] }) }
+
+InlineJSXElementClose
+    = "</" _ @JSXElementName _ ">"
+
+InlineJSXText
+    = ( !"<" !">" !"{" !"}" .)+
+    { return node("Literal", { value: text().replace(/&lt;/g, "<").replace(/&gt;/g, ">") })}
+
+InlineJSXChild
+    = "{" _ @(InlineExpression / InlineSpreadElement) _ "}"
+    / InlineJSXElementExpression
+    / InlineJSXText
+
+InlineJSXElementExpression
+    = InlineJSXElementSelfClosing
+    / open:InlineJSXElementOpen children:InlineJSXChild* close:InlineJSXElementClose
+    { return node("ElementExpression", { ...open, children, close: close ?? null }) }
+
+OutlineJSXElementExpression
+    = element:InlineJSXElementOpen children:OutlineArrayArguments
+    { return node("ElementExpression", { ...element, children }) }
+
+
 
 OutlineArrayArguments
     = EOL Indent args:(Dent @(@(OutlineExpression / @InlineExpressionList EOL) / @Statement))+ Outdent
@@ -996,7 +1060,7 @@ LineTerminatorSequence
     / "\r"
 
 Comment ""
-    = "#" (![\r\n] .)*
+    = "//" (![\r\n] .)*
 
 _ ""
     = ' '*

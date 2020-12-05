@@ -156,6 +156,20 @@ Indented Javascript
     X reconvert ionscript import to use .is not function
     X Null, Undefined referenced automatically in ionscript
     - smart import of ionscript
+      Built in Template type checking
+        Array<Type>
+        Set<Type>
+        Map<Key,Value>
+      Build a language server
+
+### Related Links
+
+    F# Implicit Yields similar motivation to our outline expressions
+    https://github.com/fsharp/fslang-design/blob/master/FSharp-4.7/FS-1069-implicit-yields.md
+
+    Dart Solution to same problem
+    https://medium.com/dartlang/making-dart-a-better-language-for-ui-f1ccaf9f546c#f399
+
 
 ### Absolute Path
 

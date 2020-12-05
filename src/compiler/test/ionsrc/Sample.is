@@ -1,260 +1,282 @@
-# import "foo/bar/baz"
-#     as d
-#     * as all
-#     a
+// import "foo/bar/baz"
+//     as d
+//     * as all
+//     a
+// data class Horizontal
+//     var x: Number = 1
+// data class Vertical
+//     var y: Number & . < 10 & . >= 0 = 2
+// data class Vector extends Horizontal, Vertical
+//     var z: Number = 0
+//     static var w = 1
+// let { a: { b, c: [d, ...e]}, ...f } = { a: { b: 12, c: [true, false], other: 20 } }
+// type ShortName = String & .length > 0 & .length < 100 & == .trim()
+// a is Null
 
-# data class Horizontal
-#     var x: Number = 1
+// let array = []
+//     a
+//     +
+//         ...A
+//     c
 
-# data class Vertical
-#     var y: Number & . < 10 & . >= 0 = 2
+// let object = {}
+//     if bar
+//         x: 20
 
-# data class Vector extends Horizontal, Vertical
-#     var z: Number = 0
-#     static var w = 1
+// var dropdown =
+//     <Dropdown>
+//         A dropdown list
+//         <Menu>
+//             <MenuItem>Do Something</MenuItem>
+//             <MenuItem>Do Something Fun!</MenuItem>
+//             <MenuItem>Do Something Else</MenuItem>
 
-# let { a: { b, c: [d, ...e]}, ...f } = { a: { b: 12, c: [true, false], other: 20 } }
+// var dropdown =
+//     <Dropdown className="foo" />
+//         "A dropdown list"
+//         <Menu />
+//             <MenuItem>Do Something</MenuItem>
+//             <MenuItem>Do Something Fun!</MenuItem>
+//             <MenuItem>Do Something Else</MenuItem>
 
-# type ShortName = String & .length > 0 & .length < 100 & == .trim()
+//  TODO: Add attributes and spread operators to <Element> syntax in parser.
+let foo =
+    <Root id="root" {...fuz} style={{a: 1, b: 2}} baz={3} selected>
+        x: 10
+        if baz
+            y: 10
+        z: 20
+        <Foo.Bar></Foo.Bar>
+        ...a
+        if bar
+            ...b
+            <Bar><A /><B>Foo &lt; &lt; <bar x="2" /> &gt; &gt;{...foo}</B></Bar>
 
-# a is Null
+// console.log()
+//     for i in [1,2,3]
+//         if i > 1
+//             i * 2
 
-let foo = (a: 1 | /foo*/) =>
-    a
+// var foo = "foo"
+// foo = 12
+// class Vector
+//    var x: Number & > 10
+//    var y: Number
 
-# console.log()
-#     for i in [1,2,3]
-#         if i > 1
-#             i * 2
+// let v = new Vector()
+// var value: Integer & < 10 = 5
+// v.x = value
+// v.x = "foo"
+// true ? logNumber(foo, "fuck", "shit") : 12
 
-# export class Person
-# var name: ShortName
+// let foo = (a: 1 | /foo*/) =>
+//     a
 
-# let logNumber = (a: Number | String) =>
-#     if a is String
-#         return 12
-#     if a < 10
-#         return 20
-#     return a
+// export class Person
+// var name: ShortName
 
-# var foo = "foo"
-# foo = 12
-# class Vector
-#     var x: Number & > 10
-#     var y: Number
+// type UInt8 = Integer & >= 0 & <= 255
 
-# let v = new Vector()
-# var value: Integer & < 10 = 5
-# v.x = value
-# v.x = "foo"
+// export data struct Vector
+//     var x: UInt8 = 0
+//     var y: UInt8 = 0
 
-# true ? logNumber(foo, "fuck", "shit") : 12
+// export data struct Vertex
+//     var color: Integer = 0
+//     var position: Vector
 
-# let a: String | Number = 10
-# a is Number && a < 10 ? logNumber(a) : a
+// let vector = new Vector()
 
-# type UInt8 = Integer & >= 0 & <= 255
+// TODO: Convenient Type structure for representing a child with an optional type
+// for instance { x?: Number, y?: Number }
+// (.x is Number || .x is Undefined) && (.y is Number || .y is Undefined)
 
-# export data struct Vector
-#     var x: UInt8 = 0
-#     var y: UInt8 = 0
+// let foo = (a: Number) =>
+//     if a > 0
+//         return "foo"
+//     else if a < 0
+//         return false
+//     else
+//         foo
 
-# export data struct Vertex
-#     var color: Integer = 0
-#     var position: Vector
+// let bar = foo(12)
 
-# let vector = new Vector()
+// import "for/side/effects"
+// import "ion/Library"
+//     foo
+//     bar
+//     as importDefault
+//     * as importStar
 
-# TODO: Convenient Type structure for representing a child with an optional type
-# for instance { x?: Number, y?: Number }
-# (.x is Number || .x is Undefined) && (.y is Number || .y is Undefined)
+// export let double = a =>
+//     if a is Number
+//         return foo
+//     else if a is String
+//         return bar
 
-# let foo = (a: Number) =>
-#     if a > 0
-#         return "foo"
-#     else if a < 0
-#         return false
-#     else
-#         foo
+// double(2)
 
-# let bar = foo(12)
+// export default class Vector
 
-# import "for/side/effects"
-# import "ion/Library"
-#     foo
-#     bar
-#     as importDefault
-#     * as importStar
+// console.log(Vector)
 
-# export let double = a =>
-#     if a is Number
-#         return foo
-#     else if a is String
-#         return bar
+// data struct Vector3
+//     var x: Number = 0
+//     var y: Number = 0
+//     var z: Number = 0
 
-# double(2)
+// type Integer = Number & Math.floor(.) == .
+// type AlsoInteger = Integer
+// type Literal = "a" | 12 | false
 
-# export default class Vector
+// let double = (a: Number) =>
+//     if a is Integer
+//         console.log(a)
+//     else
+//         console.log(a)
 
-# console.log(Vector)
+//   data class Foo
+//   data struct Foo
+//   what about a not data struct, what about a struct with writeable fields?
+//   there is nothing wrong with that... but it would NOT have .equals, .hashcode etc.
+//   data class
+//   data struct
+// ion.DataMap
+// ion.DataSet
+// ion.DataArray
 
-# data struct Vector3
-#     var x: Number = 0
-#     var y: Number = 0
-#     var z: Number = 0
+//     let sum = x + y + staticSum
+//     let constructor = () =>
+//         super()
+//     let translate = async (dx = 0, dy = 0) => new Vector(x + dx, y + dy)
+//     get foo = () => 12
+//     set foo = () => 12
+//     let [Symbol.iterator] = *() => yield* Object.keys(this)
+//     static var staticSum = x + y
+//     static let staticX = () => 10
+//     static let staticY = () => 20
+//     static get foo = () => 12
 
-# type Integer = Number & Math.floor(.) == .
-# type AlsoInteger = Integer
-# type Literal = "a" | 12 | false
+// import "module" as d
+//     a
+//     b
 
-# let double = (a: Number) =>
-#     if a is Integer
-#         console.log(a)
-#     else
-#         console.log(a)
+// struct Vector
+//     var x: Number = 0
+//     var y: Number = 0
 
-#   data class Foo
-#   data struct Foo
-#   what about a not data struct, what about a struct with writeable fields?
-#   there is nothing wrong with that... but it would NOT have .equals, .hashcode etc.
-#   data class
-#   data struct
-# ion.DataMap
-# ion.DataSet
-# ion.DataArray
+// let sum =
+//     +
+//         12
+//         if true
+//             100
+//         20
+//         45
+//         *
+//             10
+//             20
 
-#     let sum = x + y + staticSum
-#     let constructor = () =>
-#         super()
-#     let translate = async (dx = 0, dy = 0) => new Vector(x + dx, y + dy)
-#     get foo = () => 12
-#     set foo = () => 12
-#     let [Symbol.iterator] = *() => yield* Object.keys(this)
-#     static var staticSum = x + y
-#     static let staticX = () => 10
-#     static let staticY = () => 20
-#     static get foo = () => 12
+// let outlineString = ""
+//     what is up
+//     my friends?
+//     this is pretty cool.
 
-# import "module" as d
-#     a
-#     b
+// ion
+// console.log()
+//     if foo
+//         bar
+//         baz
+//     else
+//         4
+//     6
 
-# struct Vector
-#     var x: Number = 0
-#     var y: Number = 0
+// let array = []
+//     1, 2, 3, 4
+//     for x in ["a", "b", "c"]
+//         x + x
+//     6, 7, 8
 
-# let sum =
-#     +
-#         12
-#         if true
-#             100
-#         20
-#         45
-#         *
-#             10
-#             20
+// for [key, value] in (1: 2, 3: 4, 5: 6)
+//     console.log({ key, value })
 
-# let outlineString = ""
-#     what is up
-#     my friends?
-#     this is pretty cool.
+// for y in | "a", 1, true, { x: 1 } |
+//     console.log(y)
 
-# ion
-# console.log()
-#     if foo
-#         bar
-#         baz
-#     else
-#         4
-#     6
+// // ion
+// console.log()
+//     1, 2
+//     if false
+//         3, 4
+//     5, 6
 
-# let array = []
-#     1, 2, 3, 4
-#     for x in ["a", "b", "c"]
-#         x + x
-#     6, 7, 8
+// let foo = ()
+//     1: 4
+//     if foo
+//         false: true
+//     true: "huh"
 
-# for [key, value] in (1: 2, 3: 4, 5: 6)
-#     console.log({ key, value })
+// let baz = |1, 2, 3|
+// let bar = ||
+//     1, 2
+//     if foo
+//         3
+//         4
+//     5, 6
 
-# for y in | "a", 1, true, { x: 1 } |
-#     console.log(y)
+// let array = []
+//     1, 2, 3
+//     if foo
+//         4, 5, 6
+//         ...fuz
+//     7, 8, 9
+//     ...bar
 
-# # ion
-# console.log()
-#     1, 2
-#     if false
-#         3, 4
-#     5, 6
+// import "foo/bar/baz" a, b
+// import ...Foo
+//     x
+//     y
 
-# let foo = ()
-#     1: 4
-#     if foo
-#         false: true
-#     true: "huh"
+// let x = foo?.bar[12 + 5]?.baz?("foo", true, x)
 
-# let baz = |1, 2, 3|
-# let bar = ||
-#     1, 2
-#     if foo
-#         3
-#         4
-#     5, 6
+// let value = (x = 0, y = 0) => new Vector(1, 2)
 
-# let array = []
-#     1, 2, 3
-#     if foo
-#         4, 5, 6
-#         ...fuz
-#     7, 8, 9
-#     ...bar
+// await foo(await bar())
 
-# import "foo/bar/baz" a, b
-# import ...Foo
-#     x
-#     y
+// let identity = async (a, b) =>
+//     switch a
+//         // inline cases and single statement
+//         1, 2, 3: return 10
+//         2:
+//             // outline statements fine as well
+//             return 20
+//         3:
+//             return 30
+//         default:
+//             return 55
 
-# let x = foo?.bar[12 + 5]?.baz?("foo", true, x)
+// Object.defineProperties()
+//     Vector.prototype
+//     {}
+//         bar: {}
+//             get: () => 12
+//             set: (value) =>
 
-# let value = (x = 0, y = 0) => new Vector(1, 2)
+// let generator = *() =>
+//     yield* 1
+//     yield 2
+//     yield 3
 
-# await foo(await bar())
-
-# let identity = async (a, b) =>
-#     switch a
-#         # inline cases and single statement
-#         1, 2, 3: return 10
-#         2:
-#             # outline statements fine as well
-#             return 20
-#         3:
-#             return 30
-#         default:
-#             return 55
-
-# Object.defineProperties()
-#     Vector.prototype
-#     {}
-#         bar: {}
-#             get: () => 12
-#             set: (value) =>
-
-# let generator = *() =>
-#     yield* 1
-#     yield 2
-#     yield 3
-
-# let foo = [a, b, ...bar, c, d]
-# let bar = { a, x: y, ...fuz, ...huh }
-# let outline = {}
-#     x
-#     y
-#     z
-#     ...foo
-#     x: 10
-#     y: 20
-# let matrix = []
-#     1, 0, 0, 0
-#     0, 1, 0, 0
-#     0, 0, 1, 0
-#     0, 0, 0, 1
+// let foo = [a, b, ...bar, c, d]
+// let bar = { a, x: y, ...fuz, ...huh }
+// let outline = {}
+//     x
+//     y
+//     z
+//     ...foo
+//     x: 10
+//     y: 20
+// let matrix = []
+//     1, 0, 0, 0
+//     0, 1, 0, 0
+//     0, 0, 1, 0
+//     0, 0, 0, 1

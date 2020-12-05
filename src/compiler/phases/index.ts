@@ -17,7 +17,7 @@ import toModuleFiles from "./toModuleFiles"
 
 export default [
     parsing,
-    // semanticAnalysis,
+    semanticAnalysis,
     // fixImports,
     // inheritBaseClasses,
     controlFlowToExpressions,
