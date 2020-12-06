@@ -15,6 +15,18 @@ import addDataClassConstructors from "./addDataClassConstructors"
 import addTypedStructArrays from "./addTypedStructArrays"
 import toModuleFiles from "./toModuleFiles"
 
+export const fast = [
+    parsing,
+    controlFlowToExpressions,
+    addTypedStructArrays,
+    runtimeTypeChecking,
+    createRuntime,
+    toEsTree,
+    codegen,
+    toModuleFiles,
+    writeFiles,
+]
+
 export default [
     parsing,
     semanticAnalysis,

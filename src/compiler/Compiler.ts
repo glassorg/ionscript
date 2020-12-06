@@ -1,9 +1,11 @@
 import * as HtmlLogger from "./HtmlLogger";
 import * as common from "./common";
-import phases from "./phases";
+import defaultPhases, { fast } from "./phases";
 import Parser = require("./parser");
+import watchDirectory from "./watchDirectory";
 
 type Logger = (names?: string | string[], ast?: any) => void
+const NullLogger = () => {}
 
 export class Options {
 
@@ -36,35 +38,56 @@ export default class Compiler {
     }
 
     watch(options: Options) {
-        console.log("Watch", options)
+        //  first compile normal
+        this.compile(options)
+        //  then watch files for changes
+        for (let input of options.inputs) {
+            watchDirectory(input, {}, (filename, previous, current, change) => {
+                //  incrementally recompile just this file
+                let start = Date.now()
+                let content = common.read(filename)
+                let path = common.getPathFromFilename(options.namespace, filename.slice(input.length + 1))
+                // console.log({ filename, change, path, content })
+                //  we *really* should also kickoff a full recompile in a separate thread
+                //  or maybe the fast compile should be in the other thread
+                this.compile(options, { [path]: content }, defaultPhases, NullLogger)
+                let stop = Date.now()
+                let time = stop - start
+                console.log(`${filename} => ${time}ms`)
+            })
+        }
     }
 
-    compile(options: Options, files?: { [path: string]: string }) {
+    compile(options: Options, files?: { [path: string]: string }, phases = defaultPhases, logger = this.logger) {
         options.parser = Parser()
         if (files == null) {
             files = common.getInputFilesRecursive(options.inputs, options.namespace)
         }
         let root: any = files
-        this.logger("Input", root)
+        logger("Input", root)
+        let lastPhase
         try {
             for (let phase of phases) {
-                console.log(phase.name)
+                lastPhase = phase
                 root = phase(root, options) || root
-                this.logger(phase.name, root)
+                logger(phase.name, root)
             }
-            this.logger("Output", root)
-            this.logger()
+            logger("Output", root)
+            logger()
         }
         catch (e) {
-            this.logger()
+            console.log(lastPhase?.name)
+            logger()
             let location = e.location
             if (location == null || location.start == null) {
-                throw e
+                console.log(e.message)
             }
-            let { filename } = location
-            let source = files[filename]!
-            let error = options.parser.getError(e.message, location, source, filename)
-            console.log(error.message)
+            else {
+                let { filename } = location
+                let source = files[filename]!
+                let error = options.parser.getError(e.message, location, source, filename)
+                console.log(error.message)
+            }
         }
         return root
     }

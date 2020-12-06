@@ -238,7 +238,7 @@ const ionExt = '.is'
 
 export function findPackage(dir = process.cwd()) {
     let checkFilename = np.join(dir, "package.json")
-    console.log("check", checkFilename)
+    // console.log("check", checkFilename)
     if (fs.existsSync(checkFilename)) {
         return require(checkFilename)
     }
