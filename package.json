@@ -28,6 +28,7 @@
     "@glas/traverse": "^1.0.4",
     "escodegen": "^2.0.0",
     "jsondiffpatch": "0.2.5",
-    "pegs": "^0.1.1"
+    "pegs": "^0.1.1",
+    "yargs": "^16.2.0"
   }
 }

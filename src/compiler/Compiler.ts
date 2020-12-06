@@ -35,6 +35,10 @@ export default class Compiler {
         this.logger = logger
     }
 
+    watch(options: Options) {
+        console.log("Watch", options)
+    }
+
     compile(options: Options, files?: { [path: string]: string }) {
         options.parser = Parser()
         if (files == null) {

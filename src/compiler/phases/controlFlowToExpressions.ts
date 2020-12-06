@@ -173,6 +173,11 @@ function convertExpressionWithNestedStatements(node) {
         let hasNonPropertyStatements = node.children.find(a => Statement.is(a) && !PropertyStatement.is(a)) != null
         const propertiesName = "$"
         const childrenName = "$$"
+        let kind = node.kind
+        //  lower case references use strings as they represent elements
+        if (Reference.is(kind) && kind.name[0] === kind.name[0].toLowerCase()) {
+            kind = new Literal({ location, value: kind.name })
+        }
         if (hasNonPropertyStatements) {
             const mergePushElementsWithNext = new Array<Expression | SpreadElement>()
             let addedChildren = false
@@ -256,7 +261,7 @@ function convertExpressionWithNestedStatements(node) {
                                     location,
                                     callee: new Reference({ location, name: "createElement" }),
                                     arguments: [
-                                        node.kind,
+                                        kind,
                                         new Reference({ location, name: propertiesName }),
                                         new Reference({ location, name: childrenName }),
                                     ]
@@ -285,8 +290,9 @@ function convertExpressionWithNestedStatements(node) {
                 children.push(child)
             }
         }
+        //  TODO: We should probably just output JSX
         let args: Array<any> = [
-            node.kind,
+            kind,
             properties.length > 0 ? new ObjectExpression({ location, properties }) : new Literal({ location, value: null }),
             ...children
         ]

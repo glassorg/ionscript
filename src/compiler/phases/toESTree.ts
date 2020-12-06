@@ -163,11 +163,21 @@ export default function toEsTree(root: Map<string, any>, options: Options) {
                         })
                     }
                     else {
-                        result = {
-                            type: node.export === 2 ? "ExportDefaultDeclaration" : "ExportNamedDeclaration",
-                            declaration: result,
-                            specifiers: [],
-                            source: null,
+                        if (node.export === 2) {
+                            result = {
+                                type: "ExportDefaultDeclaration",
+                                declaration: VariableDeclaration.is(node) ? result.declarations[0].init : result,
+                                specifiers: [],
+                                source: null,
+                            }
+                        }
+                        else {
+                            result = {
+                                type: "ExportNamedDeclaration",
+                                declaration: result,
+                                specifiers: [],
+                                source: null,
+                            }
                         }
                     }
                 }

@@ -535,8 +535,10 @@ export const inferType: {
                             }
                             else {
                                 // throw SemanticError(`Return Value type not resolved`, node)
-                                console.log("type not resolved ===>", toCodeString(node.argument))
-                                returnTypes.push(types.Any)
+                                // console.log("type not resolved ===>", toCodeString(node.argument))
+                                if (returnTypes.indexOf(types.Any) < 0) {
+                                    returnTypes.push(types.Any)
+                                }
                             }
                             return skip
                         }
