@@ -63,6 +63,7 @@ export default class Compiler {
         if (files == null) {
             files = common.getInputFilesRecursive(options.inputs, options.namespace)
         }
+        let phaseResults = new Map<any,any>()
         let root: any = files
         logger("Input", root)
         let lastPhase
@@ -70,6 +71,7 @@ export default class Compiler {
             for (let phase of phases) {
                 lastPhase = phase
                 root = phase(root, options) || root
+                phaseResults.set(phase, root)
                 logger(phase.name, root)
             }
             logger("Output", root)
@@ -89,7 +91,7 @@ export default class Compiler {
                 console.log(error.message)
             }
         }
-        return root
+        return phaseResults
     }
 
 }
