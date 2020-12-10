@@ -7,8 +7,8 @@
     function getLocation() {
         let { start, end, filename } = location()
         return new ast.Location({
-            start: new ast.Position(start.line, start.column),
-            end: new ast.Position(end.line, end.column),
+            start: new ast.Position(start.offset, start.line, start.column),
+            end: new ast.Position(end.offset, end.line, end.column),
             filename
         })
     }
@@ -97,9 +97,15 @@ ExportDeclaration
     = ExportNamedDeclaration
     / ExportDefaultDeclaration
 
+Export
+    = ExportToken { return getLocation() }
+
+Default
+    = DefaultToken { return getLocation() }
+
 ExportNamedDeclaration
     = ExportToken _ declaration:(Declaration / ImportDeclaration)
-    { return node(declaration.constructor.name, { ...declaration, export: 1 }) }
+    { return node(declaration.constructor.name, { ...declaration, location: getLocation(), export: 1 }) }
 
 ExportDefaultDeclaration
     = ExportToken _ isDefault:DefaultToken? _ value:(ClassDeclaration / OutlineExpression)
@@ -173,6 +179,8 @@ Statement
     / ForOfStatement
     / ReturnStatement
     / WhileStatement
+    / BreakStatement
+    / ContinueStatement
     / ExpressionStatement
     / ThrowStatement
     / TryStatement
@@ -292,6 +300,14 @@ ReturnStatement
     { return node("ReturnStatement", { argument }) }
     / ReturnToken _ argument:InlineExpression EOL?
     { return node("ReturnStatement", { argument }) }
+
+BreakStatement
+    = BreakToken EOL
+    { return node("BreakStatement", {}) }
+
+ContinueStatement
+    = ContinueToken EOL
+    { return node("ContinueStatement", {}) }
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Patterns

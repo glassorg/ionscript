@@ -29,6 +29,9 @@ export {
     default as BlockStatement
 } from './BlockStatement';
 export {
+    default as BreakStatement
+} from './BreakStatement';
+export {
     default as CallExpression
 } from './CallExpression';
 export {
@@ -46,6 +49,9 @@ export {
 export {
     default as ConditionalExpression
 } from './ConditionalExpression';
+export {
+    default as ContinueStatement
+} from './ContinueStatement';
 export {
     default as Declaration
 } from './Declaration';

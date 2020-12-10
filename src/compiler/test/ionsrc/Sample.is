@@ -1,5 +1,42 @@
 
-export default 1
+let x = 12
+let string = "Foo"
+let boolean = true
+let other = false
+let regex = /foo/
+let isNull = null
+var voidThing = undefined
+var ref = someReference
+var point: Point
+type HitPoints = Integer & < 15
+type Whole = Integer & . >= 0
+let print = async (a: Number & . > 0, b: String) =>
+    for i in [1,2]
+        await foo()
+        if bar
+            continue
+        else if stuff == true
+            break
+    return 1
+let [count, setCount] = useState(0)
+var foo: Number = "bar"
+let jsx =
+    <div>
+        if count > 0
+            <p>You clicked {count} times</p>
+        for i in [1,2,3,4]
+            <p>{i}</p>
+        <button>
+            onClick() => setCount(count + 1)
+            "Click me"
+            ""
+                Foo
+                Bar
+
+export let foo = 12
+
+export default class Point
+    var x: Foo & > 10 = 12
 
 // Available token types:
 //     [comment] [string] [keyword] [number] [regexp] [operator] [namespace]

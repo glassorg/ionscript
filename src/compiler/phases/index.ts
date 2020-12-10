@@ -27,7 +27,7 @@ export const fast = [
     writeFiles,
 ]
 
-export default [
+const defaultPhases = [
     parsing,
     semanticAnalysis,
     // fixImports,
@@ -39,6 +39,9 @@ export default [
     inferTypes,
 
     addTypedStructArrays,
+
+    //  no more semantic errors past this point
+    //  just preparing for output so we can skip for noEmit
     runtimeTypeChecking,
     createRuntime,
     toEsTree,
@@ -46,3 +49,8 @@ export default [
     toModuleFiles,
     writeFiles,
 ]
+
+export default defaultPhases
+
+// we remove the last 6 phases if we're not emitting.
+export const noEmit = defaultPhases.slice(0, -6);

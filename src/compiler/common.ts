@@ -81,7 +81,7 @@ export function getOriginalDeclarator(declarator: Declarator, scopes: NodeMap<Sc
     // traverse variables that are just constant re-declarations
     if (VariableDeclaration.is(parent) && parent.kind !== "var" && Reference.is(parent.value)) {
         // keep following references to the original
-        return getDeclarator(parent.value, scopes, ancestors, true)
+        return getDeclarator(parent.value, scopes, ancestors, true, false)
     }
     return declarator
 }

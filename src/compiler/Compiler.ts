@@ -1,6 +1,6 @@
 import * as HtmlLogger from "./HtmlLogger";
 import * as common from "./common";
-import defaultPhases, { fast } from "./phases";
+import defaultPhases, { noEmit } from "./phases";
 import Parser = require("./parser");
 import watchDirectory from "./watchDirectory";
 
@@ -14,17 +14,20 @@ export class Options {
     namespace: string
     parser!: ReturnType<typeof Parser>
     debug: boolean
+    emit: boolean
 
     constructor(
         inputs: string[],
         output: string,
         namespace: string = common.findPackage()?.name ?? "_compiling_",
         debug = true,
+        emit = true,
     ) {
         this.namespace= namespace
         this.inputs = inputs
         this.output = output
         this.debug = debug
+        this.emit = emit
     }
 
 }
@@ -58,11 +61,17 @@ export default class Compiler {
         }
     }
 
-    compile(options: Options, files?: { [path: string]: string }, phases = defaultPhases, logger = this.logger) {
+    compile(
+        options: Options,
+        files?: { [path: string]: string },
+        phases = options.emit ? defaultPhases : noEmit,
+        logger = this.logger
+    ) {
         options.parser = Parser()
         if (files == null) {
             files = common.getInputFilesRecursive(options.inputs, options.namespace)
         }
+        let errors = new Array<any>();
         let phaseResults = new Map<any,any>()
         let root: any = files
         logger("Input", root)
@@ -78,6 +87,7 @@ export default class Compiler {
             logger()
         }
         catch (e) {
+            errors.push(e)
             console.log(lastPhase?.name)
             logger()
             let location = e.location
@@ -91,7 +101,7 @@ export default class Compiler {
                 console.log(error.message)
             }
         }
-        return phaseResults
+        return errors
     }
 
 }
