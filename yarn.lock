@@ -555,6 +555,11 @@ pegs@^0.1.1:
   resolved "https://registry.yarnpkg.com/pegs/-/pegs-0.1.1.tgz#75802046cceefd07b54307dfd1c14e355eb34cd9"
   integrity sha512-AGHOiUGdKBgv8zIXjLvmyrNlT4sceC8R+XOyZ4/sWMmnZVuMLTgK3o7Rli5w3VGCbreHnHA6diIipQL0SNT11g==
 
+pegs@^0.1.6:
+  version "0.1.6"
+  resolved "https://registry.yarnpkg.com/pegs/-/pegs-0.1.6.tgz#f7b37ef66c994df3f86a8b324c3d6ca164062dc2"
+  integrity sha512-Hx4VVcYRaXC0XU0cFRZg8nDtkKgjNZ0di8a0z4UiS0suIUxrvMSQ5HEJ+5KWe7JiuMl8CAWLXATMn7tpz2z6dQ==
+
 prelude-ls@~1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/prelude-ls/-/prelude-ls-1.1.2.tgz#21932a549f5e52ffd9a827f570e04be62a97da54"
