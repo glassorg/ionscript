@@ -3,17 +3,12 @@
   "version": "0.2.8",
   "description": "Indented Javascript",
   "main": "lib/index.js",
-  "browser": "website/index.html",
+  "browser": "docs/index.html",
   "repository": "https://github.com/glassorg/ionscript.git",
   "author": "Kris Nye <krisnye@gmail.com>",
   "license": "MIT",
   "bin": {
     "isc": "bin/isc.js"
-  },
-  "targets": {
-    "browser": {
-      "distDir": "website"
-    }
   },
   "scripts": {
     "setup": "yarn install",
@@ -26,7 +21,7 @@
     "debug": "node --inspect-brk node_modules/@glas/test/gtest.js lib",
     "deploy": "yarn build && npm version patch --force && npm publish",
     "watch-website": "rm -rf .parcel-cache && parcel serve ./src/website/index.html --target browser",
-    "build-website": "parcel build ./src/website/index.html --target browser"
+    "build-website": "rm -rf .parcel-cache && parcel build ./src/website/index.html --target browser"
   },
   "dependencies": {
     "@babel/core": "^7.12.3",
