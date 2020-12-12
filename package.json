@@ -10,6 +10,11 @@
   "bin": {
     "isc": "bin/isc.js"
   },
+  "targets": {
+    "browser": {
+      "publicUrl": "https://glassorg.github.io/ionscript/"
+    }
+  },
   "scripts": {
     "setup": "yarn install",
     "build": "guild build && yarn run buildGrammar",
@@ -20,8 +25,8 @@
     "buildGrammar": "pegs src/compiler/parser.pegs lib/compiler/parser.js",
     "debug": "node --inspect-brk node_modules/@glas/test/gtest.js lib",
     "deploy": "yarn build && npm version patch --force && npm publish",
-    "watch-website": "rm -rf .parcel-cache && parcel serve ./src/website/index.html --target browser",
-    "build-website": "rm -rf .parcel-cache && parcel build ./src/website/index.html --target browser"
+    "watch-website": "rm -rf .parcel-cache docs && parcel serve ./src/website/index.html --target browser",
+    "build-website": "rm -rf .parcel-cache docs && parcel build ./src/website/index.html --target browser"
   },
   "dependencies": {
     "@babel/core": "^7.12.3",
