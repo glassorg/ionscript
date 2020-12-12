@@ -160,7 +160,10 @@ Indented Javascript
         Array<Type>
         Set<Type>
         Map<Key,Value>
-      Build a language server
+    X Build a language server
+      Move highlighting logic to ionscript module so we can reuse it.
+      Use new JSX tranform: https://reactjs.org/blog/2020/09/22/introducing-the-new-jsx-transform.html
+
 
 ### Related Links
 

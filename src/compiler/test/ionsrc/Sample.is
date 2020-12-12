@@ -20,12 +20,12 @@ let print = async (a: Number & . > 0, b: String) =>
     return 1
 let [count, setCount] = useState(0)
 let jsx =
-    <div />
+    <div/>
         if count > 0
             <p>You clicked {count} times</p>
         for i in [1,2,3,4]
             <p>{i}</p>
-        <button />
+        <button/>
             onClick() => setCount(count + 1)
             ""
                 Click me
