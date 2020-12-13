@@ -19098,7 +19098,105 @@ function toEsTree(root, options) {
 }
 
 exports.default = toEsTree;
-},{"@glas/traverse":"bYRw","../ast":"tHlf","../ast/Position":"CUCB","../ast/VariableDeclaration":"KDXm","../ast/MemberExpression":"Ukrj","../ast/Expression":"zMtI","../ast/ClassDeclaration":"b3SL","../ast/AssignmentStatement":"IblK","../common":"gPgA"}],"eqB6":[function(require,module,exports) {
+},{"@glas/traverse":"bYRw","../ast":"tHlf","../ast/Position":"CUCB","../ast/VariableDeclaration":"KDXm","../ast/MemberExpression":"Ukrj","../ast/Expression":"zMtI","../ast/ClassDeclaration":"b3SL","../ast/AssignmentStatement":"IblK","../common":"gPgA"}],"qN9n":[function(require,module,exports) {
+"use strict";
+
+var __importDefault = this && this.__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+const traverse_1 = require("@glas/traverse");
+
+const ast_1 = require("../ast");
+
+const ImportDeclaration_1 = __importDefault(require("../ast/ImportDeclaration"));
+
+const ImportNamespaceSpecifier_1 = __importDefault(require("../ast/ImportNamespaceSpecifier"));
+
+const ImportDefaultSpecifier_1 = __importDefault(require("../ast/ImportDefaultSpecifier"));
+
+const ImportSpecifier_1 = __importDefault(require("../ast/ImportSpecifier"));
+
+const common_1 = require("../common");
+
+function fixImports(root, options) {
+  return traverse_1.traverse(root, {
+    enter(node) {
+      if (ast_1.Program.is(node)) {
+        return traverse_1.skip;
+      }
+    },
+
+    leave(node) {
+      if (ast_1.Program.is(node)) {
+        let originalImports = node.body.filter(node => ImportDeclaration_1.default.is(node));
+
+        for (let i of originalImports) {
+          if (i.export) {
+            throw common_1.SemanticError("export import not implemented yet: ", i);
+          }
+        }
+
+        let others = node.body.filter(node => !ImportDeclaration_1.default.is(node));
+        let newImports = new Array();
+
+        for (let declaration of originalImports) {
+          let specifiersArray = new Array(); //  first add all ImportNamespaceSpecifiers to their own sets
+
+          for (let s of declaration.specifiers) {
+            if (ImportNamespaceSpecifier_1.default.is(s)) {
+              specifiersArray.push([s]);
+            }
+          } //  then add ImportDefaulSpecifiers to any existing sets
+
+
+          for (let s of declaration.specifiers) {
+            if (ImportDefaultSpecifier_1.default.is(s)) {
+              let addTo = specifiersArray.find(a => a.length === 1 && ImportNamespaceSpecifier_1.default.is(a[0]));
+
+              if (addTo != null) {
+                addTo.unshift(s);
+              } else {
+                specifiersArray.push([s]);
+              }
+            }
+          } //  finally, add all remaining ImportSpecifiers to a set that can contain them.
+
+
+          let specifiers = declaration.specifiers.filter(ImportSpecifier_1.default.is);
+
+          if (specifiers.length > 0) {
+            let addTo = specifiersArray.find(a => a.length === 1 && ImportDefaultSpecifier_1.default.is(a[0]));
+
+            if (addTo != null) {
+              addTo.push(...specifiers);
+            } else {
+              specifiersArray.push(specifiers);
+            }
+          }
+
+          newImports.push(...specifiersArray.map(specifiers => declaration.patch({
+            specifiers
+          })));
+        }
+
+        return node.patch({
+          body: [...newImports, ...others]
+        });
+      }
+    }
+
+  });
+}
+
+exports.default = fixImports;
+},{"@glas/traverse":"bYRw","../ast":"tHlf","../ast/ImportDeclaration":"g7Am","../ast/ImportNamespaceSpecifier":"NN6s","../ast/ImportDefaultSpecifier":"yw5q","../ast/ImportSpecifier":"r0zz","../common":"gPgA"}],"eqB6":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -23730,7 +23828,476 @@ function semanticAnalysis(root, options) {
 }
 
 exports.default = semanticAnalysis;
-},{"@glas/traverse":"bYRw","../ast":"tHlf","../common":"gPgA","../toCodeString":"d3NE"}],"stDD":[function(require,module,exports) {
+},{"@glas/traverse":"bYRw","../ast":"tHlf","../common":"gPgA","../toCodeString":"d3NE"}],"pHTT":[function(require,module,exports) {
+"use strict";
+
+var __importDefault = this && this.__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+const common_1 = require("../common");
+
+const traverse_1 = require("@glas/traverse");
+
+const ast_1 = require("../ast");
+
+const createScopeMaps_1 = __importDefault(require("../createScopeMaps"));
+
+function mergeDeclarations(base, sub) {
+  // this should actually check that the types can be merged.
+  return sub;
+} // cannot extend from ion.Object until we provide ability to change reserved names.
+// const rootClassReference = new Reference({ name: getAbsoluteName("ion.Object", "Object")})
+
+
+function inheritBaseClasses(root, options) {
+  let ancestorsMap = new Map();
+  let scopes = createScopeMaps_1.default(root, {
+    ancestorsMap
+  });
+  let finished = new Map();
+  let inprogress = new Set();
+
+  function ensureDeclarationsInherited(classDeclaration, source) {
+    let result = finished.get(classDeclaration);
+
+    if (result == null) {
+      if (inprogress.has(classDeclaration)) {
+        throw common_1.SemanticError(`Circular class extension`, source);
+      }
+
+      inprogress.add(classDeclaration);
+      let baseDeclarations = new Map();
+      let baseClasses = new Map([...classDeclaration.baseClasses].map(r => [r.name, r]));
+
+      function addDeclarations(declarations) {
+        for (let declaration of declarations) {
+          if (!ast_1.Identifier.is(declaration.id)) {
+            throw common_1.SemanticError("invalid destructuring on class variable", declaration.id);
+          }
+
+          if (declaration.id.name === "constructor") {
+            // we don't inherit constructors, they are added automatically one per concrete class
+            continue;
+          }
+
+          let current = baseDeclarations.get(declaration.id.name);
+          baseDeclarations.set(declaration.id.name, current ? mergeDeclarations(current, declaration) : declaration);
+        }
+      }
+
+      for (let baseClass of classDeclaration.baseClasses) {
+        let declarator = common_1.getDeclarator(baseClass, scopes, ancestorsMap, true);
+        let baseDeclaration = ancestorsMap.get(declarator);
+
+        if (!ast_1.ClassDeclaration.is(baseDeclaration)) {
+          throw common_1.SemanticError(`Not a class declaration`, baseClass);
+        }
+
+        if (classDeclaration.isStruct && !baseDeclaration.isStruct) {
+          throw common_1.SemanticError(`Structs cannot inherit from classes`, baseClass);
+        }
+
+        if (!baseDeclaration.isData) {
+          throw common_1.SemanticError(`Data classes can only inherit from other data classes`, baseClass);
+        }
+
+        baseDeclaration = ensureDeclarationsInherited(baseDeclaration, source);
+
+        for (let ref of baseDeclaration.baseClasses) {
+          baseClasses.set(ref.name, ref);
+        }
+
+        addDeclarations(baseDeclaration.instance.declarations);
+      } // // now insert the current class declarations
+
+
+      addDeclarations(classDeclaration.instance.declarations); // // override properties with the same name
+
+      result = classDeclaration.patch({
+        baseClasses: Array.from(baseClasses.values()),
+        instance: classDeclaration.instance.patch({
+          declarations: [...baseDeclarations.values()]
+        })
+      });
+      finished.set(classDeclaration, result);
+    }
+
+    inprogress.delete(classDeclaration);
+    return result;
+  }
+
+  return traverse_1.traverse(root, {
+    leave(node) {
+      if (ast_1.ClassDeclaration.is(node) && node.isData) {
+        let declaration = ensureDeclarationsInherited(node, node);
+        return declaration;
+      }
+    }
+
+  });
+}
+
+exports.default = inheritBaseClasses;
+},{"../common":"gPgA","@glas/traverse":"bYRw","../ast":"tHlf","../createScopeMaps":"u957"}],"d3r9":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+const ast_1 = require("../ast");
+
+const traverse_1 = require("@glas/traverse");
+
+const common_1 = require("../common");
+
+function createConditionalDeclarations(root) {
+  // first we need to find any IfStatements with consequent returns or throws that don't have a
+  root = traverse_1.traverse(root, {
+    leave(node, ancestors) {
+      if (ast_1.BlockStatement.is(node)) {
+        let {
+          body
+        } = node;
+
+        for (let i = body.length - 1; i >= 0; i--) {
+          let statement = body[i];
+
+          if (ast_1.IfStatement.is(statement) && statement.alternate == null) {
+            let last = statement.consequent.body[statement.consequent.body.length - 1];
+
+            if (ast_1.ReturnStatement.is(last) || ast_1.ThrowStatement.is(last)) {
+              // we need to add everything that follows as implied
+              let remainder = body.slice(i + 1);
+
+              if (remainder.length > 0) {
+                body = [...body.slice(0, i), statement.patch({
+                  alternate: new ast_1.BlockStatement({
+                    location: statement.location,
+                    body: remainder
+                  })
+                })];
+              }
+            }
+          }
+        }
+
+        if (body !== node.body) {
+          return node.patch({
+            body
+          });
+        }
+      }
+    }
+
+  });
+  return traverse_1.traverse(root, {
+    enter(node) {},
+
+    leave(node, ancestors) {
+      if (ast_1.IfStatement.is(node) && node.consequent.body.length > 0) {
+        //  find all unique named references
+        //  create a new ConditionalDeclaration for each, replacing named refs with DotExpression
+        // find all variable declaration references
+        let refs = new Set(common_1.getNodesOfType(node.test, ast_1.Reference.is).map(n => n.name)
+        /*.filter(isLowerCase) */
+        ); // now we have to redeclare more strongly typed stuff.
+
+        let newConsequents = new Array();
+        let newAlternates = node.alternate != null ? new Array() : null;
+
+        for (let name of refs) {
+          let {
+            location
+          } = node.test;
+          newConsequents.push(new ast_1.ConditionalDeclaration({
+            kind: "conditional",
+            location,
+            id: new ast_1.Declarator({
+              name,
+              location
+            })
+          }));
+
+          if (newAlternates) {
+            newAlternates.push(new ast_1.ConditionalDeclaration({
+              kind: "conditional",
+              negate: true,
+              location,
+              id: new ast_1.Declarator({
+                name,
+                location
+              })
+            }));
+          }
+        }
+
+        let {
+          location
+        } = node;
+        let consequent = new ast_1.BlockStatement({
+          location,
+          body: [...newConsequents, ...node.consequent.body]
+        });
+        let alternate = node.alternate;
+
+        if (ast_1.IfStatement.is(alternate)) {
+          //  we must convert ifs to block statements so our scoped variable
+          //  won't interfere with it scoping the same named variable.
+          alternate = new ast_1.BlockStatement({
+            location,
+            body: [alternate]
+          });
+        }
+
+        if (ast_1.BlockStatement.is(alternate)) {
+          alternate = alternate.patch({
+            location,
+            body: [...newAlternates, ...alternate.body]
+          });
+        }
+
+        return node.patch({
+          consequent,
+          alternate
+        });
+      }
+    }
+
+  });
+}
+
+exports.default = createConditionalDeclarations;
+},{"../ast":"tHlf","@glas/traverse":"bYRw","../common":"gPgA"}],"uzrO":[function(require,module,exports) {
+"use strict";
+
+var __createBinding = this && this.__createBinding || (Object.create ? function (o, m, k, k2) {
+  if (k2 === undefined) k2 = k;
+  Object.defineProperty(o, k2, {
+    enumerable: true,
+    get: function () {
+      return m[k];
+    }
+  });
+} : function (o, m, k, k2) {
+  if (k2 === undefined) k2 = k;
+  o[k2] = m[k];
+});
+
+var __setModuleDefault = this && this.__setModuleDefault || (Object.create ? function (o, v) {
+  Object.defineProperty(o, "default", {
+    enumerable: true,
+    value: v
+  });
+} : function (o, v) {
+  o["default"] = v;
+});
+
+var __importStar = this && this.__importStar || function (mod) {
+  if (mod && mod.__esModule) return mod;
+  var result = {};
+  if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+
+  __setModuleDefault(result, mod);
+
+  return result;
+};
+
+var __importDefault = this && this.__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+const traverse_1 = require("@glas/traverse");
+
+const ast_1 = require("../ast");
+
+const runtimeTypeChecking_1 = require("./runtimeTypeChecking");
+
+const common_1 = require("../common");
+
+const combineExpressions_1 = __importDefault(require("../analysis/combineExpressions"));
+
+const types = __importStar(require("../types"));
+
+const toCodeString_1 = __importDefault(require("../toCodeString"));
+
+function toTypeCheck(type, value) {
+  if (ast_1.Reference.is(type)) {
+    return new ast_1.BinaryExpression({
+      left: value,
+      operator: "is",
+      right: type
+    });
+  }
+
+  return runtimeTypeChecking_1.replaceNodes(type, ast_1.DotExpression.is, value);
+}
+
+function createDataClassConstructor(node, instanceVariables, isStruct, options) {
+  return new ast_1.VariableDeclaration({
+    kind: "let",
+    instance: true,
+    id: new ast_1.Declarator({
+      location: node.id.location,
+      name: "constructor"
+    }),
+    value: new ast_1.FunctionExpression({
+      returnType: new ast_1.Reference(node.id),
+      params: isStruct ? instanceVariables.map(v => {
+        return new ast_1.Parameter({
+          id: common_1.clone(v.id),
+          value: common_1.clone(v.value)
+        });
+      }) : [new ast_1.Parameter({
+        id: new ast_1.AssignmentPattern({
+          left: new ast_1.ObjectPattern({
+            properties: instanceVariables.map(v => {
+              return new ast_1.Property({
+                location: v.location,
+                kind: "init",
+                shorthand: true,
+                key: common_1.clone(v.id),
+                value: !v.value ? v.id : new ast_1.AssignmentPattern({
+                  location: v.location,
+                  left: common_1.clone(v.id),
+                  right: common_1.clone(v.value)
+                })
+              });
+            })
+          }),
+          right: new ast_1.ObjectExpression({
+            properties: []
+          })
+        }),
+        type: new ast_1.TypeExpression({
+          value: combineExpressions_1.default([new ast_1.BinaryExpression({
+            left: new ast_1.DotExpression({}),
+            operator: "is",
+            right: types.Object
+          }), // Make these variable types optional...
+          ...instanceVariables.map(v => {
+            var _a;
+
+            let e = new ast_1.BinaryExpression({
+              left: new ast_1.MemberExpression({
+                object: new ast_1.DotExpression({}),
+                property: new ast_1.Identifier(v.id)
+              }),
+              operator: "is",
+              right: (_a = v.type) !== null && _a !== void 0 ? _a : types.Any
+            }); // if this type is optional, then we add Undefined as an optional value
+
+            let optional = v.type != null && toCodeString_1.default(v.type) !== toCodeString_1.default(types.Any) && v.value != null;
+
+            if (optional) {
+              e = new ast_1.BinaryExpression({
+                left: e,
+                operator: "||",
+                right: new ast_1.BinaryExpression({
+                  left: new ast_1.MemberExpression({
+                    object: new ast_1.DotExpression({}),
+                    property: new ast_1.Identifier(v.id)
+                  }),
+                  operator: "is",
+                  right: types.Undefined
+                })
+              });
+            }
+
+            return e;
+          })])
+        })
+      })],
+      body: new ast_1.BlockStatement({
+        body: [// first do type checks IF this is debug
+        ...(!options.debug ? [] : instanceVariables).map(v => {
+          return v.type == null ? null : new ast_1.IfStatement({
+            test: new ast_1.UnaryExpression({
+              prefix: true,
+              operator: "!",
+              argument: toTypeCheck(common_1.clone(v.type), new ast_1.Reference(v.id))
+            }),
+            consequent: new ast_1.BlockStatement({
+              body: [new ast_1.ThrowStatement({
+                argument: new ast_1.CallExpression({
+                  callee: new ast_1.Reference({
+                    location: v.location,
+                    name: "Error"
+                  }),
+                  arguments: [new ast_1.Literal({
+                    value: `Invalid value for ${v.id.name}`
+                  })]
+                })
+              })]
+            })
+          });
+        }).filter(v => v != null), ...instanceVariables.map(v => {
+          return new ast_1.AssignmentStatement({
+            left: new ast_1.MemberExpression({
+              object: new ast_1.ThisExpression({}),
+              property: new ast_1.Identifier(v.id)
+            }),
+            right: new ast_1.Reference(v.id)
+          });
+        }), ...(!options.debug ? [] : [new ast_1.ExpressionStatement({
+          expression: new ast_1.CallExpression({
+            callee: new ast_1.MemberExpression({
+              object: new ast_1.Reference({
+                location: node.id.location,
+                name: "Object"
+              }),
+              property: new ast_1.Identifier({
+                name: "freeze"
+              })
+            }),
+            arguments: [new ast_1.ThisExpression({})]
+          })
+        })])]
+      })
+    })
+  });
+}
+
+function getConstructor(declarations) {
+  return declarations.find(d => ast_1.Identifier.is(d.id) && d.id.name === "constructor");
+}
+
+function addDataClassConstructors(root, options) {
+  return traverse_1.traverse(root, {
+    enter(node) {
+      if (ast_1.ClassDeclaration.is(node) || ast_1.TypeExpression.is(node)) {
+        return traverse_1.skip;
+      }
+    },
+
+    leave(node) {
+      if (ast_1.ClassDeclaration.is(node) && (node.isData || node.isStruct && getConstructor(node.instance.declarations) == null)) {
+        return node.patch({
+          instance: node.instance.patch({
+            declarations: [createDataClassConstructor(node, [...node.instance.declarations.values()].filter(a => a.kind === "var"), node.isStruct, options), ...node.instance.declarations]
+          })
+        });
+      }
+    }
+
+  });
+}
+
+exports.default = addDataClassConstructors;
+},{"@glas/traverse":"bYRw","../ast":"tHlf","./runtimeTypeChecking":"uwmd","../common":"gPgA","../analysis/combineExpressions":"WnvG","../types":"xSXH","../toCodeString":"d3NE"}],"stDD":[function(require,module,exports) {
 "use strict";
 
 var __importDefault = this && this.__importDefault || function (mod) {
@@ -24295,6 +24862,8 @@ const codegen_1 = __importDefault(require("./codegen"));
 
 const toEsTree_1 = __importDefault(require("./toEsTree"));
 
+const fixImports_1 = __importDefault(require("./fixImports"));
+
 const writeFiles_1 = __importDefault(require("./writeFiles"));
 
 const controlFlowToExpressions_1 = __importDefault(require("./controlFlowToExpressions"));
@@ -24307,24 +24876,26 @@ const runtimeTypeChecking_1 = __importDefault(require("./runtimeTypeChecking"));
 
 const semanticAnalysis_1 = __importDefault(require("./semanticAnalysis"));
 
+const inheritBaseClasses_1 = __importDefault(require("./inheritBaseClasses"));
+
+const createConditionalDeclarations_1 = __importDefault(require("./createConditionalDeclarations"));
+
 const inferTypes_1 = __importDefault(require("./inferTypes"));
+
+const addDataClassConstructors_1 = __importDefault(require("./addDataClassConstructors"));
 
 const addTypedStructArrays_1 = __importDefault(require("./addTypedStructArrays"));
 
 const toModuleFiles_1 = __importDefault(require("./toModuleFiles"));
 
 exports.fast = [parsing_1.default, controlFlowToExpressions_1.default, addTypedStructArrays_1.default, runtimeTypeChecking_1.default, createRuntime_1.default, toEsTree_1.default, codegen_1.default, toModuleFiles_1.default, writeFiles_1.default];
-const defaultPhases = [parsing_1.default, semanticAnalysis_1.default, // fixImports,
-// inheritBaseClasses,
-controlFlowToExpressions_1.default, // createConditionalDeclarations,
-// addDataClassConstructors,
-checkReferences_1.default, inferTypes_1.default, addTypedStructArrays_1.default, // we could skip this.
+const defaultPhases = [parsing_1.default, semanticAnalysis_1.default, fixImports_1.default, inheritBaseClasses_1.default, controlFlowToExpressions_1.default, createConditionalDeclarations_1.default, addDataClassConstructors_1.default, checkReferences_1.default, inferTypes_1.default, addTypedStructArrays_1.default, // we could skip this.
 runtimeTypeChecking_1.default, createRuntime_1.default, toEsTree_1.default, codegen_1.default, toModuleFiles_1.default, // no emit
 writeFiles_1.default];
 exports.default = defaultPhases; // we remove the last 6 phases if we're not emitting.
 
 exports.noEmit = defaultPhases.slice(0, -1);
-},{"./parsing":"ifyw","./codegen":"IUmA","./toEsTree":"RhB4","./writeFiles":"eqB6","./controlFlowToExpressions":"LRkx","./checkReferences":"RCa2","./createRuntime":"aGfK","./runtimeTypeChecking":"uwmd","./semanticAnalysis":"PAQ2","./inferTypes":"Q2Fc","./addTypedStructArrays":"stDD","./toModuleFiles":"p7cS"}],"UdBY":[function(require,module,exports) {
+},{"./parsing":"ifyw","./codegen":"IUmA","./toEsTree":"RhB4","./fixImports":"qN9n","./writeFiles":"eqB6","./controlFlowToExpressions":"LRkx","./checkReferences":"RCa2","./createRuntime":"aGfK","./runtimeTypeChecking":"uwmd","./semanticAnalysis":"PAQ2","./inheritBaseClasses":"pHTT","./createConditionalDeclarations":"d3r9","./inferTypes":"Q2Fc","./addDataClassConstructors":"uzrO","./addTypedStructArrays":"stDD","./toModuleFiles":"p7cS"}],"UdBY":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -34684,6 +35255,24 @@ function Application() {
   return react_1.default.createElement("div", {
     className: "Application"
   }, react_1.default.createElement(CodeSample_1.default, {
+    description: "Immutable Data Classes"
+  }, `data class Person
+    var name: String & == .trim() & .length > 0 & .length < 100
+    var id: Integer & > 0
+`), react_1.default.createElement(CodeSample_1.default, {
+    description: "Immutable Data Struct"
+  }, `data struct Vector
+    var x: Number
+    var y: Number
+`), react_1.default.createElement(CodeSample_1.default, {
+    description: "Mutable Struct"
+  }, `struct Vector
+    var x: Number
+    var y: Number
+    let constructor = (a, b) =>
+        this.x = a
+        this.y = b
+`), react_1.default.createElement(CodeSample_1.default, {
     description: "Constant Definitions"
   }, `let x = 12
 let name = "Kris"
@@ -34731,4 +35320,4 @@ const Application_1 = __importDefault(require("./Application"));
 
 react_dom_1.render(react_1.default.createElement(Application_1.default, null), document.getElementById("root"));
 },{"react":"ccIB","react-dom":"x9tB","./Application":"MLmL"}]},{},["zo2T"], null)
-//# sourceMappingURL=https://glassorg.github.io/ionscript/website.1b898997.js.map
+//# sourceMappingURL=https://glassorg.github.io/ionscript/website.515a2d79.js.map

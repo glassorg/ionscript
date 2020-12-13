@@ -145,6 +145,10 @@ function createDataClassConstructor(node: ClassDeclaration, instanceVariables: V
     })
 }
 
+function getConstructor(declarations: ReadonlyArray<VariableDeclaration>) {
+    return declarations.find(d => Identifier.is(d.id) && d.id.name === "constructor")
+}
+
 export default function addDataClassConstructors(root: Assembly, options: Options) {
 
     return traverse(root, {
@@ -154,7 +158,7 @@ export default function addDataClassConstructors(root: Assembly, options: Option
             }
         },
         leave(node) {
-            if (ClassDeclaration.is(node) && node.isData) {
+            if (ClassDeclaration.is(node) && (node.isData || node.isStruct && getConstructor(node.instance.declarations) == null) {
                 return node.patch({
                     instance: node.instance.patch({
                         declarations: [

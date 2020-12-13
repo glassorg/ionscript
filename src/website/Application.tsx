@@ -5,6 +5,27 @@ import "./Application.css"
 export default function Application() {
 
     return <div className="Application">
+        <CodeSample description="Immutable Data Classes">{
+`data class Person
+    var name: String & == .trim() & .length > 0 & .length < 100
+    var id: Integer & > 0
+`
+        }</CodeSample>
+        <CodeSample description="Immutable Data Struct">{
+`data struct Vector
+    var x: Number
+    var y: Number
+`
+        }</CodeSample>
+        <CodeSample description="Mutable Struct">{
+`struct Vector
+    var x: Number
+    var y: Number
+    let constructor = (a, b) =>
+        this.x = a
+        this.y = b
+`
+        }</CodeSample>
         <CodeSample description="Constant Definitions">{
 `let x = 12
 let name = "Kris"

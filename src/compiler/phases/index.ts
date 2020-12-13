@@ -30,11 +30,11 @@ export const fast = [
 const defaultPhases = [
     parsing,
     semanticAnalysis,
-    // fixImports,
-    // inheritBaseClasses,
+    fixImports,
+    inheritBaseClasses,
     controlFlowToExpressions,
-    // createConditionalDeclarations,
-    // addDataClassConstructors,
+    createConditionalDeclarations,
+    addDataClassConstructors,
     checkReferences,
     inferTypes,
 
