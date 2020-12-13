@@ -34270,9 +34270,6 @@ function compileSample(text, name = "sample", debug = true) {
   let results = compiler.compile(options, {
     [name]: text
   });
-  console.log({
-    results
-  });
 
   if (results.errors.length > 0) {
     return results.errors[0];
@@ -34646,7 +34643,6 @@ function CodeSample(props) {
     };
   }, []);
   let javascript = Compiler_1.compileSample(content, "sample", true);
-  console.log("CODE SAMPLE22", javascript);
   let isError = typeof javascript !== "string";
   return react_1.default.createElement("div", {
     className: "CodeSample"
@@ -34736,4 +34732,4 @@ const Application_1 = __importDefault(require("./Application"));
 
 react_dom_1.render(react_1.default.createElement(Application_1.default, null), document.getElementById("root"));
 },{"react":"ccIB","react-dom":"x9tB","./Application":"MLmL"}]},{},["zo2T"], null)
-//# sourceMappingURL=https://glassorg.github.io/ionscript/website.65a77ba6.js.map
+//# sourceMappingURL=https://glassorg.github.io/ionscript/website.0cc148d8.js.map

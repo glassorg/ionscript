@@ -13,7 +13,6 @@ export default function CodeSample(props: { description: string, children: strin
     }, [])
 
     let javascript = compileSample(content, "sample", true)
-    console.log("CODE SAMPLE22", javascript)
     let isError = typeof javascript !== "string"
 
     return (
