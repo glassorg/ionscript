@@ -524,4 +524,4 @@ module.exports=exports=function(){var runtime;try{runtime=require("pegs")}catch(
 },{"react":"ccIB","./CodeSample":"aDHU","./Application.css":"Zcgp"}],"zo2T":[function(require,module,exports) {
 "use strict";var e=this&&this.__importDefault||function(e){return e&&e.__esModule?e:{default:e}};Object.defineProperty(exports,"__esModule",{value:!0});const t=e(require("react")),r=require("react-dom"),u=e(require("./Application"));r.render(t.default.createElement(u.default,null),document.getElementById("root"));
 },{"react":"ccIB","react-dom":"x9tB","./Application":"MLmL"}]},{},["zo2T"], null)
-//# sourceMappingURL=/website.8e998b43.js.map
+//# sourceMappingURL=https://glassorg.github.io/ionscript/website.8e998b43.js.map
