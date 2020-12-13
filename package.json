@@ -4,6 +4,7 @@
   "description": "Indented Javascript",
   "main": "lib/index.js",
   "browser": "docs/index.html",
+  "test": "dist/index.html",
   "repository": "https://github.com/glassorg/ionscript.git",
   "author": "Kris Nye <krisnye@gmail.com>",
   "license": "MIT",
@@ -13,7 +14,8 @@
   "targets": {
     "browser": {
       "publicUrl": "https://glassorg.github.io/ionscript/"
-    }
+    },
+    "test": {}
   },
   "scripts": {
     "setup": "yarn install",
@@ -25,8 +27,10 @@
     "buildGrammar": "pegs src/compiler/parser.pegs lib/compiler/parser.js",
     "debug": "node --inspect-brk node_modules/@glas/test/gtest.js lib",
     "deploy": "yarn build && npm version patch --force && npm publish",
-    "watch-website": "rm -rf .parcel-cache docs && parcel serve ./src/website/index.html --target browser",
-    "build-website": "rm -rf .parcel-cache docs && parcel build ./src/website/index.html --target browser"
+    "watch-website": "rm -rf .parcel-cache docs && parcel ./src/website/index.html",
+    "build-website": "rm -rf .parcel-cache docs && parcel build ./src/website/index.html -d docs",
+    "watch-website-parcel2": "rm -rf .parcel-cache docs && parcel serve ./src/website/index.html --target test",
+    "build-website-parcel2": "rm -rf .parcel-cache docs && parcel build ./src/website/index.html --target browser"
   },
   "dependencies": {
     "@babel/core": "^7.12.3",
@@ -42,8 +46,9 @@
     "@glas/ion": "0.1.8",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
-    "parcel": "^2.0.0-beta.1",
+    "parcel-bundler": "^1.12.4",
     "react": "^17.0.1",
-    "react-dom": "^17.0.1"
+    "react-dom": "^17.0.1",
+    "typescript": "^4.1.3"
   }
 }

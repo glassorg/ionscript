@@ -1,8 +1,10 @@
 import * as HtmlLogger from "./HtmlLogger";
 import * as common from "./common";
 import defaultPhases, { noEmit } from "./phases";
-import Parser = require("./parser");
+// we need the path to lib so the code works in normal compile and in parcel
+import Parser = require("../../lib/compiler/parser");
 import watchDirectory from "./watchDirectory";
+import toModuleFiles, { moduleExtension } from "./phases/toModuleFiles";
 
 type Logger = (names?: string | string[], ast?: any) => void
 const NullLogger = () => {}
@@ -30,6 +32,23 @@ export class Options {
         this.emit = emit
     }
 
+}
+
+export function compileSample(text: string, name = "sample", debug = true): string | Error {
+    let emit = false
+    let compiler = new Compiler(() => {})
+    let options = new Options([], "null", "none", debug, emit)
+    let results = compiler.compile(options, { [name]: text })
+    if (results.errors.length > 0) {
+        return results.errors[0]
+    }
+    let output = results.phases.get(toModuleFiles).modules.get(name + moduleExtension)
+    return output
+}
+
+export type Results = {
+    phases: Map<Function, any>
+    errors: Error[]
 }
 
 export default class Compiler {
@@ -66,7 +85,7 @@ export default class Compiler {
         files?: { [path: string]: string },
         phases = options.emit ? defaultPhases : noEmit,
         logger = this.logger
-    ) {
+    ): Results {
         options.parser = Parser()
         if (files == null) {
             files = common.getInputFilesRecursive(options.inputs, options.namespace)
@@ -101,7 +120,7 @@ export default class Compiler {
                 console.log(error.message)
             }
         }
-        return errors
+        return { phases: phaseResults, errors }
     }
 
 }

@@ -40,17 +40,18 @@ const defaultPhases = [
 
     addTypedStructArrays,
 
-    //  no more semantic errors past this point
-    //  just preparing for output so we can skip for noEmit
+    // we could skip this.
     runtimeTypeChecking,
     createRuntime,
     toEsTree,
     codegen,
     toModuleFiles,
+
+    // no emit
     writeFiles,
 ]
 
 export default defaultPhases
 
 // we remove the last 6 phases if we're not emitting.
-export const noEmit = defaultPhases.slice(0, -6);
+export const noEmit = defaultPhases.slice(0, -1);

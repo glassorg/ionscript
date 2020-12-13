@@ -131,7 +131,7 @@ ImportDeclaration
                 let type = isTypeName(local.name) ? "ImportDefaultSpecifier" : "ImportNamespaceSpecifier"
                 specifiers.push(node(type, { local }))
             }
-            let path = source.map(id => id.name ?? id).join(pathSeparator)
+            let path = source.map(id => id.name || id).join(pathSeparator)
             source = node("Literal", { value: path })
         }
         return node("ImportDeclaration", { specifiers, source })
@@ -155,7 +155,7 @@ Specifier
 
 ImportSpecifier
     = imported:Identifier local:(_ AsToken _ @Declarator)?
-    { return node("ImportSpecifier", { imported, local: local ?? node("Declarator", imported) }) }
+    { return node("ImportSpecifier", { imported, local: local || node("Declarator", imported) }) }
 
 ImportDefaultSpecifier
     = DefaultToken _ AsToken _ local:Declarator
@@ -747,7 +747,7 @@ JSXElementName
 
 JSXAttribute
     = key:JSXAttributeName value:JSXAttributeInitializer?
-    { return node("Property", { key, value: value ?? node("Literal", { value: true }) }) }
+    { return node("Property", { key, value: value || node("Literal", { value: true }) }) }
 
 JSXAttributeInitializer
     = "=" _ @JSXAttributeValue
@@ -764,11 +764,11 @@ JSXAttributes
 
 InlineJSXElementSelfClosing
     = "<" _ kind:JSXElementName _ properties:JSXAttributes? _ "/>"
-    { return node("ElementExpression", { kind, properties: properties ?? [], children: [] }) }
+    { return node("ElementExpression", { kind, properties: properties || [], children: [] }) }
 
 InlineJSXElementOpen
     = "<" _ kind:JSXElementName _ properties:JSXAttributes? _ ">"
-    { return node("ElementExpression", { kind, properties: properties ?? [], children: [] }) }
+    { return node("ElementExpression", { kind, properties: properties || [], children: [] }) }
 
 InlineJSXElementClose
     = "</" _ @JSXElementName _ ">"
@@ -785,7 +785,7 @@ InlineJSXChild
 InlineJSXElementExpression
     = InlineJSXElementSelfClosing
     / open:InlineJSXElementOpen children:InlineJSXChild* close:InlineJSXElementClose
-    { return node("ElementExpression", { ...open, children, close: close ?? null }) }
+    { return node("ElementExpression", { ...open, children, close: close || null }) }
 
 OutlineJSXElementExpression
     = element:InlineJSXElementSelfClosing children:OutlineArrayArguments

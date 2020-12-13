@@ -1,5 +1,4 @@
 import { Options } from "../Compiler";
-import * as babel from "@babel/core";
 
 const babel_options = {
     plugins: [
@@ -12,15 +11,21 @@ const babel_options = {
     ]
 }
 
+export const moduleExtension = ".mjs"
+
 export default function toModuleFiles(output, options: Options) {
     let modules = new Map<string,string>()
     for (let path of output.modules.keys()) {
         let modernCode = output.modules.get(path)
         // create the modern modules with import/export syntax
-        modules.set(path + ".mjs", modernCode)
+        modules.set(path + moduleExtension, modernCode)
         // create the nodejs compatible modules with require syntax
-        let nodejsCode = babel.transform(modernCode, babel_options).code
-        modules.set(path + ".js", nodejsCode)
+        if (options.emit) {
+            let r = require // don't want parcel resolving
+            let babel = r("@babel/core")
+            let nodejsCode = babel.transform(modernCode, babel_options).code
+            modules.set(path + ".js", nodejsCode)
+        }
     }
     return { ...output, modules }
 }

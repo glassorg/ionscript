@@ -1,4 +1,5 @@
 import React from "react";
 import { render } from "react-dom";
+import Application from "./Application";
 
-render(<h1>Hello React Ionscript Website 2</h1>, document.getElementById("root"));
+render(<Application />, document.getElementById("root"));
