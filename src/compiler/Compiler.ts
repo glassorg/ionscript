@@ -39,6 +39,7 @@ export function compileSample(text: string, name = "sample", debug = true): stri
     let compiler = new Compiler(() => {})
     let options = new Options([], "null", "none", debug, emit)
     let results = compiler.compile(options, { [name]: text })
+    console.log({ results })
     if (results.errors.length > 0) {
         return results.errors[0]
     }
