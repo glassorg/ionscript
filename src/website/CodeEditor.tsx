@@ -18,7 +18,6 @@ function insertTextAtCursor(text)
 }
 
 export default memo(function CodeEditor(props: { children: string, onInput }) {
-    console.log("code editor.....")
     let { children, ...other } = props
     return (
         <div { ...other } className="Code ionscript">

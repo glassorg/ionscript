@@ -34477,7 +34477,6 @@ function insertTextAtCursor(text) {
 }
 
 exports.default = react_1.memo(function CodeEditor(props) {
-  console.log("code editor.....");
   let {
     children,
     ...other
@@ -34732,4 +34731,4 @@ const Application_1 = __importDefault(require("./Application"));
 
 react_dom_1.render(react_1.default.createElement(Application_1.default, null), document.getElementById("root"));
 },{"react":"ccIB","react-dom":"x9tB","./Application":"MLmL"}]},{},["zo2T"], null)
-//# sourceMappingURL=https://glassorg.github.io/ionscript/website.0cc148d8.js.map
+//# sourceMappingURL=https://glassorg.github.io/ionscript/website.1b898997.js.map
