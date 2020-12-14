@@ -2,6 +2,7 @@ import React, { memo, useState } from "react"
 import { compileSample } from "../compiler/Compiler";
 import TopLabel from "./TopLabel";
 import "./Code.css";
+import highlight from 'highlight-javascript-syntax';
 
 function insertTextAtCursor(text)
 {
@@ -22,8 +23,9 @@ export default memo(function CodeEditor(props: { source: string, debug: boolean 
 
     let javascript = compileSample(source, "sample", debug)
     let isError = typeof javascript !== "string"
+    let content = isError ? javascript.toString() : javascript.toString()
 
     return (
-    <div { ...other } className="Code javascript">{ javascript.toString() }<TopLabel>{ debug ? "JavaScript Debug" : "JavaScript Release" }</TopLabel></div>
+        <div { ...other } className="Code javascript"><div dangerouslySetInnerHTML={{__html:content}}></div><TopLabel>{ debug ? "JavaScript Debug" : "JavaScript Release" }</TopLabel></div>
     )
 })

@@ -32,6 +32,44 @@ export class Options {
         this.emit = emit
     }
 
+    static from(options) {
+        if (options instanceof Options) {
+            return options
+        }
+        return new Options(
+            options.inputs || [],
+            options.output || "",
+            options.namespace,
+            options.debug || false,
+            options.emit || (options.output != null && options.output.length > 0),
+        )
+    }
+
+}
+
+type OptionsJSON = {
+    inputs?: string[]
+    output?: string
+    namespace?: string
+    parser?: ReturnType<typeof Parser>
+    debug?: boolean
+    emit?: boolean
+}
+
+type CompileSingleResult = {
+    output?: string
+    error?: Error
+    map?: any
+}
+
+export function compileSingle(source: string, debug = true, name = "sample"): CompileSingleResult {
+    let output = compileSample(source, name, debug)
+    if (typeof output === 'string') {
+        return { output }
+    }
+    else {
+        return { error: output as Error }
+    }
 }
 
 export function compileSample(text: string, name = "sample", debug = true): string | Error {
@@ -55,11 +93,12 @@ export default class Compiler {
 
     logger: Logger
 
-    constructor(logger: Logger = HtmlLogger.create("./output.html")) {
+    constructor(logger: Logger = () => {}) {
         this.logger = logger
     }
 
-    watch(options: Options) {
+    watch(optionsOrJson: Options | OptionsJSON) {
+        let options = Options.from(optionsOrJson)
         //  first compile normal
         this.compile(options)
         //  then watch files for changes
@@ -81,11 +120,15 @@ export default class Compiler {
     }
 
     compile(
-        options: Options,
+        optionsOrJson: Options | OptionsJSON,
         files?: { [path: string]: string },
-        phases = options.emit ? defaultPhases : noEmit,
+        phases: any = undefined,
         logger = this.logger
     ): Results {
+        let options = Options.from(optionsOrJson)
+        if (phases == null) {
+            phases = options.emit ? defaultPhases : noEmit
+        }
         options.parser = Parser()
         if (files == null) {
             files = common.getInputFilesRecursive(options.inputs, options.namespace)

@@ -12,6 +12,11 @@ Indented Javascript
 
 ## Design Decisions
 
+- We will not add type annotations to the language in order to satisfy the type checker.
+    - Adding them makes the language uglier.
+    - The Compile time type checker will only throw errors if it can prove a type will always be wrong.
+    - All other type checks can be performed at runtime in debug builds.
+
 - Use a literate programming model?
     - pros:
         - good cohesion between documentation and code

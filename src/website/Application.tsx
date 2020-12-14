@@ -1,6 +1,7 @@
 import React from "react"
 import CodeSample from "./CodeSample"
 import "./Application.css"
+import "./Hello.is"
 
 export default function Application() {
 
@@ -21,9 +22,6 @@ export default function Application() {
 `struct Vector
     var x: Number
     var y: Number
-    let constructor = (a, b) =>
-        this.x = a
-        this.y = b
 `
         }</CodeSample>
         <CodeSample description="Constant Definitions">{
