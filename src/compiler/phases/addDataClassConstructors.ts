@@ -158,7 +158,7 @@ export default function addDataClassConstructors(root: Assembly, options: Option
             }
         },
         leave(node) {
-            if (ClassDeclaration.is(node) && (node.isData || node.isStruct && getConstructor(node.instance.declarations) == null) {
+            if (ClassDeclaration.is(node) && (node.isData || node.isStruct && getConstructor(node.instance.declarations) == null)) {
                 return node.patch({
                     instance: node.instance.patch({
                         declarations: [
