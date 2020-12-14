@@ -1,6 +1,6 @@
 {
   "name": "ionscript",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "description": "Indented Javascript",
   "main": "lib/index.js",
   "browser": "docs/index.html",
