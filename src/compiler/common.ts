@@ -1,8 +1,8 @@
 import * as fs from "fs";
 import * as np from "path";
-import { traverse } from "@glas/traverse";
+import { traverse, skip } from "@glas/traverse";
 import { NodeMap, ScopeMap } from "./createScopeMaps";
-import { Reference, Node, VariableDeclaration, ModuleSpecifier, ImportDeclaration, Declarator, Program, ImportDefaultSpecifier, ImportNamespaceSpecifier, ImportSpecifier, Exportable, Declaration } from "./ast";
+import { Reference, Node, VariableDeclaration, ModuleSpecifier, ImportDeclaration, Declarator, Program, ImportDefaultSpecifier, ImportNamespaceSpecifier, ImportSpecifier, Exportable, Declaration, Statement, Identifier } from "./ast";
 
 export const runtimeModuleName = "ionscript"
 
@@ -44,6 +44,30 @@ export function isValidId(name: string) {
 ////////////////////////////////////////////////////////////////////////////////
 //  Miscelaneous Functions
 ////////////////////////////////////////////////////////////////////////////////
+
+//  quick check for a declarator without creating a scope map
+export function hasDeclarator(statements: Array<Statement>, name: string) {
+    // console.log(statements)
+    for (let s of statements) {
+        if (ImportDeclaration.is(s)) {
+            for (let specifier of s.specifiers) {
+                if (specifier.local.name === name) {
+                    return true
+                }
+            }
+        }
+        if (VariableDeclaration.is(s)) {
+            if (Identifier.is(s.id)) {
+                if (s.id.name === name) {
+                    return true
+                }
+            }
+            //  TODO: Make this work for ObjectPatterns.
+            //  They aren't currently using Declarator's as they should.
+        }
+    }
+    return false
+}
 
 export function getOriginalDeclarator(declarator: Declarator, scopes: NodeMap<ScopeMap>, ancestors: Map<Node, Node>): Declarator | null {
     let parent = ancestors.get(declarator)

@@ -1,9 +1,13 @@
-struct Vector
-    var x: Number
-    var y: Number
-    let constructor = (a, b) =>
-        this.x = a
-        this.y = b
+
+export default xxx() =>
+    return 1
+
+// struct Vector
+//     var x: Number
+//     var y: Number
+//     let constructor = (a, b) =>
+//         this.x = a
+//         this.y = b
 
 // let x = 12
 // let string = "Foo"

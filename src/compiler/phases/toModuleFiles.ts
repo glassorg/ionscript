@@ -13,6 +13,8 @@ const babel_options = {
 
 export const moduleExtension = ".mjs"
 
+const isNode = typeof window === "undefined"
+
 export default function toModuleFiles(output, options: Options) {
     let modules = new Map<string,string>()
     for (let path of output.modules.keys()) {
@@ -20,7 +22,7 @@ export default function toModuleFiles(output, options: Options) {
         // create the modern modules with import/export syntax
         modules.set(path + moduleExtension, modernCode)
         // create the nodejs compatible modules with require syntax
-        if (options.emit) {
+        if (isNode) {
             let r = require // don't want parcel resolving
             let babel = r("@babel/core")
             let nodejsCode = babel.transform(modernCode, babel_options).code

@@ -5,6 +5,7 @@ import { getAncestor, getOriginalDeclarator, memoizeIntern, SemanticError } from
 import { getGlobalReference, getModulePath } from "../pathFunctions";
 import toCodeString from "../toCodeString";
 import * as types from "../types";
+import reservedWords from "../reservedWords";
 
 export default function checkReferences(root: Assembly) {
     let ancestorsMap = new Map<Node, Node>()
@@ -32,9 +33,14 @@ export default function checkReferences(root: Assembly) {
             // we also set variable id onto function expressions if they aren't named already
             if (VariableDeclaration.is(node)) {
                 if (Identifier.is(node.id) && FunctionExpression.is(node.value) && node.value.id == null) {
+                    if (!reservedWords.has(node.id.name))
+                    // but NOT if they are
                     return node.patch({
                         value: node.value.patch({
-                            id: node.id
+                            id: new Declarator({
+                                location: node.location,
+                                name: node.id.name
+                            })
                         })
                     })
                 }

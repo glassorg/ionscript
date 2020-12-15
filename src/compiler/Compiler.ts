@@ -62,8 +62,8 @@ type CompileSingleResult = {
     map?: any
 }
 
-export function compileSingle(source: string, debug = true, name = "sample"): CompileSingleResult {
-    let output = compileSample(source, name, debug)
+export function compileSingle(source: string, debug = true, name = "sample", ext: ".mjs" | ".js" = ".js"): CompileSingleResult {
+    let output = compileSample(source, name, debug, ext)
     if (typeof output === 'string') {
         return { output }
     }
@@ -72,7 +72,7 @@ export function compileSingle(source: string, debug = true, name = "sample"): Co
     }
 }
 
-export function compileSample(text: string, name = "sample", debug = true): string | Error {
+export function compileSample(text: string, name = "sample", debug = true, ext: ".mjs" | ".js" = moduleExtension): string | Error {
     let emit = false
     let compiler = new Compiler(() => {})
     let options = new Options([], "null", "none", debug, emit)
@@ -80,7 +80,7 @@ export function compileSample(text: string, name = "sample", debug = true): stri
     if (results.errors.length > 0) {
         return results.errors[0]
     }
-    let output = results.phases.get(toModuleFiles).modules.get(name + moduleExtension)
+    let output = results.phases.get(toModuleFiles).modules.get(name + ext)
     return output
 }
 

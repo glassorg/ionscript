@@ -1,6 +1,6 @@
 {
   "name": "ionscript",
-  "version": "0.2.10",
+  "version": "0.3.0",
   "description": "Indented Javascript",
   "main": "lib/index.js",
   "browser": "docs/index.html",
@@ -27,7 +27,7 @@
     "watchGrammar": "nodemon -w src/compiler/parser.pegs -i src,lib -e pegs -x yarn run buildGrammar",
     "buildGrammar": "pegs src/compiler/parser.pegs lib/compiler/parser.js",
     "debug": "node --inspect-brk node_modules/@glas/test/gtest.js lib",
-    "deploy": "yarn build && npm version patch --force && npm publish",
+    "deploy": "yarn build && npm publish",
     "watch-website": "rm -rf .cache docs && parcel ./src/website/index.html",
     "debug-website": "rm -rf .cache docs && parcel build ./src/website/index.html -d docs --public-url ./ --no-minify",
     "build-website": "rm -rf .cache docs && parcel build ./src/website/index.html -d docs --public-url https://glassorg.github.io/ionscript/ --no-minify",

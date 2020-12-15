@@ -1,11 +1,11 @@
 import { Options } from "../Compiler"
 import { traverse, skip, remove } from "@glas/traverse"
-import { ArrayExpression, BinaryExpression, BlockStatement, CallExpression, Declarator, ElementExpression, Expression, ExpressionStatement, FunctionExpression, Identifier, Literal, Location, MemberExpression, Node, ObjectExpression, OutlineOperation, Parameter, Program, Property, Reference, ReturnStatement, SpreadElement, Statement } from "../ast"
+import { ArrayExpression, BinaryExpression, BlockStatement, CallExpression, Declarator, ElementExpression, Expression, ExpressionStatement, FunctionExpression, Identifier, ImportDeclaration, ImportNamespaceSpecifier, ImportSpecifier, Literal, Location, MemberExpression, Node, ObjectExpression, OutlineOperation, Parameter, Program, Property, Reference, ReturnStatement, SpreadElement, Statement } from "../ast"
 import Assembly from "../ast/Assembly"
 import ArrowFunctionExpression from "../ast/ArrowFunctionExpression"
 import PropertyStatement from "../ast/PropertyStatement"
 import AssignmentStatement from "../ast/AssignmentStatement"
-import { SemanticError } from "../common"
+import { hasDeclarator, SemanticError } from "../common"
 
 function convertExpressionWithNestedStatements(node) {
     const { location } = node
@@ -172,7 +172,7 @@ function convertExpressionWithNestedStatements(node) {
     else if (ElementExpression.is(node)) {
         let hasNonPropertyStatements = node.children.find(a => Statement.is(a) && !PropertyStatement.is(a)) != null
         const propertiesName = "$"
-        const childrenName = "$$"
+        const childrenName = "children"
         let kind = node.kind
         //  lower case references use strings as they represent elements
         if (Reference.is(kind) && kind.name[0] === kind.name[0].toLowerCase()) {
@@ -187,7 +187,7 @@ function convertExpressionWithNestedStatements(node) {
                     location,
                     params: [
                         new Parameter({ location, id: new Declarator({ location, name: propertiesName}) }),
-                        new Parameter({ location, id: new Declarator({ location, name: childrenName}) }),
+                        // new Parameter({ location, id: new Declarator({ location, name: childrenName}) }),
                     ],
                     expression: false,
                     body: new BlockStatement({
@@ -245,7 +245,11 @@ function convertExpressionWithNestedStatements(node) {
                                         location,
                                         callee: new MemberExpression({
                                             location,
-                                            object: new Reference({ location, name: childrenName }),
+                                            object: new MemberExpression({
+                                                location,
+                                                object: new Reference({ location, name: propertiesName }),
+                                                property:  new Identifier({ location, name: childrenName }),
+                                            }),
                                             property: new Identifier({ location, name: "push" }),
                                         }),
                                         arguments: [...mergePushElementsWithNext, e]
@@ -259,11 +263,11 @@ function convertExpressionWithNestedStatements(node) {
                                 location,
                                 argument: new CallExpression({
                                     location,
-                                    callee: new Reference({ location, name: "createElement" }),
+                                    callee: new Reference({ location, name: "jsx" }),
                                     arguments: [
                                         kind,
                                         new Reference({ location, name: propertiesName }),
-                                        new Reference({ location, name: childrenName }),
+                                        // new Reference({ location, name: childrenName }),
                                     ]
                                 })
                             })
@@ -271,13 +275,22 @@ function convertExpressionWithNestedStatements(node) {
                     })
                 }),
                 arguments: [
-                    new ObjectExpression({ location, properties: node.properties }),
-                    new ArrayExpression({ location, elements: [] }),
+                    new ObjectExpression({
+                        location,
+                        properties: [
+                            ...node.properties,
+                            new Property({
+                                location,
+                                key: new Identifier({ location, name: childrenName }),
+                                value: new ArrayExpression({ location, elements: [] })
+                            })
+                        ]
+                    }),
                 ]
             })
         }
         // we are converting this into a simple createElement(kind, properties, ...children) function call
-        let properties = [...node.properties]
+        let properties = [ ...node.properties ]
         let children: Array<any> = []
         for (let child of node.children) {
             if (PropertyStatement.is(child)) {
@@ -293,12 +306,22 @@ function convertExpressionWithNestedStatements(node) {
         //  TODO: We should probably just output JSX
         let args: Array<any> = [
             kind,
-            properties.length > 0 ? new ObjectExpression({ location, properties }) : new Literal({ location, value: null }),
-            ...children
+            new ObjectExpression({
+                location,
+                properties: [
+                    ...properties,
+                    new Property({
+                        location,
+                        key: new Identifier({ location, name: "children" }),
+                        value: new ArrayExpression({ location, elements: children })
+                    })
+                ]
+            })
+            // ...children
         ]
         return new CallExpression({
             location,
-            callee: new Reference({ location, name: "createElement" }),
+            callee: new Reference({ location, name: "jsx" }),
             arguments: args
         })
     }
@@ -307,48 +330,82 @@ function convertExpressionWithNestedStatements(node) {
 export default function controlFlowToExpressions(root: Assembly, options: Options) {
     return traverse(root, {
         enter(node) {
+            if (Program.is(node)) {
+                return skip
+            }
         },
         leave(node) {
             let { location } = node
-            if (CallExpression.is(node) && node.arguments.find(Statement.is)) {
-                return node.patch({
-                    arguments: [
-                        new SpreadElement({
-                            location,
-                            argument: convertExpressionWithNestedStatements(new ArrayExpression({ location, elements: node.arguments }))!
-                        })
-                    ]
-                })
-            }
-            if (OutlineOperation.is(node)) {
-                let { operator } = node
-                let operands = new ArrayExpression({ location, elements: node.operands })
-                return new CallExpression({
-                    location,
-                    callee: new MemberExpression({
-                        location,
-                        object: convertExpressionWithNestedStatements(operands) ?? operands,
-                        property: new Identifier({ location, name: "reduce" })
-                    }),
-                    arguments: [
-                        new ArrowFunctionExpression({
-                            location,
-                            params: [
-                                new Parameter({ location, id:  new Declarator({ location, name: "a"}) }),
-                                new Parameter({ location, id:  new Declarator({ location, name: "c"}) }),
-                            ],
-                            body: new BinaryExpression({
+            if (Program.is(node)) {
+                let hasJsxElements = false
+                let program = traverse(node, {
+                    leave(node) {
+                        if (ElementExpression.is(node)) {
+                            hasJsxElements = true
+                        }
+                        if (CallExpression.is(node) && node.arguments.find(Statement.is)) {
+                            return node.patch({
+                                arguments: [
+                                    new SpreadElement({
+                                        location,
+                                        argument: convertExpressionWithNestedStatements(new ArrayExpression({ location, elements: node.arguments }))!
+                                    })
+                                ]
+                            })
+                        }
+                        if (OutlineOperation.is(node)) {
+                            let { operator } = node
+                            let operands = new ArrayExpression({ location, elements: node.operands })
+                            return new CallExpression({
                                 location,
-                                left: new Reference({ location, name: "a"}),
-                                operator,
-                                right: new Reference({ location, name: "c"})
-                            }),
-                            expression: true
-                        })
-                    ]
+                                callee: new MemberExpression({
+                                    location,
+                                    object: convertExpressionWithNestedStatements(operands) ?? operands,
+                                    property: new Identifier({ location, name: "reduce" })
+                                }),
+                                arguments: [
+                                    new ArrowFunctionExpression({
+                                        location,
+                                        params: [
+                                            new Parameter({ location, id:  new Declarator({ location, name: "a"}) }),
+                                            new Parameter({ location, id:  new Declarator({ location, name: "c"}) }),
+                                        ],
+                                        body: new BinaryExpression({
+                                            location,
+                                            left: new Reference({ location, name: "a"}),
+                                            operator,
+                                            right: new Reference({ location, name: "c"})
+                                        }),
+                                        expression: true
+                                    })
+                                ]
+                            })
+                        }
+                        return convertExpressionWithNestedStatements(node)
+                    }
                 })
+                // add jsx import statement
+                if (hasJsxElements && ! hasDeclarator(program.body, "jsx") ) {
+                    program = program.patch({
+                        body: [
+                            new ImportDeclaration({
+                                location,
+                                specifiers: [
+                                    new ImportSpecifier({
+                                        location,
+                                        local: new Declarator({ name: "jsx", location }),
+                                        imported: new Reference({ name: "jsx", location })
+                                    })
+                                ],
+                                source: new Literal({ value: "react/jsx-runtime", location })
+                            }),
+                            ...program.body
+                        ]
+                    })
+    
+                }
+                return program
             }
-            return convertExpressionWithNestedStatements(node)
         }
     })
 }

@@ -1,6 +1,7 @@
 import { traverse } from "@glas/traverse";
 import { AwaitExpression, BreakStatement, CallExpression, ClassDeclaration, ContinueStatement, Declarator, ElementExpression, ForOfStatement, ForStatement, FunctionExpression, Identifier, IfStatement, Literal, MemberExpression, Reference, RegularExpression, ReturnStatement, Typed, TypeExpression, VariableDeclaration, YieldExpression } from "./ast";
 import Parser from "./parser";
+import reservedWords from "./reservedWords";
 const parser = Parser();
 
 function add(position, offset) {
@@ -11,14 +12,6 @@ const keywordTokenTypes = {
 	let: ["macro"],
 	var: ["variable", "readonly"],
 	type: ["macro"],
-	export: ["keyword"],
-	default: ["keyword"],
-	class: ["macro"],
-	return: ["keyword"],
-	yield: ["keyword"],
-	else: ["keyword"],
-	await: ["keyword"],
-	async: ["keyword"],
 }
 
 type SemanticHighlight = {
@@ -54,6 +47,11 @@ export function getSemanticHighlights(
         let words = lineText.trim().split(/\s+/).slice(0, max);
         for (let word of words) {
             let tokenType = keywordTokenTypes[word];
+            if (tokenType == null) {
+                if (reservedWords.has(word)) {
+                    tokenType = ["keyword"]
+                }
+            }
             if (tokenType != null) {
                 let column = lineText.indexOf(word) + 1;
                 push({ start: { line, column }, end: { line, column: column + word.length } }, tokenType[0], ...tokenType.slice(1));
