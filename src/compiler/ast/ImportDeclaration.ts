@@ -16,6 +16,7 @@ import * as Type from './Type';
 import * as Integer from './ion/Integer';
 import * as _Array from './ion/Array';
 import * as Literal from './Literal';
+import * as Identifier from './Identifier';
 import * as Class from './ion/Class';
 export type Specifier = ImportSpecifier.ImportSpecifier | (ImportDefaultSpecifier.ImportDefaultSpecifier | ImportNamespaceSpecifier.ImportNamespaceSpecifier);
 export function isSpecifier(value): value is Specifier {
@@ -26,6 +27,7 @@ export class ImportDeclaration implements _Object.Object , Declaration.Declarati
     readonly type: Type.Type | Null.Null;
     readonly export: Integer.Integer;
     readonly specifiers: _Array.Array<Specifier>;
+    readonly path: _Array.Array<Literal.Literal | Identifier.Identifier> | Null.Null;
     readonly source: Literal.Literal;
     static readonly id = 'ImportDeclaration';
     static readonly implements = new Set([
@@ -42,12 +44,14 @@ export class ImportDeclaration implements _Object.Object , Declaration.Declarati
         type = null,
         export: _export = 0,
         specifiers,
+        path = null,
         source
     }: {
         location?: Location.Location | Null.Null,
         type?: Type.Type | Null.Null,
         export?: Integer.Integer,
         specifiers: _Array.Array<Specifier>,
+        path?: _Array.Array<Literal.Literal | Identifier.Identifier> | Null.Null,
         source: Literal.Literal
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
@@ -58,12 +62,15 @@ export class ImportDeclaration implements _Object.Object , Declaration.Declarati
             throw new Error('export is not a Integer: ' + Class.toString(_export));
         if (!_Array.isArray(specifiers))
             throw new Error('specifiers is not a Array: ' + Class.toString(specifiers));
+        if (!(_Array.isArray(path) || Null.isNull(path)))
+            throw new Error('path is not a Array | Null: ' + Class.toString(path));
         if (!Literal.isLiteral(source))
             throw new Error('source is not a Literal: ' + Class.toString(source));
         this.location = location;
         this.type = type;
         this.export = _export;
         this.specifiers = specifiers;
+        this.path = path;
         this.source = source;
         Object.freeze(this);
     }
@@ -72,6 +79,7 @@ export class ImportDeclaration implements _Object.Object , Declaration.Declarati
         type?: Type.Type | Null.Null,
         export?: Integer.Integer,
         specifiers?: _Array.Array<Specifier>,
+        path?: _Array.Array<Literal.Literal | Identifier.Identifier> | Null.Null,
         source?: Literal.Literal
     }) {
         return new ImportDeclaration({

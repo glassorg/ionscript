@@ -18,6 +18,7 @@ export default new Set([
     "function",
     "if",
     "is",       //  ionscript
+    "as",       //  ionscript
     "import",
     "in",
     "instanceof",

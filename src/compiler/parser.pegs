@@ -124,17 +124,18 @@ ExportDefaultDeclaration
 ImportDeclaration
     = ImportToken _ source:(StringLiteral / Path) _ specifiers:(InlineSpecifiers / OutlineSpecifiers)
     {
+        let path = null
         if (Array.isArray(source) /* is Path */) {
             if (specifiers.length === 0) {
                 // smart import
                 let local = source[source.length - 1]
                 let type = isTypeName(local.name) ? "ImportDefaultSpecifier" : "ImportNamespaceSpecifier"
-                specifiers.push(node(type, { local }))
+                specifiers.push(node(type, { local, location: local.location }))
             }
-            let path = source.map(id => id.name || id).join(pathSeparator)
-            source = node("Literal", { value: path })
+            path = source
+            source = node("Literal", { value: source.map(id => id.name || id).join(pathSeparator) })
         }
-        return node("ImportDeclaration", { specifiers, source })
+        return node("ImportDeclaration", { specifiers, path, source })
     }
 
 InlineSpecifiers

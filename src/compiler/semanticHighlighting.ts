@@ -1,7 +1,8 @@
 import { traverse } from "@glas/traverse";
-import { AwaitExpression, BreakStatement, CallExpression, ClassDeclaration, ContinueStatement, Declarator, ElementExpression, ForOfStatement, ForStatement, FunctionExpression, Identifier, IfStatement, Literal, MemberExpression, Reference, RegularExpression, ReturnStatement, Typed, TypeExpression, VariableDeclaration, YieldExpression } from "./ast";
+import { AwaitExpression, BreakStatement, CallExpression, ClassDeclaration, ContinueStatement, Declarator, ElementExpression, ForOfStatement, ForStatement, FunctionExpression, Identifier, IfStatement, ImportDeclaration, Literal, MemberExpression, ModuleSpecifier, Reference, RegularExpression, ReturnStatement, Typed, TypeExpression, VariableDeclaration, YieldExpression } from "./ast";
 import Parser from "./parser";
 import reservedWords from "./reservedWords";
+import toCodeString from "./toCodeString";
 const parser = Parser();
 
 function add(position, offset) {
@@ -63,9 +64,31 @@ export function getSemanticHighlights(
 
     let ast = parser.parse(text, fileName);
     traverse(ast, {
-        enter(node) {
+        enter(node, ancestors) {
             if (node.location == null) {
                 return;
+            }
+
+            if (ModuleSpecifier.is(node)) {
+                highlightStartingKeywords(node.location.start.line, 2);
+                push(node.local, "macro")
+            }
+
+            if (ImportDeclaration.is(node)) {
+                highlightStartingKeywords(node.location.start.line, 1);
+                if (node.path) {
+                    let isAutoImport = node.specifiers.length === 1 && node.specifiers[0].location?.start.line === node.location?.start.line
+                    for (let step of node.path) {
+                        if (Identifier.is(step)) {
+                            let isLast = node.path[node.path.length - 1] === step
+                            push(step, isLast && isAutoImport ? "macro" : "variable")
+                        }
+                    }
+                }
+                else {
+                    // no path, highlight string
+                    push(node.source, "string")
+                }
             }
 
             if (TypeExpression.is(node)) {
@@ -141,7 +164,8 @@ export function getSemanticHighlights(
                 }
             }
 
-            if (Literal.is(node)) {
+            if (Literal.is(node) && !ImportDeclaration.is(ancestors[ancestors.length - 1])) {
+
                 if (typeof node.value === "string") {
                     push(node, "string");
                     // could be an outline string.
@@ -164,9 +188,11 @@ export function getSemanticHighlights(
             if (RegularExpression.is(node)) {
                 push(node, "regexp");
             }
-            if (Declarator.is(node)) {
-                push(node, "variable", "declaration")
-            }
+            // DO NOT highlight all declarators, their containers should highlight them.
+            //  this also causes a problem because there is a 'Declarator' at the start of each module for it's module.id
+            // if (Declarator.is(node)) {
+            //     push(node, "variable", "declaration")
+            // }
             if (Reference.is(node)) {
                 push(node, "variable")
             }
