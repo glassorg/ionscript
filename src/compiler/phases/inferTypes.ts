@@ -316,13 +316,15 @@ export const inferType: {
                 let pkey = c.getResolved(p.key)
                 let pvalue = c.getResolved(p.value)
                 if (pvalue.type == null) {
-                    console.log({ pkey, pvalue })
+                    // console.log({ pkey, pvalue })
                 }
-                expressions.push(new ast.BinaryExpression({
-                    left: new ast.MemberExpression({ object: new ast.DotExpression({}), property: pkey }),
-                    operator: "is",
-                    right: pvalue.type!
-                }))
+                else {
+                    expressions.push(new ast.BinaryExpression({
+                        left: new ast.MemberExpression({ object: new ast.DotExpression({}), property: pkey }),
+                        operator: "is",
+                        right: pvalue.type!
+                    }))
+                }
             }
             else {
                 // Spread Element

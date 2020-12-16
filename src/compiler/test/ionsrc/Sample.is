@@ -1,6 +1,5 @@
 
-export default xxx() =>
-    return 1
+<div key={ i }>{ i }</div>
 
 // struct Vector
 //     var x: Number

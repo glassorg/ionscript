@@ -1,6 +1,6 @@
 import { Options } from "../Compiler"
-import { traverse, skip, replace } from "@glas/traverse"
-import { BinaryExpression, CallExpression, Exportable, FunctionExpression, Identifier, ImportDeclaration, Literal, Node, Parameter, Program, RegularExpression, SwitchCase, TypeExpression, UnaryExpression } from "../ast"
+import { traverse, skip, replace, remove } from "@glas/traverse"
+import { BinaryExpression, CallExpression, ConditionalDeclaration, Exportable, FunctionExpression, Identifier, ImportDeclaration, Literal, Node, Parameter, Program, RegularExpression, SwitchCase, TypeExpression, UnaryExpression } from "../ast"
 import Position from "../ast/Position"
 import VariableDeclaration from "../ast/VariableDeclaration"
 import Reference from "../ast/Reference"
@@ -25,6 +25,9 @@ export default function toEsTree(root: Map<string, any>, options: Options) {
         },
         merge(node, changes, helper) {
             if (Node.is(node)) {
+                if (ConditionalDeclaration.is(node)) {
+                    return remove
+                }
                 // convert negative literal number to unary negation
                 if (Literal.is(node) && typeof node.value === "number" && node.value < 0) {
                     return {
