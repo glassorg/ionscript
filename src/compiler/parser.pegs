@@ -47,7 +47,7 @@
             return node("BinaryExpression", { left, operator, right })
         }
         else {
-            return node("UnaryExpression", { operator, left })
+            return node("UnaryExpression", { operator, argument:left })
         }
     }
 
@@ -273,9 +273,9 @@ AssignmentOperator
 AssignmentStatement
     = left:InlineExpression _ operator:AssignmentOperator _ right:OutlineExpression
     {
-        if (operator.length > 1) {
-            right = operation(left, node("Identifier",{ name:operator.slice(0,-1) }), right)
-        }
+        // if (operator.length > 1) {
+        //     right = operation(left, node("Identifier",{ name:operator.slice(0,-1) }), right)
+        // }
         return node("AssignmentStatement", {left, operator, right})
     }
 
@@ -457,7 +457,8 @@ UnaryOperator
 
 UnaryExpression
     = MemberExpression
-    / operator:UnaryOperator _ argument:MemberExpression { return operation(argument, operator) }
+    / operator:UnaryOperator _ argument:MemberExpression
+    { return operation(argument, operator) }
 
 ExponentiationOperator "operator"
     = "**" / "<<" / ">>"
