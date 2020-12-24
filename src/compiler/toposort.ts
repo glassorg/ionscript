@@ -20,19 +20,17 @@ export default function(edges){
       , visited = {}
       , i = cursor
   
-      // try {
-        while (i--) {
-          if (!visited[i]) visit(nodes[i], i, [])
-        }
-      // }
-      // catch (e) {
-      //   console.log({ nodes, edges, visited })
-      // }
+      while (i--) {
+        if (!visited[i]) visit(nodes[i], i, [])
+      }
   
     return sorted
   
     function visit(node, i, predecessors) {
       if (predecessors.indexOf(node) >= 0) {
+        // automatically remove self from predecessors?
+        // console.log("Cyclic dependency removal in toposort")
+        // predecessors = predecessors.filter(p => p !== node)
         console.log({ predecessors: predecessors.map(toCodeString) })
         throw new Error('Cyclic dependency: ' + toCodeString(node))
       }

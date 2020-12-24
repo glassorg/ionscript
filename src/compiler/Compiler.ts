@@ -17,6 +17,8 @@ export class Options {
     parser!: ReturnType<typeof Parser>
     debug: boolean
     emit: boolean
+    errors: Array<any>
+    commandLine = false
 
     constructor(
         inputs: string[],
@@ -30,6 +32,7 @@ export class Options {
         this.output = output
         this.debug = debug
         this.emit = emit
+        this.errors = []
     }
 
     static from(options) {
@@ -54,6 +57,7 @@ type OptionsJSON = {
     parser?: ReturnType<typeof Parser>
     debug?: boolean
     emit?: boolean
+    commandLine?: boolean
 }
 
 type CompileSingleResult = {
@@ -111,6 +115,8 @@ export default class Compiler {
                 // console.log({ filename, change, path, content })
                 //  we *really* should also kickoff a full recompile in a separate thread
                 //  or maybe the fast compile should be in the other thread
+                // always reset options errors
+                options.errors.length = 0
                 this.compile(options, { [path]: content }, defaultPhases, NullLogger)
                 let stop = Date.now()
                 let time = stop - start
@@ -133,7 +139,21 @@ export default class Compiler {
         if (files == null) {
             files = common.getInputFilesRecursive(options.inputs, options.namespace)
         }
-        let errors = new Array<any>();
+        function printErrorConsole(e) {
+            let location = e.location
+            if (location == null || location.start == null) {
+                throw e
+            }
+            else {
+                let { filename } = location
+                let source = files?.[filename];
+                let error = options.parser.getError(e.message, location, source, filename)
+                console.log("")
+                console.log(error.message.trim())
+            }
+        }
+
+        let errors = options.errors
         let phaseResults = new Map<any,any>()
         let root: any = files
         logger("Input", root)
@@ -149,20 +169,22 @@ export default class Compiler {
             logger()
         }
         catch (e) {
-            errors.push(e)
-            console.log(lastPhase?.name)
             logger()
-            let location = e.location
-            if (location == null || location.start == null) {
-                console.log(e.message)
-            }
-            else {
-                let { filename } = location
-                let source = files[filename]!
-                let error = options.parser.getError(e.message, location, source, filename)
-                console.log(error.message)
+            errors.push(e)
+            if (options.commandLine) {
+                console.log(lastPhase?.name)
+                printErrorConsole(e)
+                console.log("")
             }
         }
+
+        if (options.errors.length > 0) {
+            for (let e of options.errors) {
+                printErrorConsole(e)
+            }
+            console.log("")
+        }
+        
         return { phases: phaseResults, errors }
     }
 

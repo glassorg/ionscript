@@ -5,5 +5,16 @@ Object.defineProperties(Object, {
         value(a) {
             return a != null && !Array.isArray(a) && typeof a === "object";
         }
-    }
+    },
 });
+
+Object.defineProperties(Object.prototype, {
+    [Symbol.iterator]: {
+        *value() {
+            for (let name in this) {
+                let value = this[name]
+                yield [name, value]
+            }
+        }
+    }
+})

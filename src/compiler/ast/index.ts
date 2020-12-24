@@ -149,8 +149,8 @@ export {
     default as Property
 } from './Property';
 export {
-    default as PropertyStatement
-} from './PropertyStatement';
+    default as Range
+} from './Range';
 export {
     default as Reference
 } from './Reference';

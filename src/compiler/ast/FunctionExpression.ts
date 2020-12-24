@@ -4,18 +4,18 @@ This file was generated from ion source. Do not edit.
 import * as _Object from './ion/Object';
 import * as Expression from './Expression';
 import * as Scope from './Scope';
+import * as Type from './Type';
 import * as Typed from './Typed';
 import * as Node from './Node';
 import * as Location from './Location';
 import * as Null from './ion/Null';
-import * as Type from './Type';
 import * as Identifier from './Identifier';
 import * as _Array from './ion/Array';
 import * as Parameter from './Parameter';
 import * as BlockStatement from './BlockStatement';
 import * as Boolean from './ion/Boolean';
 import * as Class from './ion/Class';
-export class FunctionExpression implements _Object.Object , Expression.Expression , Scope.Scope , Typed.Typed , Node.Node {
+export class FunctionExpression implements _Object.Object , Expression.Expression , Scope.Scope , Type.Type , Typed.Typed , Node.Node {
     readonly location: Location.Location | Null.Null;
     readonly type: Type.Type | Null.Null;
     readonly id: Identifier.Identifier | Null.Null;
@@ -30,6 +30,7 @@ export class FunctionExpression implements _Object.Object , Expression.Expressio
         'ion_Object',
         'Expression',
         'Scope',
+        'Type',
         'Typed',
         'Node'
     ]);

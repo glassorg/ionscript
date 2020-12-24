@@ -1,7 +1,0 @@
-import
-    ion.*
-    .*
-
-export
-    class PropertyStatement extends Statement
-        var property: Property

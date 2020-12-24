@@ -14,6 +14,7 @@ import inferTypes from "./inferTypes"
 import addDataClassConstructors from "./addDataClassConstructors"
 import addTypedStructArrays from "./addTypedStructArrays"
 import toModuleFiles from "./toModuleFiles"
+import identity from "./identity"
 
 export const fast = [
     parsing,
@@ -33,9 +34,9 @@ const defaultPhases = [
     fixImports,
     inheritBaseClasses,
     controlFlowToExpressions,
+    checkReferences,
     createConditionalDeclarations,
     addDataClassConstructors,
-    checkReferences,
     inferTypes,
 
     addTypedStructArrays,

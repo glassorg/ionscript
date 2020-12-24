@@ -11,7 +11,10 @@ export default function checkReferences(root: Assembly) {
     let ancestorsMap = new Map<Node, Node>()
     let scopes = createScopeMaps(root, { ancestorsMap })
     let getName = memoizeIntern((d: Declarator) => {
-        d = getOriginalDeclarator(d, scopes, ancestorsMap)!
+        d = getOriginalDeclarator(d, scopes, ancestorsMap, false)!
+        if (d == null) {
+            return null
+        }
         let parent = ancestorsMap.get(d)
         let { name } = d
         let location: Location | undefined
@@ -33,16 +36,19 @@ export default function checkReferences(root: Assembly) {
             // we also set variable id onto function expressions if they aren't named already
             if (VariableDeclaration.is(node)) {
                 if (Identifier.is(node.id) && FunctionExpression.is(node.value) && node.value.id == null) {
-                    if (!reservedWords.has(node.id.name))
-                    // but NOT if they are
-                    return node.patch({
-                        value: node.value.patch({
-                            id: new Declarator({
-                                location: node.location,
-                                name: node.id.name
+                    // but NOT if they are reserved
+                    let name = node.kind === "type" ? `is${node.id.name}` : node.id.name
+                    if (!reservedWords.has(node.id.name)) {
+                        return node.patch({
+                            value: node.value.patch({
+                                id: new Declarator({
+                                    location: node.location,
+                                    name,
+                                    path: node.id.path
+                                })
                             })
                         })
-                    })
+                    }
                 }
             }
             if (Declarator.is(node)) {
@@ -67,15 +73,14 @@ export default function checkReferences(root: Assembly) {
                     let declaration = ancestors[ancestors.length - 1]
                     if (VariableDeclaration.is(declaration)) {
                         let cls = getAncestor(declaration, ancestorsMap, ClassDeclaration.is)
-                        if (declaration.instance && cls!.instance.declarations.find(d => (d.id as Declarator).name === node.name)) {
+                        if (declaration.instance && cls!.instance.declarations.find(d => (d.id as Declarator)?.name === node.name)) {
                             // add implied this. to instance property references
-                            console.log({ node })
                             return new MemberExpression({
                                 object: new ThisExpression({}),
                                 property: new Identifier(node)
                             })
                         }
-                        else if (declaration.static && cls!.static.find(d => (d.id as Declarator).name === node.name)) {
+                        else if (declaration.static && cls!.static.find(d => (d.id as Declarator)?.name === node.name)) {
                             //  add implied Class. to static property references
                             let classDeclaration = getAncestor(node, ancestorsMap, ClassDeclaration.is)
                             // declaratorAncestors[declaratorAncestors.length - 3] as ClassDeclaration

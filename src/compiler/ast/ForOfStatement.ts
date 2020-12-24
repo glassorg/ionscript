@@ -16,6 +16,7 @@ export class ForOfStatement implements _Object.Object , Statement.Statement , Ty
     readonly location: Location.Location | Null.Null;
     readonly type: Type.Type | Null.Null;
     readonly left: VariableDeclaration.VariableDeclaration;
+    readonly count: VariableDeclaration.VariableDeclaration | Null.Null;
     readonly right: Expression.Expression;
     readonly body: BlockStatement.BlockStatement;
     static readonly id = 'ForOfStatement';
@@ -26,10 +27,11 @@ export class ForOfStatement implements _Object.Object , Statement.Statement , Ty
         'Typed',
         'Node'
     ]);
-    constructor({location = null, type = null, left, right, body}: {
+    constructor({location = null, type = null, left, count = null, right, body}: {
         location?: Location.Location | Null.Null,
         type?: Type.Type | Null.Null,
         left: VariableDeclaration.VariableDeclaration,
+        count?: VariableDeclaration.VariableDeclaration | Null.Null,
         right: Expression.Expression,
         body: BlockStatement.BlockStatement
     }) {
@@ -39,6 +41,8 @@ export class ForOfStatement implements _Object.Object , Statement.Statement , Ty
             throw new Error('type is not a Type | Null: ' + Class.toString(type));
         if (!VariableDeclaration.isVariableDeclaration(left))
             throw new Error('left is not a VariableDeclaration: ' + Class.toString(left));
+        if (!(VariableDeclaration.isVariableDeclaration(count) || Null.isNull(count)))
+            throw new Error('count is not a VariableDeclaration | Null: ' + Class.toString(count));
         if (!Expression.isExpression(right))
             throw new Error('right is not a Expression: ' + Class.toString(right));
         if (!BlockStatement.isBlockStatement(body))
@@ -46,6 +50,7 @@ export class ForOfStatement implements _Object.Object , Statement.Statement , Ty
         this.location = location;
         this.type = type;
         this.left = left;
+        this.count = count;
         this.right = right;
         this.body = body;
         Object.freeze(this);
@@ -54,6 +59,7 @@ export class ForOfStatement implements _Object.Object , Statement.Statement , Ty
         location?: Location.Location | Null.Null,
         type?: Type.Type | Null.Null,
         left?: VariableDeclaration.VariableDeclaration,
+        count?: VariableDeclaration.VariableDeclaration | Null.Null,
         right?: Expression.Expression,
         body?: BlockStatement.BlockStatement
     }) {

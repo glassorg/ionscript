@@ -3,7 +3,7 @@ import
     .*
 
 export
-    class FunctionExpression extends Expression, Scope
+    class FunctionExpression extends Expression, Scope, Type
         var id: Identifier | Null = null
         var params: Array<Parameter>
         var body: BlockStatement

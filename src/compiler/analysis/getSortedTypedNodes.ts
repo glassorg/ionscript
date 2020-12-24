@@ -5,9 +5,24 @@ import { Type, Node, Typed, IfStatement, Property, FunctionExpression, ReturnSta
 import * as ast from "../ast"
 import { getAncestor, SemanticError } from "../common";
 
-function getReturnStatements(node: FunctionExpression): ReturnStatement[] {
+function contains(graph, predicate) {
+    let found = false
+    traverse(graph, {
+        enter(node) {
+            if (!found && predicate(node)) {
+                found = true
+            }
+            if (found) {
+                return skip
+            }
+        }
+    })
+    return found
+}
+
+function getNonRecursiveReturnStatements(fn: FunctionExpression): ReturnStatement[] {
     let statements: ReturnStatement[] = []
-    traverse(node, {
+    traverse(fn, {
         enter(node) {
             if (CallExpression.is(node)) {
                 return skip
@@ -15,7 +30,10 @@ function getReturnStatements(node: FunctionExpression): ReturnStatement[] {
         },
         leave(node) {
             if (ReturnStatement.is(node)) {
-                statements.push(node)
+                // make sure the return argument doesn't contain a recursive reference to itself.
+                if (fn.id?.path == null || !contains(node.argument, check => ast.Reference.is(check) && check.path === fn.id!.path)) {
+                    statements.push(node)
+                }
             }
         }
     })
@@ -127,7 +145,7 @@ const predecessors: { [P in keyof typeof ast]?: (e: InstanceType<typeof ast[P]>,
         // a function depends on it's parameters which means it depends on it's parameter types
         yield* node.params
         if (node.returnType === null) {
-            for (let returnStatement of getReturnStatements(node)) {
+            for (let returnStatement of getNonRecursiveReturnStatements(node)) {
                 yield returnStatement.argument  
             }
         }

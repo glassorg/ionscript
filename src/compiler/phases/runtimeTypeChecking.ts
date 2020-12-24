@@ -148,7 +148,9 @@ export default function runtimeTypeChecking(root: Assembly, options: Options) {
                                             }),
                                             arguments: [
                                                 new Literal({ value: (node.id as Reference).name }),
-                                                new FunctionExpression({
+                                                FunctionExpression.is(node.value)
+                                                ? node.value
+                                                : new FunctionExpression({
                                                     params: [
                                                         new Parameter({ id: new Declarator({ name: "_" }) })
                                                     ],

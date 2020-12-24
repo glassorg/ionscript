@@ -15,13 +15,12 @@ const binaryOps = {
 }
 
 const unaryOps = {
-    "!": (a) => !a,
-    "+": (a) => +a,
-    "-": (a) => -a,
-    "~": (a) => ~a,
+    "!": (a) => ! a,
+    "+": (a) => + a,
+    "-": (a) => - a,
+    "~": (a) => ~ a,
 }
 
-// that is some typescript kung fu right there.
 export const simplifyFunctions: { [P in keyof typeof ast]?: (e: InstanceType<typeof ast[P]>, resolved: { get<T>(t: T): T }, scope: ScopeMaps) => any} = {
     BinaryExpression(node, resolved) {
         let left = resolved.get(node.left)
@@ -31,9 +30,10 @@ export const simplifyFunctions: { [P in keyof typeof ast]?: (e: InstanceType<typ
             return new Literal({ location: node.location, value })
         }
     },
-    UnaryExpression(node) {
+    UnaryExpression(node, resolved) {
         if (Literal.is(node.argument)) {
-            let value = unaryOps[node.operator](node.argument)
+            let arg = resolved.get(node.argument)
+            let value = unaryOps[node.operator](arg.value)
             return new Literal({ location: node.location, value })
         }
     },

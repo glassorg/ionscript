@@ -5,3 +5,4 @@ export { default as Type } from "./Type";
 export { default as Null } from "./Null";
 export { default as Undefined } from "./Undefined";
 export { default as createTypeCheck } from "./createTypeCheck";
+export { default as range } from "./range";

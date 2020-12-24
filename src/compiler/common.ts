@@ -2,7 +2,7 @@ import * as fs from "fs";
 import * as np from "path";
 import { traverse, skip } from "@glas/traverse";
 import { NodeMap, ScopeMap } from "./createScopeMaps";
-import { Reference, Node, VariableDeclaration, ModuleSpecifier, ImportDeclaration, Declarator, Program, ImportDefaultSpecifier, ImportNamespaceSpecifier, ImportSpecifier, Exportable, Declaration, Statement, Identifier } from "./ast";
+import { Reference, Node, VariableDeclaration, ModuleSpecifier, ImportDeclaration, Declarator, Program, ImportDefaultSpecifier, ImportNamespaceSpecifier, ImportSpecifier, Exportable, Declaration, Statement, Identifier, Parameter } from "./ast";
 
 export const runtimeModuleName = "ionscript"
 
@@ -69,7 +69,7 @@ export function hasDeclarator(statements: Array<Statement>, name: string) {
     return false
 }
 
-export function getOriginalDeclarator(declarator: Declarator, scopes: NodeMap<ScopeMap>, ancestors: Map<Node, Node>): Declarator | null {
+export function getOriginalDeclarator(declarator: Declarator, scopes: NodeMap<ScopeMap>, ancestors: Map<Node, Node>, throwErrors = true): Declarator | null {
     let parent = ancestors.get(declarator)
     if (ModuleSpecifier.is(parent)) {
         let importDeclaration = ancestors.get(parent) as ImportDeclaration
@@ -91,10 +91,16 @@ export function getOriginalDeclarator(declarator: Declarator, scopes: NodeMap<Sc
             let sourceProgramScope = scopes.get(sourceModuleDeclaration)
             let sourceDeclarator = sourceProgramScope[name]
             if (sourceDeclarator == null) {
+                if (!throwErrors) {
+                    return null
+                }
                 throw SemanticError(`${importDeclaration.source.value} does not have export ${name}`, parent)
             }
             let sourceDeclaratorParent = ancestors.get(sourceDeclarator)
             if (!Exportable.is(sourceDeclaratorParent) || !sourceDeclaratorParent.export) {
+                if (!throwErrors) {
+                    return null
+                }
                 throw SemanticError(`${importDeclaration.source.value} ${name} is not exported`, parent)
             }
             // recurse in case this exported value is also a reference or re-export

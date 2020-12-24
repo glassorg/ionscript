@@ -29,12 +29,14 @@ export default function toEsTree(root: Map<string, any>, options: Options) {
                     return remove
                 }
                 // convert negative literal number to unary negation
-                if (Literal.is(node) && typeof node.value === "number" && node.value < 0) {
-                    return {
-                        type: "UnaryExpression",
-                        operator: "-",
-                        prefix: true,
-                        argument: { type: "Literal", value: Math.abs(node.value) }
+                if (Literal.is(node)) {
+                    if (typeof node.value === "number" && node.value < 0) {
+                        return {
+                            type: "UnaryExpression",
+                            operator: "-",
+                            prefix: true,
+                            argument: { type: "Literal", value: Math.abs(node.value) }
+                        }
                     }
                 }
                 //  Convert Reference and Declarators to Identifier
@@ -157,12 +159,13 @@ export default function toEsTree(root: Map<string, any>, options: Options) {
                 // finally, handle exports
                 if (Exportable.is(node) && node.export > 0) {
                     if (ImportDeclaration.is(node)) {
+                        throw new Error("This is not implemented right")
                         result = replace({
                             type: "ExpressionStatement",
-                            expression: { type: "Literal", value: "Fuck" },
+                            expression: { type: "Literal", value: "???" },
                         }, {
                             type: "ExpressionStatement",
-                            expression: { type: "Literal", value: "You" },
+                            expression: { type: "Literal", value: "???" },
                         })
                     }
                     else {

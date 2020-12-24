@@ -1,7 +1,8 @@
 
-a.b += x.y
+// class Recursive
+//     var recursive: Recursive
 
-// struct Vector
+// data struct Vector
 //     var x: Number
 //     var y: Number
 //     let constructor = (a, b) =>

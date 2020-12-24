@@ -18,6 +18,7 @@ export default new Set([
     "function",
     "if",
     "is",       //  ionscript
+    "isnt",     //  ionscript
     "as",       //  ionscript
     "import",
     "in",
@@ -26,6 +27,8 @@ export default new Set([
     "return",
     "super",
     "switch",
+    "struct",   //  ionscript
+    "static",   //  ionscript
     "this",
     "throw",
     "try",

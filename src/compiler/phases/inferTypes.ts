@@ -6,7 +6,7 @@ import * as types from "../types"
 import { ScopeContext, ScopeMaps } from "../createScopeMaps"
 import getSortedTypedNodes, { getContainingIfTestAndOriginalDeclarator, getPredecessors } from "../analysis/getSortedTypedNodes"
 import evaluate from "../analysis/evaluate"
-import { getAncestorsAndSelfList, SemanticError } from "../common"
+import { getAncestorsAndSelfList, getOriginalDeclaration, SemanticError } from "../common"
 import simplify from "../analysis/simplify"
 import toCodeString from "../toCodeString"
 import getLeftMostMemberObject from "../analysis/getLeftMostMemberObject"
@@ -34,6 +34,7 @@ const binaryOperationsType = {
     "==": types.Boolean,
     "!=": types.Boolean,
     "is": types.Boolean,
+    "isnt": types.Boolean,
     "&&": types.Boolean,
     "&": types.Number,
     "||": types.Boolean,
@@ -50,6 +51,8 @@ const unaryOperationsType = {
     "!": types.Boolean,
     "+": types.Number,
     "-": types.Number,
+    "typeof": types.String,
+    "delete": types.Void,
 }
 
 function is(type: ast.Type, left: Expression = new ast.DotExpression({})) {
@@ -187,6 +190,13 @@ function getDeclarator(node: ast.Reference, c: InferContext): ast.Declarator | n
         return c.getResolved(getDeclarator(referencedNode, c))
     }
     else if (ast.Declarator.is(referencedNode)) {
+        while (referencedNode != null) {
+            let declaration = c.getAncestor(referencedNode, ast.Declaration.is)
+            // we traverse ACROSS conditional variables to get the original declaration
+            if (ast.VariableDeclaration.is(declaration) && declaration.kind === "conditional") {
+                referencedNode = c.getDeclarator(c.ancestors.get(referencedNode)!, referencedNode.name)
+            }
+        }
         return c.getResolved(referencedNode)
     }
     else {
@@ -595,7 +605,7 @@ export const inferType: {
                 type = value?.type
                 //  if this variable is reassignable, then we remove the initial literal value
                 //  from the variable type. So String & . == "foo" becomes => String
-                if (node.kind === "var" && ast.TypeExpression.is(type)) {
+                if (c.isAssignable(node) && ast.TypeExpression.is(type)) {
                     type = type.patch({
                         value: combineExpressions([...splitExpressions(type.value)].filter(
                             term => {
@@ -619,7 +629,8 @@ export const inferType: {
             if (check === false) {
                 //  we only throw an error if we KNOW that a value is invalid.
                 //  if it only might be invalid then we
-                throw SemanticError(`Cannot assign type (${toCodeString(value.type)}) to type (${toCodeString(node.type)})`, node.value)
+                throw SemanticError(`Cannot assign type (${toCodeString(value.type)}) to type (${toCodeString(node.type)})`, node.value!);
+                c.semanticError(`Cannot assign type (${toCodeString(value.type)}) to type (${toCodeString(node.type)})`, node.value!);
             }
         }
     },
@@ -651,12 +662,18 @@ export const inferType: {
     AssignmentStatement(node, c) {
         let left = c.getResolved(node.left)
         let right = c.getResolved(node.right)
+        if (!c.isAssignable(left)) {
+            let name = ast.Reference.is(left) ? left.name
+                : ast.MemberExpression.is(left) && ast.Identifier.is(left.property) ? left.property.name
+                : "variable"
+            c.semanticError(`${name} is not assignable`, node.left);
+        }
         if (left.type != null && right.type != null) {
             let check = c.isConsequent(toTypeExpression(right.type)!, toTypeExpression(left.type)!)
             if (check === false) {
                 //  we only throw an error if we KNOW that a value is invalid.
                 //  if it only might be invalid then we
-                throw SemanticError(`Cannot assign type (${toCodeString(right.type)}) to type (${toCodeString(left.type)})`, left)
+                c.semanticError(`Cannot assign type (${toCodeString(right.type)}) to type (${toCodeString(left.type)})`, left)
             }
         }
     },
@@ -677,8 +694,8 @@ export const inferType: {
                 let paramType: ast.Type | ast.SpreadElement | null = calleeType.params[i]
                 if (paramType == null) {
                     let lastType = calleeType.params[calleeType.params.length - 1]
-                    if (!ast.SpreadElement.is(lastType)) {
-                        throw SemanticError(`Target function only accepts ${calleeType.params.length} argument${calleeType.params.length === 1 ? '' : 's'}`, arg)
+                    if (!ast.SpreadElement.is(lastType) && i >= calleeType.params.length) {
+                        c.semanticError(`Target function only expects ${calleeType.params.length} argument${calleeType.params.length === 1 ? '' : 's'}`, arg)
                     }
                     paramType = lastType
                 }
@@ -691,7 +708,7 @@ export const inferType: {
                     if (check === false) {
                         //  we only throw an error if we KNOW that a value is invalid.
                         //  if it only might be invalid then we
-                        throw SemanticError(`Argument of type (${toCodeString(arg.type)}) is not valid for expected parameter type (${toCodeString(paramType)})`, arg)
+                        c.semanticError(`Argument of type (${toCodeString(arg.type)}) is not valid for expected parameter type (${toCodeString(paramType)})`, arg)
                     }
                     // console.log("(" + check + ") >>>>> " + toCodeString(arg) + " type " + toCodeString(arg.type) + " ::: " + toCodeString(paramType))
                 }
@@ -717,10 +734,39 @@ export const typeProperties = new Set(["type", "returnType", "instanceType"])
 class InferContext extends ScopeContext {
 
     resolved = new Map<Typed,Typed>() as Map<Typed,Typed> & Resolved
+    options: Options
 
-    constructor(root) {
+    constructor(root, options: Options) {
         super(root, true)
+        this.options = options
     }
+
+    semanticError(message, node: Node) {
+        this.options.errors.push(SemanticError(message, node))
+    }
+
+    isAssignable(node) {
+        if (ast.Reference.is(node)) {
+            node = getDeclarator(node, this)
+        }
+        if (ast.Declarator.is(node)) {
+            node = this.getAncestor(node, ast.Declaration.is)
+        }
+        if (ast.VariableDeclaration.is(node) && node.kind === "var") {
+            return true
+        }
+        if (ast.Parameter.is(node)) {
+            return true
+        }
+        if (ast.MemberExpression.is(node)) {
+            //  technically, we should check the property declaration type
+            //  but for now we'll just say true
+            return true
+        }
+        // for now assume
+        return false
+    }
+    
 
     setResolved(originalNode, currentNode) {
         this.resolved.set(originalNode, currentNode)
@@ -739,7 +785,7 @@ class InferContext extends ScopeContext {
 }
 
 export default function inferTypes(root: Assembly, options: Options) {
-    let sc = new InferContext(root)
+    let sc = new InferContext(root, options)
     let ancestorsMap = sc.ancestors
     let scopes = sc.scopes
     let resolved = sc.resolved

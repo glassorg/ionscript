@@ -13,6 +13,7 @@ yargs
             output = clean(output)
             const { default: Compiler, Options } = require("../lib/compiler/Compiler");
             let options = new Options([input], output, namespace);
+            options.commandLine = true
             let compiler = new Compiler();
             compiler[watch ? "watch" : "compile"](options);
         }

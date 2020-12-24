@@ -1,5 +1,5 @@
 import { traverse } from "@glas/traverse";
-import { ArrayPattern, AwaitExpression, BreakStatement, CallExpression, ClassDeclaration, ContinueStatement, Declarator, ElementExpression, ForOfStatement, ForStatement, FunctionExpression, Identifier, IfStatement, ImportDeclaration, Literal, MemberExpression, ModuleSpecifier, Parameter, Pattern, Property, Reference, RegularExpression, ReturnStatement, Typed, TypeExpression, VariableDeclaration, YieldExpression } from "./ast";
+import { ArrayPattern, AwaitExpression, BinaryExpression, BreakStatement, CallExpression, ClassDeclaration, ContinueStatement, Declarator, ElementExpression, ForOfStatement, ForStatement, FunctionExpression, Identifier, IfStatement, ImportDeclaration, Literal, MemberExpression, ModuleSpecifier, Parameter, Pattern, Property, Reference, RegularExpression, ReturnStatement, ThisExpression, ThrowStatement, TryStatement, Typed, TypeExpression, UnaryExpression, VariableDeclaration, YieldExpression } from "./ast";
 import Parser from "./parser";
 import reservedWords from "./reservedWords";
 import toCodeString from "./toCodeString";
@@ -12,10 +12,18 @@ function add(position, offset) {
 const keywordTokenTypes = {
 	let: ["macro"],
 	var: ["macro"],
-	type: ["macro"],
+    type: ["struct"],
+    struct: ["macro"],
+    class: ["macro"],
+    data: ["keyword"],
 }
 
 const declarationTokenTypes = ["variable", "readonly"]
+const typeTokenTypes = ["type"]
+
+function isType(name: string) {
+    return name[0] === name[0].toUpperCase()
+}
 
 type SemanticHighlight = {
     line: number
@@ -56,7 +64,7 @@ export function getSemanticHighlights(
                     tokenType = ["keyword"]
                 }
             }
-            if (tokenType != null) {
+            if (Array.isArray(tokenType)) {
                 let column = lineText.indexOf(word) + 1;
                 push({ start: { line, column }, end: { line, column: column + word.length } }, tokenType[0], ...tokenType.slice(1));
             }
@@ -79,13 +87,23 @@ export function getSemanticHighlights(
                 let parent = ancestors[ancestors.length - 1]
                 let gparent = ancestors[ancestors.length - 2]
                 if (Parameter.is(parent) || Pattern.is(ancestors[ancestors.length - 2])) {
-                    push(node, ...declarationTokenTypes)
+                    push(node, ...(isType(node.name) ? typeTokenTypes : declarationTokenTypes))
+                }
+            }
+
+            if (ThisExpression.is(node)) {
+                push(node, "keyword")
+            }
+
+            if (BinaryExpression.is(node)) {
+                if (reservedWords.has(node.operator)) {
+                    push({ start: node.left.location!.end, end: node.right.location!.start }, "keyword")
                 }
             }
 
             if (ModuleSpecifier.is(node)) {
                 highlightStartingKeywords(node.location.start.line, 2);
-                push(node.local, ...declarationTokenTypes)
+                push(node.local, ...(isType(node.local.name) ? typeTokenTypes : declarationTokenTypes))
             }
 
             if (MemberExpression.is(node)) {
@@ -103,11 +121,15 @@ export function getSemanticHighlights(
             if (ImportDeclaration.is(node)) {
                 highlightStartingKeywords(node.location.start.line, 1);
                 if (node.path) {
-                    let isAutoImport = node.specifiers.length === 1 && node.specifiers[0].location?.start.line === node.location?.start.line
+                    let last = node.path[node.path.length - 1]
+                    let isAutoImport = Identifier.is(last) && node.specifiers.find(s => {
+                        return s.local.name === (last as any)?.name
+                    })
+                    node.specifiers.length === 1 && node.specifiers[0].location?.start.line === node.location?.start.line
                     for (let step of node.path) {
                         if (Identifier.is(step)) {
                             let isLast = node.path[node.path.length - 1] === step;
-                            push(step, ...(isLast && isAutoImport ? declarationTokenTypes : ["variable"]))
+                            push(step, ...(isLast && isAutoImport ? ( isType((step as any).name) ? typeTokenTypes : declarationTokenTypes) : ["variable"]))
                         }
                     }
                 }
@@ -118,7 +140,7 @@ export function getSemanticHighlights(
             }
 
             if (TypeExpression.is(node)) {
-                push(node.value, "type");
+                push(node.value, ...typeTokenTypes);
             }
 
             if (IfStatement.is(node)) {
@@ -132,7 +154,7 @@ export function getSemanticHighlights(
                 push({ start: node.location.start, end: add(node.location.start, "for".length) }, "keyword");
                 if (ForOfStatement.is(node)) {
                     // highlight the "in"
-                    push({ start: add(node.left.id.location!.end, 0), end: add(node.right.location!.start, 0) }, "keyword");
+                    push({ start: add((node.count || node.left).id.location!.end, 0), end: add(node.right.location!.start, 0) }, "keyword");
                 }
             }
 
@@ -141,6 +163,10 @@ export function getSemanticHighlights(
             }
 
             if (ReturnStatement.is(node) || YieldExpression.is(node) || AwaitExpression.is(node)) {
+                highlightStartingKeywords(node.location.start.line, 1);
+            }
+
+            if (UnaryExpression.is(node) && node.operator === "delete") {
                 highlightStartingKeywords(node.location.start.line, 1);
             }
 
@@ -155,6 +181,9 @@ export function getSemanticHighlights(
             }
             if (CallExpression.is(node)) {
                 let callee = node.callee as any;
+                if (node.new) {
+                    push({ start: node.location.start, end: add(node.location.start, "new".length)}, "keyword")
+                }
                 if (MemberExpression.is(callee)) {
                     callee = callee.property;
                 }
@@ -163,24 +192,46 @@ export function getSemanticHighlights(
                 }
             }
 
-            if (Typed.is(node)) {
-                if (node.type) {
-                    push(node.type, "type");
-                }
-            }
+            // if (Typed.is(node)) {
+            //     if (node.type) {
+            //         push(node.type, "type");
+            //     }
+            // }
 
             if (VariableDeclaration.is(node)) {
-                let right = (node.export === 2 ? node.value : node.id)!.location;
+                // let right = (node.export === 2 ? node.value : node.id)!.location;
                 // this will keyword color the let/const and export [default]
                 highlightStartingKeywords(node.location.start.line)
 
                 if (Identifier.is(node.id)) {
-                    push(node.id, ...declarationTokenTypes);
+                    if (FunctionExpression.is(node.value)) {
+                        if (!reservedWords.has(node.id.name)) {
+                            push(node.id, "function");
+                        }
+                    }
+                    else {
+                        push(node.id, ...declarationTokenTypes);
+                    }
+                }
+            }
+
+            if (ThrowStatement.is(node)) {
+                highlightStartingKeywords(node.location.start.line, 1)
+            }
+
+            if (TryStatement.is(node)) {
+                highlightStartingKeywords(node.location.start.line, 1)
+                if (node.handler) {
+                    highlightStartingKeywords(node.handler.location!.start.line, 1)
+                }
+                if (node.finalizer) {
+                    highlightStartingKeywords(node.finalizer.location!.start.line, 1)
                 }
             }
 
             if (ClassDeclaration.is(node)) {
-                highlightStartingKeywords(node.location.start.line)
+                highlightStartingKeywords(node.location.start.line, 4)
+                push(node.id, "struct")
             }
 
             if (ElementExpression.is(node)) {
@@ -195,8 +246,16 @@ export function getSemanticHighlights(
                 if (typeof node.value === "string") {
                     push(node, "string");
                     // could be an outline string.
+                    let parent = ancestors[ancestors.length - 1]
                     if (node.location.start.line < node.location.end.line) {
-                        for (let line = node.location.start.line; line < node.location.end.line; line++) {
+                        for (let line = node.location.start.line + 1; line < node.location.end.line; line++) {
+                            let lineText = lines[line]
+                            let lineTrimmed = lineText.trimStart()
+                            let indent = lineText.length - lineTrimmed.length
+                            if (indent <= 1 || VariableDeclaration.is(parent) && indent <= parent.location!.start.column) {
+                                // outdent occurred as comments but our greedy parser consumed the comments.
+                                break;
+                            }
                             push({ start: { line, column: 1 }, end: { line, column: 100 } }, "string");
                         }
                     }
@@ -208,14 +267,14 @@ export function getSemanticHighlights(
                     push(node, "number");
                 }
                 else if (node.value === null){
-                    push(node, "null");
+                    push(node, "variable");
                 }
             }
             if (RegularExpression.is(node)) {
                 push(node, "regexp");
             }
             if (Reference.is(node)) {
-                push(node, "variable")
+                push(node, ...(isType(node.name) ? typeTokenTypes : ["variable"]))
             }
         }
     });

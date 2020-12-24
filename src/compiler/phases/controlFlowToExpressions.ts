@@ -3,7 +3,6 @@ import { traverse, skip, remove } from "@glas/traverse"
 import { ArrayExpression, BinaryExpression, BlockStatement, CallExpression, Declarator, ElementExpression, Expression, ExpressionStatement, FunctionExpression, Identifier, ImportDeclaration, ImportNamespaceSpecifier, ImportSpecifier, Literal, Location, MemberExpression, Node, ObjectExpression, OutlineOperation, Parameter, Program, Property, Reference, ReturnStatement, SpreadElement, Statement } from "../ast"
 import Assembly from "../ast/Assembly"
 import ArrowFunctionExpression from "../ast/ArrowFunctionExpression"
-import PropertyStatement from "../ast/PropertyStatement"
 import AssignmentStatement from "../ast/AssignmentStatement"
 import { hasDeclarator, SemanticError } from "../common"
 
@@ -37,9 +36,6 @@ function convertExpressionWithNestedStatements(node) {
                             //  if this is an immediate child expression we treat it as a statement
                             //  so it gets converted to an ExpressionStatement down below.
                             let parent = ancestors[ancestors.length - 1]
-                            if (PropertyStatement.is(e)) {
-                                e = e.property
-                            }
                             if (Property.is(e) && Array.isArray(parent)) {
                                 if (isMap) {
                                     let { key, value } = e
@@ -170,7 +166,7 @@ function convertExpressionWithNestedStatements(node) {
         })
     }
     else if (ElementExpression.is(node)) {
-        let hasNonPropertyStatements = node.children.find(a => Statement.is(a) && !PropertyStatement.is(a)) != null
+        let hasNonPropertyStatements = node.children.find(a => Statement.is(a)) != null
         const propertiesName = "$"
         const childrenName = "children"
         let kind = node.kind
@@ -207,9 +203,6 @@ function convertExpressionWithNestedStatements(node) {
                                 let parent = ancestors[ancestors.length - 1]
                                 if (ExpressionStatement.is(e)) {
                                     e = e.expression
-                                }
-                                if (PropertyStatement.is(e)) {
-                                    e = e.property
                                 }
                                 if (Property.is(e) && Array.isArray(parent)) {
                                     //  we do NOT allow properties to be set AFTER children have been added
@@ -293,8 +286,8 @@ function convertExpressionWithNestedStatements(node) {
         let properties = [ ...node.properties ]
         let children: Array<any> = []
         for (let child of node.children) {
-            if (PropertyStatement.is(child)) {
-                properties.push(child.property)
+            if (Property.is(child)) {
+                properties.push(child)
             }
             else {
                 if (!(Expression.is(child) || SpreadElement.is(child))) {
