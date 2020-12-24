@@ -21,6 +21,12 @@ const codeToString: { [P in keyof typeof ast]?: (node: InstanceType<typeof ast[P
     ThisExpression(node) {
         return "this"
     },
+    AssignmentPattern(node) {
+        return `${toCodeString(node.left)} = ${toCodeString(node.right)}`
+    },
+    ObjectPattern(node) {
+        return `{ ${node.properties.map(toCodeString).join(', ')} }`
+    },
     ObjectExpression(node) {
         return `{ ${node.properties.map(toCodeString).join(', ')} }`
     },

@@ -160,6 +160,7 @@ export default class Compiler {
         let lastPhase
         try {
             for (let phase of phases) {
+                // console.log(phase.name)
                 lastPhase = phase
                 root = phase(root, options) || root
                 phaseResults.set(phase, root)

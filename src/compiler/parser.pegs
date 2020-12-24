@@ -54,12 +54,7 @@
     function buildBinaryExpression(head, tail) {
         return tail.reduce(
             (left, [,operator,,right]) => {
-                if (operator === "isnt") {
-                    return operation(operation(left, "is", right), "!")
-                }
-                else {
-                    return operation(left, operator, right)
-                }
+                return operation(left, operator, right)
             }
             ,head
         )

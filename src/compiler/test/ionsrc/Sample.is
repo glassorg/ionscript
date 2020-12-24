@@ -1,4 +1,8 @@
 
+for step in steps
+    if step
+        step = 1
+
 // class Recursive
 //     var recursive: Recursive
 

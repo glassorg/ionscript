@@ -1,6 +1,6 @@
 import { Options } from "../Compiler"
 import { traverse, skip } from "@glas/traverse"
-import { ClassDeclaration, ElementExpression, Program, VariableDeclaration } from "../ast"
+import { BinaryExpression, ClassDeclaration, ElementExpression, Program, UnaryExpression, VariableDeclaration } from "../ast"
 import { SemanticError } from "../common"
 import Assembly from "../ast/Assembly"
 import toCodeString from "../toCodeString"
@@ -22,6 +22,19 @@ export default function semanticAnalysis(root: Assembly, options: Options) {
             if (ElementExpression.is(node)) {
                 if (node.close != null && toCodeString(node.kind) !== toCodeString(node.close)) {
                     throw SemanticError("closing element does not match opening element", node.close)
+                }
+            }
+        },
+        leave(node) {
+            if (BinaryExpression.is(node)) {
+                let { location } = node
+                if (node.operator === "isnt") {
+                    return new UnaryExpression({
+                        location,
+                        operator: "!",
+                        prefix: true,
+                        argument: node.patch({ operator: "is" }),
+                    })
                 }
             }
         }

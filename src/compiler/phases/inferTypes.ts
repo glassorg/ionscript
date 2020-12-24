@@ -194,7 +194,17 @@ function getDeclarator(node: ast.Reference, c: InferContext): ast.Declarator | n
             let declaration = c.getAncestor(referencedNode, ast.Declaration.is)
             // we traverse ACROSS conditional variables to get the original declaration
             if (ast.VariableDeclaration.is(declaration) && declaration.kind === "conditional") {
-                referencedNode = c.getDeclarator(c.ancestors.get(referencedNode)!, referencedNode.name)
+                let before = referencedNode
+                let refDeclaratorParent = c.ancestors.get(c.getAncestor(referencedNode, ast.Declaration.is)!)
+                if (refDeclaratorParent != null) {
+                    referencedNode = c.getDeclarator(refDeclaratorParent, referencedNode.name)
+                }
+                if (before === referencedNode) {
+                    throw SemanticError(`Conditional referencing itself?`, referencedNode)
+                }
+            }
+            else {
+                break
             }
         }
         return c.getResolved(referencedNode)
