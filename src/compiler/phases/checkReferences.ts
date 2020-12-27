@@ -6,8 +6,9 @@ import { getGlobalReference, getModulePath } from "../pathFunctions";
 import toCodeString from "../toCodeString";
 import * as types from "../types";
 import reservedWords from "../reservedWords";
+import { Options } from "../Compiler";
 
-export default function checkReferences(root: Assembly) {
+export default function checkReferences(root: Assembly, options: Options) {
     let ancestorsMap = new Map<Node, Node>()
     let scopes = createScopeMaps(root, { ancestorsMap })
     let getName = memoizeIntern((d: Declarator) => {

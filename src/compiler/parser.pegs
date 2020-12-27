@@ -42,12 +42,12 @@
         return result
     }
 
-    function operation(left, operator, right) {
+    function operation(left, operator, right, props) {
         if (right) {
-            return node("BinaryExpression", { left, operator, right })
+            return node("BinaryExpression", { left, operator, right, ...props })
         }
         else {
-            return node("UnaryExpression", { operator, argument:left })
+            return node("UnaryExpression", { operator, argument:left, ...props })
         }
     }
 
@@ -62,6 +62,20 @@
 
     function toMap(nodes, getKey = node => node.id.name) {
         return new Map(nodes.map(node => [getKey(node), node]))
+    }
+
+    function toChain(head, tail) {
+        return tail.reduce(
+            (left, right) => {
+                if (right.arguments) {
+                    return node("CallExpression", {callee:left, ...right})
+                }
+                else {
+                    return node("MemberExpression", { object:left, ...right })
+                }
+            }
+            ,head
+        )
     }
 
 }
@@ -133,7 +147,7 @@ ImportDeclaration
                     //  convert to import namespace
                     type = "ImportNamespaceSpecifier"
                 }
-                specifiers.push(node(type, { local, location: local.location }))
+                specifiers.push(node(type, { local: new ast.Declarator(local), location: local.location }))
             }
             path = source
             source = node("Literal", { value: source.map(id => id.name || id).join(pathSeparator) })
@@ -262,7 +276,7 @@ MetaProperties
 
 DynamicOutlineProperty
     = '[' _ key:InlineExpression _ ']' value:(_ ":" _ @OutlineExpression / EOL { return null })
-    { return node("KeyValuePair", {key, value, computed:true} ) }
+    { return node("Property", {key, value, computed:true} ) }
 
 // VariableMetaProperties
 //     = EOL Indent @OutlineProperty+ Outdent
@@ -402,8 +416,12 @@ OutlineType
 InlineType
     = type:UnionType
     {
-        let isReference = ast.BinaryExpression.is(type) && type.operator === "is" && ast.Reference.is(type.right)
-        return isReference ? type.right : node("TypeExpression", { value: type })
+        let isSimpleReference
+            = ast.BinaryExpression.is(type)
+            && ast.DotExpression.is(type.left)
+            && type.operator === "is"
+            && ast.Reference.is(type.right)
+        return isSimpleReference ? type.right : node("TypeExpression", { value: type })
     }
 
 UnionType
@@ -467,11 +485,20 @@ TemplateReference
 //  Operations
 ////////////////////////////////////////////////////////////////////////////////
 
+UpdateOperator
+    = "++" / "--"
+
+UpdateExpression
+    = operator:UpdateOperator argument:MemberExpression
+    { return operation(argument, operator, null, { prefix: true  }) }
+    / argument:MemberExpression operator:UpdateOperator?
+    { return operator ? operation(argument, operator, null, { prefix: false }) : argument }
+
 UnaryOperator
     = "+" / "-" / "!" / TypeofToken / DeleteToken
 
 UnaryExpression
-    = operator:UnaryOperator? _ argument:MemberExpression
+    = operator:UnaryOperator? _ argument:UpdateExpression
     { return operator ? operation(argument, operator) : argument }
 
 ExponentiationOperator "operator"
@@ -558,9 +585,13 @@ FunctionParameters
     / id:Declarator { return [node("Parameter", { id } )] }
     / "(" _ head:Parameter tail:(_ ',' _ @Parameter)* _ ")" { return [head, ...tail] }
 
+FunctionArrow
+    = "->" { return false }
+    / "=>" { return true }
+
 FunctionHead
-    = async:AsyncToken? _ generator:"*"? id:(@Identifier &"(")? params:FunctionParameters? type:(_ ":" _ @InlineType)? _ "=>"
-    { return { id, type, async: async != null, generator: generator != null, params: params || [] } }
+    = async:AsyncToken? _ generator:"*"? id:(@Identifier &"(")? params:FunctionParameters? type:(_ ":" _ @InlineType)? _ bind:FunctionArrow
+    { return { id, type, async: async != null, generator: generator != null, bind, params: params || [] } }
 
 InlineFunction
     = head:FunctionHead _ value:InlineExpression?
@@ -581,8 +612,8 @@ NamedOutlineFunction
 ////////////////////////////////////////////////////////////////////////////////
 
 OutlineExpression
-    = OutlineExpressionStartsThisLine
-    / EOL Indent Dent @OutlineExpressionStartsThisLine Outdent
+    = OutlineMemberExpression
+    / EOL Indent Dent @OutlineMemberExpression Outdent
 
 OutlineExpressionStartsThisLine
     = OutlineYieldExpression
@@ -599,6 +630,15 @@ OutlineExpressionStartsThisLine
     / OutlineSpreadElement
     / OutlineOperation
     / @InlineExpression EOL
+
+OutlineMemberExpression =
+    head: OutlineExpressionStartsThisLine
+    tail: (Dent @OutlineChain)*
+    {
+        // we flatten and remove arrays since trailing comments show up as arrays.
+        tail = tail.flat().filter(a => !Array.isArray(a))
+        return toChain(head, tail)
+    }
 
 OutlineDoExpression
     = DoToken " " _ callee:OutlineFunction
@@ -691,38 +731,42 @@ InlineArguments
     / "(" _ @InlineExpressionList _ ")"
     // / _ @InlineExpressionList
 
-ChainMemberComputed
+InlineChainMemberComputed
     = optional:"?"? "[" _ property:InlineExpression _ "]"
     { return { property, computed:true, optional: optional != null } }
 
-ChainMember
+InlineChainMember
     = optional:"?"? _ "." property:Identifier
     { return { property, computed:false, optional: optional != null } }
 
-ChainMemberCall
+InlineChainMemberCall
     = optional:"?"? args:InlineArguments
     { return { arguments:args, optional: optional != null } }
 
+InlineChain
+    = InlineChainMemberComputed
+    / InlineChainMember
+    / InlineChainMemberCall
+
+OutlineChain
+    = head:InlineChain+ tail:(OutlineArguments / EOL { return null })
+    {
+        let last = head[head.length - 1]
+        if (tail && last.arguments) {
+            // then we can insert our outline arguments if we have any.
+            head[head.length - 1] = { ...last, arguments: [...last.arguments, ...tail] }
+        }
+        return head
+    }
+
 MemberExpression =
     head: PrimaryExpression
-    tail: (ChainMemberComputed / ChainMember / ChainMemberCall)*
-    {
-        return tail.reduce(
-            (left, right) => {
-                if (right.arguments) {
-                    return node("CallExpression", {callee:left, ...right})
-                }
-                else {
-                    return node("MemberExpression", { object:left, ...right })
-                }
-            }
-            ,head
-        )
-    }
+    tail: InlineChain*
+    { return toChain(head, tail) }
 
 MemberExpressionNoCall =
     head: PrimaryExpression
-    tail: (ChainMemberComputed / ChainMember)*
+    tail: (InlineChainMemberComputed / InlineChainMember)*
     {
         return tail.reduce(
             (left, right) => node("MemberExpression", { object:left, ...right })
@@ -975,19 +1019,19 @@ IdPart
     = IdStart / [0-9]
 
 IdName
-    = $(!ReservedWord IdStart IdPart*)
+    = $(IdStart IdPart*)
     / "`" @($((!"`" .)*)) "`"
 
 Identifier
     = name:IdName { return node('Identifier', { name }) }
 
 Reference
-    = name:IdName {
+    = !ReservedWord name:IdName {
         return node("Reference", { name })
     }
 
 Declarator
-    = name:IdName {
+    = !ReservedWord name:IdName {
         return node("Declarator", { name })
     }
 

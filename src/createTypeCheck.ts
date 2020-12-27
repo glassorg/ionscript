@@ -14,6 +14,6 @@ export default function createTypeCheck(cls: DataClass) {
             return false
         }
         let ctor = instance.constructor
-        return ctor === cls || ctor.implements.has(cls)
+        return ctor === cls || ctor.implements?.has(cls) === true
     }
 }

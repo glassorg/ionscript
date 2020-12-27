@@ -155,7 +155,21 @@ export default function runtimeTypeChecking(root: Assembly, options: Options) {
                                                         new Parameter({ id: new Declarator({ name: "_" }) })
                                                     ],
                                                     body: new BlockStatement({
-                                                        body: [ new ReturnStatement({ argument: replaceNodes((node as any).value.value ?? node.value, DotExpression.is, new Reference({ name: "_" })) }) ]
+                                                        body: [
+                                                            new ReturnStatement({
+                                                                argument: traverse((node as any).value.value ?? node.value, {
+                                                                    leave(node) {
+                                                                        if (DotExpression.is(node)) {
+                                                                            return new Reference({ name: "_" })
+                                                                        }
+                                                                        // type checks should NOT throw null so we implicitly convert all dot expressions to optional
+                                                                        if (MemberExpression.is(node) && !node.optional) {
+                                                                            return node.patch({ optional: true })
+                                                                        }
+                                                                    }
+                                                                })
+                                                            })
+                                                        ]
                                                     })
                                                 })
                                             ]

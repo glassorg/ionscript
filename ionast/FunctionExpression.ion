@@ -5,6 +5,7 @@ import
 export
     class FunctionExpression extends Expression, Scope, Type
         var id: Identifier | Null = null
+        var bind: Boolean = false
         var params: Array<Parameter>
         var body: BlockStatement
         var async: Boolean = false

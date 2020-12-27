@@ -3,6 +3,7 @@ import * as np from "path";
 import { traverse, skip } from "@glas/traverse";
 import { NodeMap, ScopeMap } from "./createScopeMaps";
 import { Reference, Node, VariableDeclaration, ModuleSpecifier, ImportDeclaration, Declarator, Program, ImportDefaultSpecifier, ImportNamespaceSpecifier, ImportSpecifier, Exportable, Declaration, Statement, Identifier, Parameter } from "./ast";
+import { getRelative } from "./pathFunctions";
 
 export const runtimeModuleName = "ionscript"
 
@@ -72,8 +73,12 @@ export function hasDeclarator(statements: Array<Statement>, name: string) {
 export function getOriginalDeclarator(declarator: Declarator, scopes: NodeMap<ScopeMap>, ancestors: Map<Node, Node>, throwErrors = true): Declarator | null {
     let parent = ancestors.get(declarator)
     if (ModuleSpecifier.is(parent)) {
+        let containingModule = getAncestor(parent, ancestors, Program.is)!
         let importDeclaration = ancestors.get(parent) as ImportDeclaration
-        let sourceModuleDeclaration = scopes.get(declarator)[importDeclaration.source.value as string]
+        let absoluteSource = getRelative(containingModule.id.name, importDeclaration.source.value as string)
+        //  we cannot just use importDeclaration.source.value  // that may be relative...
+        //  must at least make it absolute first.
+        let sourceModuleDeclaration = scopes.get(declarator)[absoluteSource]
         if (sourceModuleDeclaration) {
             if (ImportNamespaceSpecifier.is(parent as any)) {
                 return sourceModuleDeclaration

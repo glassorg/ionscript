@@ -13,4 +13,8 @@ export default class Type {
         return name
     }
 
+    static is(instance) {
+        return instance != null && typeof instance.name === "string" && typeof instance.is === "function"
+    }
+
 }

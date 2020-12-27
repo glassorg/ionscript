@@ -70,6 +70,10 @@ Indented Javascript
     - No. Keys should just be strings or integers.
     - In debug mode we can freeze child properties in data classes and add pure functional properties there.
 
+- Can files be compiled individually or must be compiled as a group?
+    - In debug mode files must be able to be incrementally compiled individually.
+    - In release mode compilation and optimization as a group is allowed.
+
 ## Syntax
 
 ### Import
@@ -166,9 +170,14 @@ Indented Javascript
         Set<Type>
         Map<Key,Value>
     X Build a language server
-      Move highlighting logic to ionscript module so we can reuse it.
-      Use new JSX tranform: https://reactjs.org/blog/2020/09/22/introducing-the-new-jsx-transform.html
-
+    X Move highlighting logic to ionscript module so we can reuse it.
+    X new JSX tranform: https://reactjs.org/blog/2020/09/22/introducing-the-new-jsx-transform.html
+    X Add implied optional member checks as is Type checks should never throw
+    X Need ability to form long .chains across multiple lines
+      Runtime Properties... which can hold meta data and we can use for the next step.
+      Data class implementation needs to NOT require external linkage at compile time.
+        But... if it's dynamic using properties then that would decrease runtime performance.
+        Fix for incremental compile failing because of above.
 
 ### Related Links
 

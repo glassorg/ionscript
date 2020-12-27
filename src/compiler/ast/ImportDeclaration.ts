@@ -17,6 +17,7 @@ import * as Integer from './ion/Integer';
 import * as _Array from './ion/Array';
 import * as Literal from './Literal';
 import * as Identifier from './Identifier';
+import * as String from './ion/String';
 import * as Class from './ion/Class';
 export type Specifier = ImportSpecifier.ImportSpecifier | (ImportDefaultSpecifier.ImportDefaultSpecifier | ImportNamespaceSpecifier.ImportNamespaceSpecifier);
 export function isSpecifier(value): value is Specifier {
@@ -29,6 +30,7 @@ export class ImportDeclaration implements _Object.Object , Declaration.Declarati
     readonly specifiers: _Array.Array<Specifier>;
     readonly path: _Array.Array<Literal.Literal | Identifier.Identifier> | Null.Null;
     readonly source: Literal.Literal;
+    readonly absoluteSource: String.String | Null.Null;
     static readonly id = 'ImportDeclaration';
     static readonly implements = new Set([
         'ImportDeclaration',
@@ -45,14 +47,16 @@ export class ImportDeclaration implements _Object.Object , Declaration.Declarati
         export: _export = 0,
         specifiers,
         path = null,
-        source
+        source,
+        absoluteSource = null
     }: {
         location?: Location.Location | Null.Null,
         type?: Type.Type | Null.Null,
         export?: Integer.Integer,
         specifiers: _Array.Array<Specifier>,
         path?: _Array.Array<Literal.Literal | Identifier.Identifier> | Null.Null,
-        source: Literal.Literal
+        source: Literal.Literal,
+        absoluteSource?: String.String | Null.Null
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
             throw new Error('location is not a Location | Null: ' + Class.toString(location));
@@ -66,12 +70,15 @@ export class ImportDeclaration implements _Object.Object , Declaration.Declarati
             throw new Error('path is not a Array | Null: ' + Class.toString(path));
         if (!Literal.isLiteral(source))
             throw new Error('source is not a Literal: ' + Class.toString(source));
+        if (!(String.isString(absoluteSource) || Null.isNull(absoluteSource)))
+            throw new Error('absoluteSource is not a String | Null: ' + Class.toString(absoluteSource));
         this.location = location;
         this.type = type;
         this.export = _export;
         this.specifiers = specifiers;
         this.path = path;
         this.source = source;
+        this.absoluteSource = absoluteSource;
         Object.freeze(this);
     }
     patch(properties: {
@@ -80,7 +87,8 @@ export class ImportDeclaration implements _Object.Object , Declaration.Declarati
         export?: Integer.Integer,
         specifiers?: _Array.Array<Specifier>,
         path?: _Array.Array<Literal.Literal | Identifier.Identifier> | Null.Null,
-        source?: Literal.Literal
+        source?: Literal.Literal,
+        absoluteSource?: String.String | Null.Null
     }) {
         return new ImportDeclaration({
             ...this,

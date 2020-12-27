@@ -162,7 +162,13 @@ export default class Compiler {
             for (let phase of phases) {
                 // console.log(phase.name)
                 lastPhase = phase
+                let before = errors.length
                 root = phase(root, options) || root
+                let after = errors.length
+                let count = after - before
+                if (count > 0) {
+                    console.log(phase.name + ": Errors: " + count)
+                }
                 phaseResults.set(phase, root)
                 logger(phase.name, root)
             }

@@ -34,7 +34,7 @@ const defaultPhases = [
     fixImports,
     inheritBaseClasses,
     controlFlowToExpressions,
-    checkReferences,
+    checkReferences, // probably leave this here.
     createConditionalDeclarations,
     addDataClassConstructors,
     inferTypes,

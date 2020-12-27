@@ -1,4 +1,5 @@
 import { Identifier } from "../ast"
+import { SemanticError } from "../common"
 import * as t from "../types"
 
 //  key = type, value = all types implemented by this type
@@ -62,8 +63,12 @@ export type IsType = (isInstanceOfThisType: Identifier, anInstanceOfThisType: Id
 export function createIsType(types: Identifier[][]): IsType {
     let typeMap = getTypeMap([...baseTypes, ...types])
     return (checkIfType: Identifier, isInstanceOfOtherType: Identifier): boolean | null => {
-        let checkPath = checkIfType.path!.toString()
-        let otherPath = isInstanceOfOtherType.path!.toString()
+        let checkPath = checkIfType.path?.toString()
+        let otherPath = isInstanceOfOtherType.path?.toString()
+        if (checkPath == null || otherPath == null) {
+            console.log("TODO: Figure out why isType#createIsType path's aren't present, possibly because of cyclic references")
+            return null
+        }
         let checkData = typeMap.get(checkPath)
         let otherData = typeMap.get(otherPath)
         if (checkData == null || otherData == null) {

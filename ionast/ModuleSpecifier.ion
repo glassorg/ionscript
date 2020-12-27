@@ -4,4 +4,4 @@ import
 
 export
     class ModuleSpecifier extends Node
-        var local: Identifier
+        var local: Declarator

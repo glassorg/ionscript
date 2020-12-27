@@ -2,7 +2,7 @@ import { Options } from "../Compiler";
 import { traverse, skip } from "@glas/traverse"
 import { Assembly, AssignmentStatement, BinaryExpression, BlockStatement, CallExpression, ClassDeclaration, Declarator, DotExpression, Expression, ExpressionStatement, ForStatement, FunctionExpression, Identifier, InstanceDeclarations, Literal, MemberExpression, Node, Parameter, Reference, ReturnStatement, ThisExpression, Type, TypeExpression, UnaryExpression, Variable, VariableDeclaration, YieldExpression } from "../ast";
 import createScopeMaps, { NodeMap, ScopeMap } from "../createScopeMaps";
-import { getOriginalDeclaration, getOriginalDeclarator, SemanticError } from "../common";
+import { getOriginalDeclaration, SemanticError } from "../common";
 import toCodeString from "../toCodeString";
 import { IntegerTypes } from "../types";
 import isConsequent from "../analysis/isConsequent";

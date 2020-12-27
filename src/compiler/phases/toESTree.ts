@@ -1,6 +1,6 @@
 import { Options } from "../Compiler"
 import { traverse, skip, replace, remove } from "@glas/traverse"
-import { BinaryExpression, CallExpression, ConditionalDeclaration, Exportable, FunctionExpression, Identifier, ImportDeclaration, Literal, Node, Parameter, Program, RegularExpression, SwitchCase, TypeExpression, UnaryExpression } from "../ast"
+import { BinaryExpression, CallExpression, ConditionalDeclaration, DotExpression, Exportable, FunctionExpression, Identifier, ImportDeclaration, Literal, Node, Parameter, Program, RegularExpression, ReturnStatement, SwitchCase, TypeExpression, UnaryExpression } from "../ast"
 import Position from "../ast/Position"
 import VariableDeclaration from "../ast/VariableDeclaration"
 import Reference from "../ast/Reference"
@@ -23,10 +23,17 @@ export default function toEsTree(root: Map<string, any>, options: Options) {
                 return skip
             }
         },
-        merge(node, changes, helper) {
+        merge(node, changes, helper, ancestors) {
             if (Node.is(node)) {
                 if (ConditionalDeclaration.is(node)) {
                     return remove
+                }
+                // all dot expressions SHOULD be converted by now, but for dev purposes we'll write it out
+                if (DotExpression.is(node)) {
+                    return {
+                        type: "Identifier",
+                        name: "DOT"
+                    }
                 }
                 // convert negative literal number to unary negation
                 if (Literal.is(node)) {
@@ -99,6 +106,29 @@ export default function toEsTree(root: Map<string, any>, options: Options) {
                 }
                 else {
                     result = { ...node, ...changes, type: node.constructor.name }
+                }
+
+                if (
+                    VariableDeclaration.is(node) && FunctionExpression.is(node.value)
+                    && Identifier.is(node.id) && node.id.name === node.value.id?.name
+                    && !node.value.bind
+                ) {
+                    let cls = ancestors.find(ClassDeclaration.is)
+                    if (cls === null) {
+                        // simplify from let fn = function() to function fn()
+                        result = { ...changes.value, type: "FunctionDeclaration" }
+                    }
+                }
+                if (FunctionExpression.is(node)) {
+                    if (node.bind) {
+                        result.type = "ArrowFunctionExpression"
+                        //  if it's just a return statement
+                        //  then we make it an expression arrow function
+                        if (ReturnStatement.is(node.body?.body?.[0])) {
+                            result.body = result.body.body[0].argument
+                            result.expression = true
+                        }
+                    }
                 }
                 //  convert UnaryExpressions to UpdateExpressions if they use ++ or --
                 if (UnaryExpression.is(node) && (node.operator === "++" || node.operator === "--")) {

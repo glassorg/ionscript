@@ -178,7 +178,7 @@ const predecessors: { [P in keyof typeof ast]?: (e: InstanceType<typeof ast[P]>,
             }
         }
     },
-    *CallExpression(node) {
+    *CallExpression(node, scopeMap, ancestorMap) {
         yield node.callee
         for (let arg of node.arguments) {
             if (ast.SpreadElement.is(arg)) {

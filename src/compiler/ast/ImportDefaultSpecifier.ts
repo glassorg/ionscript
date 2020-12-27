@@ -6,11 +6,11 @@ import * as ModuleSpecifier from './ModuleSpecifier';
 import * as Node from './Node';
 import * as Location from './Location';
 import * as Null from './ion/Null';
-import * as Identifier from './Identifier';
+import * as Declarator from './Declarator';
 import * as Class from './ion/Class';
 export class ImportDefaultSpecifier implements _Object.Object , ModuleSpecifier.ModuleSpecifier , Node.Node {
     readonly location: Location.Location | Null.Null;
-    readonly local: Identifier.Identifier;
+    readonly local: Declarator.Declarator;
     static readonly id = 'ImportDefaultSpecifier';
     static readonly implements = new Set([
         'ImportDefaultSpecifier',
@@ -20,19 +20,19 @@ export class ImportDefaultSpecifier implements _Object.Object , ModuleSpecifier.
     ]);
     constructor({location = null, local}: {
         location?: Location.Location | Null.Null,
-        local: Identifier.Identifier
+        local: Declarator.Declarator
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
             throw new Error('location is not a Location | Null: ' + Class.toString(location));
-        if (!Identifier.isIdentifier(local))
-            throw new Error('local is not a Identifier: ' + Class.toString(local));
+        if (!Declarator.isDeclarator(local))
+            throw new Error('local is not a Declarator: ' + Class.toString(local));
         this.location = location;
         this.local = local;
         Object.freeze(this);
     }
     patch(properties: {
         location?: Location.Location | Null.Null,
-        local?: Identifier.Identifier
+        local?: Declarator.Declarator
     }) {
         return new ImportDefaultSpecifier({
             ...this,

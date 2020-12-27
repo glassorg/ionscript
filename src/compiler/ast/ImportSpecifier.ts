@@ -6,11 +6,12 @@ import * as ModuleSpecifier from './ModuleSpecifier';
 import * as Node from './Node';
 import * as Location from './Location';
 import * as Null from './ion/Null';
+import * as Declarator from './Declarator';
 import * as Identifier from './Identifier';
 import * as Class from './ion/Class';
 export class ImportSpecifier implements _Object.Object , ModuleSpecifier.ModuleSpecifier , Node.Node {
     readonly location: Location.Location | Null.Null;
-    readonly local: Identifier.Identifier;
+    readonly local: Declarator.Declarator;
     readonly imported: Identifier.Identifier;
     static readonly id = 'ImportSpecifier';
     static readonly implements = new Set([
@@ -21,13 +22,13 @@ export class ImportSpecifier implements _Object.Object , ModuleSpecifier.ModuleS
     ]);
     constructor({location = null, local, imported}: {
         location?: Location.Location | Null.Null,
-        local: Identifier.Identifier,
+        local: Declarator.Declarator,
         imported: Identifier.Identifier
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
             throw new Error('location is not a Location | Null: ' + Class.toString(location));
-        if (!Identifier.isIdentifier(local))
-            throw new Error('local is not a Identifier: ' + Class.toString(local));
+        if (!Declarator.isDeclarator(local))
+            throw new Error('local is not a Declarator: ' + Class.toString(local));
         if (!Identifier.isIdentifier(imported))
             throw new Error('imported is not a Identifier: ' + Class.toString(imported));
         this.location = location;
@@ -37,7 +38,7 @@ export class ImportSpecifier implements _Object.Object , ModuleSpecifier.ModuleS
     }
     patch(properties: {
         location?: Location.Location | Null.Null,
-        local?: Identifier.Identifier,
+        local?: Declarator.Declarator,
         imported?: Identifier.Identifier
     }) {
         return new ImportSpecifier({

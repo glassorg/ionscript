@@ -1,6 +1,6 @@
 import { Options } from "../Compiler"
-import { traverse, skip } from "@glas/traverse"
-import { Program } from "../ast"
+import { traverse, skip, replace } from "@glas/traverse"
+import { ClassDeclaration, Declarator, Program, Reference, VariableDeclaration } from "../ast"
 import ImportDeclaration from "../ast/ImportDeclaration"
 import ImportNamespaceSpecifier from "../ast/ImportNamespaceSpecifier"
 import ImportDefaultSpecifier from "../ast/ImportDefaultSpecifier"
@@ -16,6 +16,7 @@ export default function fixImports(root: Assembly, options: Options) {
             }
         },
         leave(node) {
+            // refactor default class exports to be a stand alone declaration and a default export let declaration
             if (Program.is(node)) {
                 let originalImports = node.body.filter(node => ImportDeclaration.is(node)) as ImportDeclaration[]
                 for (let i of originalImports) {

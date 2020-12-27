@@ -53,6 +53,8 @@ const unaryOperationsType = {
     "-": types.Number,
     "typeof": types.String,
     "delete": types.Void,
+    "++": types.Number,
+    "--": types.Number,
 }
 
 function is(type: ast.Type, left: Expression = new ast.DotExpression({})) {
@@ -178,7 +180,9 @@ function getConstructorType(node: ast.ClassDeclaration, c: InferContext, returnT
 
     // default constructor
     return returnDefault ? new ast.FunctionType({
-        params: [],
+        params: [
+            new ast.SpreadElement({ argument: new ast.Reference({ name: "unknown" })})
+        ],
         returnType: new ast.Reference(node.id)
     }) : null
 }
@@ -705,6 +709,7 @@ export const inferType: {
                 if (paramType == null) {
                     let lastType = calleeType.params[calleeType.params.length - 1]
                     if (!ast.SpreadElement.is(lastType) && i >= calleeType.params.length) {
+                        console.log("calleeType: " + toCodeString(calleeType))
                         c.semanticError(`Target function only expects ${calleeType.params.length} argument${calleeType.params.length === 1 ? '' : 's'}`, arg)
                     }
                     paramType = lastType

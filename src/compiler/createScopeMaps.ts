@@ -1,6 +1,6 @@
 import { traverse, skip } from "@glas/traverse"
 import { getAncestor, getAncestorsAndSelfList, getOriginalDeclaration, SemanticError } from "./common"
-import { Node, FunctionExpression, Scope, Identifier, Reference, Declaration, VariableDeclaration, Declarator, Pattern, Parameter, Program, ClassDeclaration, ExpressionStatement, Expression } from "./ast"
+import { Node, FunctionExpression, Scope, Identifier, Reference, Declaration, VariableDeclaration, Declarator, Pattern, Parameter, Program, ClassDeclaration, ExpressionStatement, Expression, ImportDefaultSpecifier } from "./ast"
 import * as types from "./types"
 import { createIsType, IsType } from "./analysis/isType"
 import isConsequent from "./analysis/isConsequent"
@@ -175,6 +175,10 @@ export default function createScopeMaps(
             if (Pattern.is(node)) {
                 declarePattern(node)
             }
+
+            // if (ImportDefaultSpecifier.is(node)) {
+            //     console.log({ import: node })
+            // }
 
             //  functions set their parameters in scope
             if (FunctionExpression.is(node)) {

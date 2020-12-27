@@ -1,7 +1,24 @@
 
-for step in steps
-    if step
-        step = 1
+let x =
+    foo()
+    .then()
+        ->
+            something()
+    .finally()
+        ->
+            somethingElse()
+    .catch()
+        e ->
+            console.log(e)
+
+// .finally()
+// .catch()
+
+// type Schema = .name is String
+
+// for step in steps
+//     if step
+//         step = 1
 
 // class Recursive
 //     var recursive: Recursive
