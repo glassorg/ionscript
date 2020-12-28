@@ -1,7 +1,7 @@
 import { Options } from "../Compiler"
 import { traverse, skip, replace } from "@glas/traverse"
 import Assembly from "../ast/Assembly"
-import { AssignmentStatement, BinaryExpression, BlockStatement, CallExpression, ClassDeclaration, Declaration, Declarator, DotExpression, Expression, ExpressionStatement, FunctionExpression, Identifier, IfStatement, ImportDeclaration, ImportNamespaceSpecifier, InstanceDeclarations, Literal, MemberExpression, ObjectExpression, Parameter, Program, Property, Reference, ReturnStatement, Statement, ThisExpression, ThrowStatement, Type, TypeExpression, UnaryExpression, VariableDeclaration } from "../ast"
+import { AssignmentStatement, BinaryExpression, BlockStatement, CallExpression, ClassDeclaration, Declaration, Declarator, DotExpression, Expression, ExpressionStatement, FunctionExpression, Identifier, IfStatement, ImportDeclaration, ImportNamespaceSpecifier, InstanceDeclarations, Literal, MemberExpression, ObjectExpression, Parameter, Program, Property, Reference, RegularExpression, ReturnStatement, Statement, ThisExpression, ThrowStatement, Type, TypeExpression, UnaryExpression, VariableDeclaration } from "../ast"
 import { getLast, runtimeModuleName } from "../common"
 
 // let Vector_x = Symbol("Vector_x")
@@ -109,6 +109,47 @@ function replaceTypedVarsWithProperties(clas: ClassDeclaration, options: Options
     })
 }
 
+export function toRuntimeType(type, name: string) {
+    if (Reference.is(type) || MemberExpression.is(type) || Literal.is(type) || RegularExpression.is(type)) {
+        return type
+    }
+
+    return new CallExpression({
+        new: true,
+        callee: new MemberExpression({
+            object: new Reference({ name: runtimeModuleName }),
+            property: new Identifier({ name: "Type" })
+        }),
+        arguments: [
+            new Literal({ value: name }),
+            FunctionExpression.is(type)
+            ? type
+            : new FunctionExpression({
+                params: [
+                    new Parameter({ id: new Declarator({ name: "_" }) })
+                ],
+                body: new BlockStatement({
+                    body: [
+                        new ReturnStatement({
+                            argument: traverse((type as TypeExpression).value ?? type, {
+                                leave(node) {
+                                    if (DotExpression.is(node)) {
+                                        return new Reference({ name: "_" })
+                                    }
+                                    // type checks should NOT throw null so we implicitly convert all dot expressions to optional
+                                    if (MemberExpression.is(node) && !node.optional) {
+                                        return node.patch({ optional: true })
+                                    }
+                                }
+                            })
+                        })
+                    ]
+                })
+            })
+        ]
+    })
+}
+
 // also adds ion import if there are any references to ion
 export default function runtimeTypeChecking(root: Assembly, options: Options) {
     if (!options.debug) {
@@ -138,42 +179,7 @@ export default function runtimeTypeChecking(root: Assembly, options: Options) {
                             if (node.kind === "type") {
                                 return node.patch({
                                     kind: "const",
-                                    value: Reference.is(node.value)
-                                        ? node.value
-                                        : new CallExpression({
-                                            new: true,
-                                            callee: new MemberExpression({
-                                                object: new Reference({ name: runtimeModuleName }),
-                                                property: new Identifier({ name: "Type" })
-                                            }),
-                                            arguments: [
-                                                new Literal({ value: (node.id as Reference).name }),
-                                                FunctionExpression.is(node.value)
-                                                ? node.value
-                                                : new FunctionExpression({
-                                                    params: [
-                                                        new Parameter({ id: new Declarator({ name: "_" }) })
-                                                    ],
-                                                    body: new BlockStatement({
-                                                        body: [
-                                                            new ReturnStatement({
-                                                                argument: traverse((node as any).value.value ?? node.value, {
-                                                                    leave(node) {
-                                                                        if (DotExpression.is(node)) {
-                                                                            return new Reference({ name: "_" })
-                                                                        }
-                                                                        // type checks should NOT throw null so we implicitly convert all dot expressions to optional
-                                                                        if (MemberExpression.is(node) && !node.optional) {
-                                                                            return node.patch({ optional: true })
-                                                                        }
-                                                                    }
-                                                                })
-                                                            })
-                                                        ]
-                                                    })
-                                                })
-                                            ]
-                                        })
+                                    value: toRuntimeType(node.value, (node.id as Declarator).name)
                                 })
                             }
                         }

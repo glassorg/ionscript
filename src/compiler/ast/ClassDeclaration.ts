@@ -17,6 +17,7 @@ import * as Declarator from './Declarator';
 import * as _Array from './ion/Array';
 import * as Parameter from './Parameter';
 import * as Reference from './Reference';
+import * as MemberExpression from './MemberExpression';
 import * as VariableDeclaration from './VariableDeclaration';
 import * as InstanceDeclarations from './InstanceDeclarations';
 import * as Class from './ion/Class';
@@ -28,7 +29,7 @@ export class ClassDeclaration implements _Object.Object , Declaration.Declaratio
     readonly isData: Boolean.Boolean;
     readonly id: Declarator.Declarator;
     readonly parameters: _Array.Array<Parameter.Parameter>;
-    readonly baseClasses: _Array.Array<Reference.Reference>;
+    readonly baseClasses: _Array.Array<Reference.Reference | MemberExpression.MemberExpression>;
     readonly static: _Array.Array<VariableDeclaration.VariableDeclaration>;
     readonly instance: InstanceDeclarations.InstanceDeclarations;
     readonly instanceType: Type.Type | Null.Null;
@@ -63,7 +64,7 @@ export class ClassDeclaration implements _Object.Object , Declaration.Declaratio
         isData?: Boolean.Boolean,
         id: Declarator.Declarator,
         parameters?: _Array.Array<Parameter.Parameter>,
-        baseClasses?: _Array.Array<Reference.Reference>,
+        baseClasses?: _Array.Array<Reference.Reference | MemberExpression.MemberExpression>,
         static: _Array.Array<VariableDeclaration.VariableDeclaration>,
         instance: InstanceDeclarations.InstanceDeclarations,
         instanceType?: Type.Type | Null.Null
@@ -111,7 +112,7 @@ export class ClassDeclaration implements _Object.Object , Declaration.Declaratio
         isData?: Boolean.Boolean,
         id?: Declarator.Declarator,
         parameters?: _Array.Array<Parameter.Parameter>,
-        baseClasses?: _Array.Array<Reference.Reference>,
+        baseClasses?: _Array.Array<Reference.Reference | MemberExpression.MemberExpression>,
         static?: _Array.Array<VariableDeclaration.VariableDeclaration>,
         instance?: InstanceDeclarations.InstanceDeclarations,
         instanceType?: Type.Type | Null.Null

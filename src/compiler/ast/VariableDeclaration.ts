@@ -27,6 +27,7 @@ export class VariableDeclaration implements _Object.Object , Variable.Variable ,
     readonly kind: String.String;
     readonly static: Identifier.Identifier | Null.Null;
     readonly instance: Boolean.Boolean;
+    readonly inherited: Boolean.Boolean;
     static readonly id = 'VariableDeclaration';
     static readonly implements = new Set([
         'VariableDeclaration',
@@ -46,7 +47,8 @@ export class VariableDeclaration implements _Object.Object , Variable.Variable ,
         export: _export = 0,
         kind,
         static: _static = null,
-        instance = false
+        instance = false,
+        inherited = false
     }: {
         location?: Location.Location | Null.Null,
         type?: Type.Type | Null.Null,
@@ -55,7 +57,8 @@ export class VariableDeclaration implements _Object.Object , Variable.Variable ,
         export?: Integer.Integer,
         kind: String.String,
         static?: Identifier.Identifier | Null.Null,
-        instance?: Boolean.Boolean
+        instance?: Boolean.Boolean,
+        inherited?: Boolean.Boolean
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
             throw new Error('location is not a Location | Null: ' + Class.toString(location));
@@ -73,6 +76,8 @@ export class VariableDeclaration implements _Object.Object , Variable.Variable ,
             throw new Error('static is not a Identifier | Null: ' + Class.toString(_static));
         if (!Boolean.isBoolean(instance))
             throw new Error('instance is not a Boolean: ' + Class.toString(instance));
+        if (!Boolean.isBoolean(inherited))
+            throw new Error('inherited is not a Boolean: ' + Class.toString(inherited));
         this.location = location;
         this.type = type;
         this.id = id;
@@ -81,6 +86,7 @@ export class VariableDeclaration implements _Object.Object , Variable.Variable ,
         this.kind = kind;
         this.static = _static;
         this.instance = instance;
+        this.inherited = inherited;
         Object.freeze(this);
     }
     patch(properties: {
@@ -91,7 +97,8 @@ export class VariableDeclaration implements _Object.Object , Variable.Variable ,
         export?: Integer.Integer,
         kind?: String.String,
         static?: Identifier.Identifier | Null.Null,
-        instance?: Boolean.Boolean
+        instance?: Boolean.Boolean,
+        inherited?: Boolean.Boolean
     }) {
         return new VariableDeclaration({
             ...this,

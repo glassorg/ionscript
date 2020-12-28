@@ -12,6 +12,8 @@ import * as SpreadElement from '../SpreadElement';
 import * as Expression from '../Expression';
 import * as Pattern from '../Pattern';
 import * as BlockStatement from '../BlockStatement';
+import * as Reference from '../Reference';
+import * as MemberExpression from '../MemberExpression';
 import * as Identifier from '../Identifier';
 import * as Property from '../Property';
 import * as VariableDeclaration from '../VariableDeclaration';
@@ -35,6 +37,7 @@ export type BlockStatement_BlockStatement_or_Expression_Expression = BlockStatem
 export type Pattern_Pattern_or_Expression_Expression = Pattern.Pattern | Expression.Expression;
 export type Statement_Statement_or_SpreadElement_SpreadElement = Statement.Statement | SpreadElement.SpreadElement;
 export type Expression_Expression_or_ion_types_Statement_Statement_or_SpreadElement_SpreadElement = Expression.Expression | (Statement.Statement | SpreadElement.SpreadElement);
+export type Reference_Reference_or_MemberExpression_MemberExpression = Reference.Reference | MemberExpression.MemberExpression;
 export type Expression_Expression_or_ion_Null_Null = Expression.Expression | Null.Null;
 export type Identifier_Identifier_or_ion_Null_Null = Identifier.Identifier | Null.Null;
 export type ion_String_String_or_ion_Null_Null = String.String | Null.Null;

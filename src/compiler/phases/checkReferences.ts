@@ -71,7 +71,7 @@ export default function checkReferences(root: Assembly, options: Options) {
                     return getGlobalReference(node)
                 }
                 else {
-                    let declaration = ancestors[ancestors.length - 1]
+                    let declaration = getAncestor(node, ancestorsMap, Declaration.is)
                     if (VariableDeclaration.is(declaration)) {
                         let cls = getAncestor(declaration, ancestorsMap, ClassDeclaration.is)
                         if (declaration.instance && cls!.instance.declarations.find(d => (d.id as Declarator)?.name === node.name)) {

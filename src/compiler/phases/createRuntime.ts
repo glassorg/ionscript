@@ -1,8 +1,8 @@
 import { Options } from "../Compiler";
 import { traverse, skip, replace } from "@glas/traverse";
 import Assembly from "../ast/Assembly";
-import { ArrayExpression, AssignmentStatement, BinaryExpression, BlockStatement, CallExpression, ClassDeclaration, Declarator, DotExpression, Expression, ExpressionStatement, FunctionExpression, Identifier, ImportDeclaration, ImportDefaultSpecifier, ImportNamespaceSpecifier, InstanceDeclarations, Literal, MemberExpression, ObjectExpression, Parameter, Program, Property, Reference, RegularExpression, ReturnStatement, ThisExpression, TypeExpression, VariableDeclaration, Range, ForOfStatement, UnaryExpression } from "../ast";
-import { replaceNodes } from "./runtimeTypeChecking";
+import { ArrayExpression, AssignmentStatement, BinaryExpression, BlockStatement, CallExpression, ClassDeclaration, Declarator, DotExpression, Expression, ExpressionStatement, FunctionExpression, Identifier, ImportDeclaration, ImportDefaultSpecifier, ImportNamespaceSpecifier, InstanceDeclarations, Literal, MemberExpression, ObjectExpression, Parameter, Program, Property, Reference, RegularExpression, ReturnStatement, ThisExpression, TypeExpression, VariableDeclaration, Range, ForOfStatement, UnaryExpression, SpreadElement, FunctionType } from "../ast";
+import { replaceNodes, toRuntimeType } from "./runtimeTypeChecking";
 import { typeProperties } from "./inferTypes";
 import { hasDeclarator, runtimeModuleName } from "../common";
 import createTypeCheck from "../../createTypeCheck";
@@ -91,6 +91,11 @@ export default function createRuntime(root: Assembly, options: Options) {
                             }
                             return node.value
                         }
+                        if (FunctionType.is(node)) {
+                            //  we do NOT have runtime function type checking yet
+                            //  so we at least just verify that it is in fact a function.
+                            return new Reference({ name: "Function" })
+                        }
                         // if (DotExpression.is(node)) {
                         //     return new Reference({ name: "value" })
                         // }
@@ -173,13 +178,25 @@ export default function createRuntime(root: Assembly, options: Options) {
                                     })
                                 }
                             }
-                            // remove extends from data classes
+                            // remove extends from data classes and insert single extends from ionscript.Data
                             if (node.isData) {
-                                result = result.patch({ baseClasses: [] })
+                                result = result.patch({
+                                    baseClasses: [
+                                        new MemberExpression({
+                                            object: new Reference({ name: runtimeModuleName }),
+                                            property: new Identifier({ name: "Data" })
+                                        })
+                                    ],
+                                    // also remove all the instance variable declarations
+                                    instance: result.instance!.patch({
+                                        declarations: []
+                                    })
+                                })
                             }
                             //  handle static vars and typed vars
                             let staticVarsWithDefaults = node.static.filter(d => d.kind === "var" && d.value != null)
                             if (node.isData) {
+                                usesIonscript = true
                                 staticVarsWithDefaults.push(
                                     new VariableDeclaration({
                                         static: new Identifier({ name: "static" }),
@@ -196,7 +213,6 @@ export default function createRuntime(root: Assembly, options: Options) {
                                         })
                                     })
                                 )
-                                usesIonscript = true
                                 staticVarsWithDefaults.push(
                                     new VariableDeclaration({
                                         static: new Identifier({ name: "static" }),
@@ -208,6 +224,104 @@ export default function createRuntime(root: Assembly, options: Options) {
                                                 property: new Identifier({ name: createTypeCheck.name.valueOf() }),
                                             }),
                                             arguments: [ new Reference(node.id) ],
+                                        })
+                                    })
+                                )
+                                // insert (ClassName).prototype.properties
+                                const instancePropertiesLocation = "prototype.properties"
+                                staticVarsWithDefaults.push(
+                                    new VariableDeclaration({
+                                        static: new Identifier({ name: "static" }),
+                                        kind: "var",
+                                        //  this prototype.properties hack works fine in generated javascript
+                                        //  could also do "prototype[ionscript.symbols.properties]"
+                                        id: new Declarator({ name: instancePropertiesLocation }),
+                                        value: new CallExpression({
+                                            new: true,
+                                            callee: new Reference({ name: "Map" }),
+                                            arguments: [
+                                                new ArrayExpression({
+                                                    elements: [
+                                                        ...node.baseClasses.map(
+                                                            base => new SpreadElement({
+                                                                argument: new MemberExpression({
+                                                                    object: base,
+                                                                    property: new Identifier({ name: instancePropertiesLocation })
+                                                                })
+                                                            })
+                                                        ) as any,
+                                                        ...node.instance.declarations.filter(d => !d.inherited && d.instance && (d.id as any).name !== "constructor").map(
+                                                            d => {
+                                                                let name = (d.id as Declarator).name
+                                                                return new ArrayExpression({
+                                                                    elements: [
+                                                                        new Literal({ value: name }),
+                                                                        new CallExpression({
+                                                                            new: true,
+                                                                            callee: new MemberExpression({
+                                                                                object: new Reference({ name: runtimeModuleName }),
+                                                                                property: new Identifier({ name: "Property" })
+                                                                            }),
+                                                                            arguments: [
+                                                                                new ObjectExpression({
+                                                                                    properties: (() => {
+                                                                                        let writable = d.kind === "var"
+                                                                                        let properties = new Array<Property>()
+                                                                                        // writable
+                                                                                        if (writable) {
+                                                                                            properties.push(
+                                                                                                new Property({
+                                                                                                    key: new Identifier({ name: "writable" }),
+                                                                                                    value: new Literal({ value: writable }),
+                                                                                                }),
+                                                                                                // we also make any writable properties enumerable as well
+                                                                                                new Property({
+                                                                                                    key: new Identifier({ name: "enumerable" }),
+                                                                                                    value: new Literal({ value: writable }),
+                                                                                                }),
+                                                                                            )
+                                                                                        }
+                                                                                        if (d.type) {
+                                                                                            properties.push(
+                                                                                                new Property({
+                                                                                                    key: new Identifier({ name: "type" }),
+                                                                                                    value: toRuntimeType(d.type, `${node.id.name}.${name}.Type`),
+                                                                                                })
+                                                                                            )
+                                                                                        }
+                                                                                        if (d.value) {
+                                                                                            if (d.kind === "get") {
+                                                                                                properties.push(
+                                                                                                    new Property({
+                                                                                                        key: new Identifier({ name: "get" }),
+                                                                                                        method: true,
+                                                                                                        value: d.value!,
+                                                                                                    })
+                                                                                                )
+                                                                                            }
+                                                                                            else {
+                                                                                                properties.push(
+                                                                                                    new Property({
+                                                                                                        key: new Identifier({ name: "value" }),
+                                                                                                        method: FunctionExpression.is(d.value),
+                                                                                                        value: d.value,
+                                                                                                    })
+                                                                                                )
+                                                                                            }
+                                                                                        }
+                                                                                        return properties
+                                                                                    })() as any
+                                                                                })
+                                                                            ]
+                                                                        })
+                                                                        // need a new Property implementation.
+                                                                    ]
+                                                                })
+                                                            }
+                                                        )
+                                                    ]
+                                                })
+                                            ],
                                         })
                                     })
                                 )

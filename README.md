@@ -174,10 +174,19 @@ Indented Javascript
     X new JSX tranform: https://reactjs.org/blog/2020/09/22/introducing-the-new-jsx-transform.html
     X Add implied optional member checks as is Type checks should never throw
     X Need ability to form long .chains across multiple lines
-      Runtime Properties... which can hold meta data and we can use for the next step.
-      Data class implementation needs to NOT require external linkage at compile time.
-        But... if it's dynamic using properties then that would decrease runtime performance.
-        Fix for incremental compile failing because of above.
+    X Runtime Properties... which can hold meta data and we can use for the next step.
+    X   Property defined
+    X   Extend from ionscript.Data
+    X   Create Map<string,Property> fields on Data Classes.
+    X   Also include inherited properties
+    X   Write Data class constructor that uses prototype properties.
+    X   Remove Current constructor
+    X   Test this in ionscript.platform
+    X   Convert back to incremental build.
+    X Fix auto prefix of static and instance properties for referencing each other.
+    X Data class implementation needs to NOT require external linkage at compile time.
+    X   But... if it's dynamic using properties then that would decrease runtime performance.
+    X   Fix for incremental compile failing because of above.
 
 ### Related Links
 

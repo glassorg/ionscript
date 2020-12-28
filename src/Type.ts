@@ -1,3 +1,4 @@
+import { is } from "./symbols"
 
 export default class Type {
 
@@ -14,7 +15,7 @@ export default class Type {
     }
 
     static is(instance) {
-        return instance != null && typeof instance.name === "string" && typeof instance.is === "function"
+        return instance != null && typeof (instance.is ?? instance[is]) === "function"
     }
 
 }

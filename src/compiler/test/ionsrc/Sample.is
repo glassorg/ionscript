@@ -1,18 +1,24 @@
 
-let x =
-    foo()
-    .then()
-        ->
-            something()
-    .finally()
-        ->
-            somethingElse()
-    .catch()
-        e ->
-            console.log(e)
+data class One
+    var x: Number = 0
+    let doubleX = x * 2
+    let double = a -> a * 2
+    var foo: Type
 
-// .finally()
-// .catch()
+data class Two extends One
+    var y: Number & >= 0 = 1
+
+// let x =
+//     foo()
+//     .then()
+//         ->
+//             something()
+//     .finally()
+//         ->
+//             somethingElse()
+//     .catch()
+//         e ->
+//             console.log(e)
 
 // type Schema = .name is String
 

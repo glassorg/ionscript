@@ -1,6 +1,6 @@
 import { Options } from "../Compiler"
 import { traverse, skip, replace, remove } from "@glas/traverse"
-import { BinaryExpression, CallExpression, ConditionalDeclaration, DotExpression, Exportable, FunctionExpression, Identifier, ImportDeclaration, Literal, Node, Parameter, Program, RegularExpression, ReturnStatement, SwitchCase, TypeExpression, UnaryExpression } from "../ast"
+import { BinaryExpression, CallExpression, ConditionalDeclaration, DotExpression, Exportable, FunctionExpression, Identifier, ImportDeclaration, Literal, Node, Parameter, Program, RegularExpression, ReturnStatement, SwitchCase, UnaryExpression } from "../ast"
 import Position from "../ast/Position"
 import VariableDeclaration from "../ast/VariableDeclaration"
 import Reference from "../ast/Reference"

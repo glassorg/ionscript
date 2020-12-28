@@ -28,6 +28,7 @@ export class ConditionalDeclaration implements _Object.Object , VariableDeclarat
     readonly kind: String.String;
     readonly static: Identifier.Identifier | Null.Null;
     readonly instance: Boolean.Boolean;
+    readonly inherited: Boolean.Boolean;
     readonly negate: Boolean.Boolean;
     static readonly id = 'ConditionalDeclaration';
     static readonly implements = new Set([
@@ -50,6 +51,7 @@ export class ConditionalDeclaration implements _Object.Object , VariableDeclarat
         kind,
         static: _static = null,
         instance = false,
+        inherited = false,
         negate = false
     }: {
         location?: Location.Location | Null.Null,
@@ -60,6 +62,7 @@ export class ConditionalDeclaration implements _Object.Object , VariableDeclarat
         kind: String.String,
         static?: Identifier.Identifier | Null.Null,
         instance?: Boolean.Boolean,
+        inherited?: Boolean.Boolean,
         negate?: Boolean.Boolean
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
@@ -78,6 +81,8 @@ export class ConditionalDeclaration implements _Object.Object , VariableDeclarat
             throw new Error('static is not a Identifier | Null: ' + Class.toString(_static));
         if (!Boolean.isBoolean(instance))
             throw new Error('instance is not a Boolean: ' + Class.toString(instance));
+        if (!Boolean.isBoolean(inherited))
+            throw new Error('inherited is not a Boolean: ' + Class.toString(inherited));
         if (!Boolean.isBoolean(negate))
             throw new Error('negate is not a Boolean: ' + Class.toString(negate));
         this.location = location;
@@ -88,6 +93,7 @@ export class ConditionalDeclaration implements _Object.Object , VariableDeclarat
         this.kind = kind;
         this.static = _static;
         this.instance = instance;
+        this.inherited = inherited;
         this.negate = negate;
         Object.freeze(this);
     }
@@ -100,6 +106,7 @@ export class ConditionalDeclaration implements _Object.Object , VariableDeclarat
         kind?: String.String,
         static?: Identifier.Identifier | Null.Null,
         instance?: Boolean.Boolean,
+        inherited?: Boolean.Boolean,
         negate?: Boolean.Boolean
     }) {
         return new ConditionalDeclaration({

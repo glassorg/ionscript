@@ -4,6 +4,7 @@ import { traverse, skip } from "@glas/traverse"
 import { VariableDeclaration, Identifier, Literal, Assembly, ClassDeclaration, Declaration, Reference, Node, Declarator, FunctionExpression, BlockStatement, AssignmentPattern, ObjectPattern, ObjectExpression, Parameter, Property, ExpressionStatement, AssignmentStatement, MemberExpression, ThisExpression, IfStatement, DotExpression, Statement, Expression, Type, TypeExpression, BinaryExpression, UnaryExpression, ThrowStatement, CallExpression } from "../ast";
 import createScopeMaps from "../createScopeMaps";
 import { replaceNodes } from "./runtimeTypeChecking";
+import { Ref } from "react";
 
 function mergeDeclarations(base: VariableDeclaration, sub: VariableDeclaration) {
     // this should actually check that the types can be merged.
@@ -27,8 +28,8 @@ export default function inheritBaseClasses(root: Assembly, options: Options) {
             }
             inprogress.add(classDeclaration)
             let baseDeclarations = new Map<string, VariableDeclaration>()
-            let baseClasses = new Map<string,Reference>([...classDeclaration.baseClasses].map(r => [r.name, r]))
-            function addDeclarations(declarations: Iterable<VariableDeclaration>) {
+            let baseClasses = new Map<string,Reference>([...classDeclaration.baseClasses as Array<Reference>].map(r => [r.name, r]))
+            function addDeclarations(declarations: Iterable<VariableDeclaration>, patch?) {
                 for (let declaration of declarations) {
                     if (!Identifier.is(declaration.id)) {
                         throw SemanticError("invalid destructuring on class variable", declaration.id)
@@ -38,22 +39,24 @@ export default function inheritBaseClasses(root: Assembly, options: Options) {
                         continue
                     }
                     let current = baseDeclarations.get(declaration.id.name)
-                    baseDeclarations.set(
-                        declaration.id.name,
-                        current ? mergeDeclarations(current, declaration) : declaration
-                    )
+                    let newValue = current ? mergeDeclarations(current, declaration) : declaration
+                    if (patch != null) {
+                        newValue = newValue.patch(patch)
+                    }
+                    baseDeclarations.set(declaration.id.name, newValue)
                 }
             }
             for (let baseClass of classDeclaration.baseClasses) {
-                let declarator = getDeclarator(baseClass, scopes, ancestorsMap, true)!
+                let declarator = getDeclarator(baseClass as Reference, scopes, ancestorsMap, true)!
 
                 let baseDeclaration = ancestorsMap.get(declarator) as ClassDeclaration
                 if (!ClassDeclaration.is(baseDeclaration)) {
-                    if (!options.emit) {
-                        // probably a quick incremental compile, so we just ignore
-                        continue
-                    }
-                    throw SemanticError(`Not a class declaration`, baseClass)
+                    continue
+                    // we now just skip if not found to allow single file compilation.
+                    // if (!options.emit) {
+                    //     // probably a quick incremental compile, so we just ignore
+                    // }
+                    // throw SemanticError(`Not a class declaration`, baseClass)
                 }
 
                 if (classDeclaration.isStruct && !baseDeclaration.isStruct) {
@@ -63,10 +66,10 @@ export default function inheritBaseClasses(root: Assembly, options: Options) {
                     throw SemanticError(`Data classes can only inherit from other data classes`, baseClass)
                 }
                 baseDeclaration = ensureDeclarationsInherited(baseDeclaration, source)
-                for (let ref of baseDeclaration.baseClasses) {
+                for (let ref of baseDeclaration.baseClasses as Array<Reference>) {
                     baseClasses.set(ref.name, ref)
                 }
-                addDeclarations(baseDeclaration.instance.declarations)
+                addDeclarations(baseDeclaration.instance.declarations, { inherited: true })
             }
             // // now insert the current class declarations
             addDeclarations(classDeclaration.instance.declarations)

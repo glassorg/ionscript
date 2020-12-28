@@ -143,7 +143,7 @@ export default function createScopeMaps(
                 ancestorsMap.set(node, ancestor!)
             }
             if (options.implements && ClassDeclaration.is(node)) {
-                options.implements.push([node.id, types.Object, ...node.baseClasses])
+                options.implements.push([node.id, types.Object, ...node.baseClasses as Array<Reference>])
             }
             //  do nothing on Parameters, they're handled by their containing functions
             if (Program.is(node)) {

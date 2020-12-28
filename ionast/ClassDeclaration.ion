@@ -8,7 +8,7 @@ export
         var isData: Boolean = false
         var id: Declarator
         var parameters: Array<Parameter> = []
-        var baseClasses: Array<Reference> = []
+        var baseClasses: Array<Reference | MemberExpression> = []
         # var declarations: Array<VariableDeclaration>
         var static: Array<VariableDeclaration>
         # we place the instance declarations within a blockStatement

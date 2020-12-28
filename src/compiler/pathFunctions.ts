@@ -1,6 +1,8 @@
 import Null from "../Null"
 import Undefined from "../Undefined"
 import Type from "../Type"
+import Property from "../Property"
+import Integer from "../Integer"
 // // absolute path related functions
 // import np from "path"
 
@@ -17,6 +19,8 @@ const ionGlobals = new Set([
     Undefined.name,
     Null.name,
     Type.name,
+    Property.name,
+    Integer.name,
 ])
 
 const globalPrefix = "global:"

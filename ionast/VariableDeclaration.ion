@@ -7,4 +7,5 @@ export
         var kind: String # var, let, get, set
         var static: Identifier | Null = null
         var instance: Boolean = false
+        var inherited: Boolean = false
 

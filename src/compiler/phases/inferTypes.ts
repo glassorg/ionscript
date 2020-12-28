@@ -160,7 +160,7 @@ function getConstructorType(node: ast.ClassDeclaration, c: InferContext, returnT
     let ctor = node.instance.declarations.find(d => ast.VariableDeclaration.is(d) && (d.id as ast.Declarator).name === "constructor")
     if (ctor == null) {
         for (let base of node.baseClasses) {
-            let baseDeclaration = getClassDeclaration(base, c)
+            let baseDeclaration = getClassDeclaration(base as ast.Reference, c)
             if (baseDeclaration != null) {
                 let baseType = getConstructorType(baseDeclaration, c, returnType)
                 if (baseType != null) {
@@ -482,7 +482,7 @@ export const inferType: {
         // with normal (non-data) classes, we should combine actual instanceType from class 
         for (let base of node.baseClasses) {
             if (!node.isData) {
-                let baseDeclaration = getClassDeclaration(base, c)
+                let baseDeclaration = getClassDeclaration(base as ast.Reference, c)
                 if (baseDeclaration != null) {
                     instanceExpressions.push(baseDeclaration.instanceType!)
                     // SKIP adding the reference is check beneath since this already contains it
