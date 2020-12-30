@@ -1,5 +1,5 @@
 import { traverse } from "@glas/traverse";
-import { ArrayPattern, AwaitExpression, BinaryExpression, BreakStatement, CallExpression, ClassDeclaration, ContinueStatement, Declarator, ElementExpression, ForOfStatement, ForStatement, FunctionExpression, Identifier, IfStatement, ImportDeclaration, Literal, MemberExpression, ModuleSpecifier, Parameter, Pattern, Property, Reference, RegularExpression, ReturnStatement, ThisExpression, ThrowStatement, TryStatement, Typed, TypeExpression, UnaryExpression, VariableDeclaration, YieldExpression } from "./ast";
+import { ArrayPattern, AwaitExpression, BinaryExpression, BreakStatement, CallExpression, ClassDeclaration, ContinueStatement, Declarator, ElementExpression, ForOfStatement, ForStatement, FunctionExpression, Identifier, IfStatement, ImportDeclaration, ImportDefaultSpecifier, ImportNamespaceSpecifier, Literal, MemberExpression, ModuleSpecifier, Parameter, Pattern, Property, Reference, RegularExpression, ReturnStatement, ThisExpression, ThrowStatement, TryStatement, Typed, TypeExpression, UnaryExpression, VariableDeclaration, YieldExpression } from "./ast";
 import Parser from "./parser";
 import reservedWords from "./reservedWords";
 import toCodeString from "./toCodeString";
@@ -121,9 +121,11 @@ export function getSemanticHighlights(
             if (ImportDeclaration.is(node)) {
                 highlightStartingKeywords(node.location.start.line, 1);
                 if (node.path) {
-                    let last = node.path[node.path.length - 1]
+                    const last = node.path[node.path.length - 1]
                     let isAutoImport = Identifier.is(last) && node.specifiers.find(s => {
-                        return s.local.name === (last as any)?.name
+                        if ((ImportNamespaceSpecifier.is(s) || ImportDefaultSpecifier.is(s)) && s.local.name === last.name) {
+                            return true
+                        }
                     })
                     node.specifiers.length === 1 && node.specifiers[0].location?.start.line === node.location?.start.line
                     for (let step of node.path) {

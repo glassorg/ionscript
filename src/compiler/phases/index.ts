@@ -35,9 +35,9 @@ const defaultPhases = [
     inheritBaseClasses,
     controlFlowToExpressions,
     checkReferences, // probably leave this here.
-    createConditionalDeclarations,
-    // addDataClassConstructors,    // removed as part of refactoring to isolated file compilation with Data.properties
-    inferTypes,
+    // createConditionalDeclarations,
+    // // addDataClassConstructors,    // removed as part of refactoring to isolated file compilation with Data.properties
+    // inferTypes,
 
     addTypedStructArrays,
 

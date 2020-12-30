@@ -25,7 +25,8 @@ export default function fixImports(root: Assembly, options: Options) {
                     }
                 }
                 let others = node.body.filter(node => !ImportDeclaration.is(node))
-                let newImports = new Array<ImportDeclaration>()
+                //  start with all imports that have no specifiers (for side-effects only)
+                let newImports = originalImports.filter(i => i.specifiers.length === 0)
                 for (let declaration of originalImports) {
                     let specifiersArray = new Array<Array<any>>()
                     //  first add all ImportNamespaceSpecifiers to their own sets

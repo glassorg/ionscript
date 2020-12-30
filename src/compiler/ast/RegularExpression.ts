@@ -4,13 +4,14 @@ This file was generated from ion source. Do not edit.
 import * as _Object from './ion/Object';
 import * as Expression from './Expression';
 import * as Type from './Type';
+import * as RuntimeType from './RuntimeType';
 import * as Typed from './Typed';
 import * as Node from './Node';
 import * as Location from './Location';
 import * as Null from './ion/Null';
 import * as String from './ion/String';
 import * as Class from './ion/Class';
-export class RegularExpression implements _Object.Object , Expression.Expression , Type.Type , Typed.Typed , Node.Node {
+export class RegularExpression implements _Object.Object , Expression.Expression , Type.Type , RuntimeType.RuntimeType , Typed.Typed , Node.Node {
     readonly location: Location.Location | Null.Null;
     readonly type: Type.Type | Null.Null;
     readonly pattern: String.String;
@@ -21,6 +22,7 @@ export class RegularExpression implements _Object.Object , Expression.Expression
         'ion_Object',
         'Expression',
         'Type',
+        'RuntimeType',
         'Typed',
         'Node'
     ]);

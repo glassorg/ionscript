@@ -187,6 +187,13 @@ Indented Javascript
     X Data class implementation needs to NOT require external linkage at compile time.
     X   But... if it's dynamic using properties then that would decrease runtime performance.
     X   Fix for incremental compile failing because of above.
+        Fix module scoped 'parse' and static 'parse' function resolution incorrectly to class.parse
+        Need Concise Export from Import Syntax
+        Fix this compile error
+            <div />
+                let { foo } = bar
+        Outline || Operator is ambiguous with Set literal declaration.
+
 
 ### Related Links
 
@@ -195,7 +202,6 @@ Indented Javascript
 
     Dart Solution to same problem
     https://medium.com/dartlang/making-dart-a-better-language-for-ui-f1ccaf9f546c#f399
-
 
 ### Absolute Path
 

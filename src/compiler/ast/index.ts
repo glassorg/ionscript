@@ -164,6 +164,9 @@ export {
     default as ReturnStatement
 } from './ReturnStatement';
 export {
+    default as RuntimeType
+} from './RuntimeType';
+export {
     default as Scope
 } from './Scope';
 export {

@@ -136,7 +136,7 @@ ImportDeclaration
         let path = null
         if (Array.isArray(source) /* is Path */) {
             let local = source[source.length - 1]
-            if (local.name === "*" || !specifiers.find(d => ast.ImportDefaultSpecifier.is(d) || ast.ImportNamespaceSpecifier.is(d))) {
+            if (local.name === "*" || !specifiers.find(d => ast.ImportDefaultSpecifier.is(d) || ast.ImportNamespaceSpecifier.is(d) || d.local.name === local.name)) {
                 // smart import
                 let type = "ImportDefaultSpecifier"
                 if (local.name === "*") {
@@ -164,8 +164,12 @@ OutlineSpecifiers
 
 Path
     // TODO: add support for .*
-    = relative:(".")* head:Identifier tail:("." @Identifier)* final:(".*" { return node("Identifier", { name: "*"})})?
+    = relative:(".")* head:AtIdentifier tail:("." @Identifier)* final:(".*" { return node("Identifier", { name: "*"})})?
     { return [...getRelativePrefixSteps(relative.length), head, ...tail, ...(final ? [final] : [])] }
+
+AtIdentifier
+    = at:"@"? id:Identifier
+    { return at ? id.patch({ name: text() }) : id }
 
 Specifier
     = ImportDefaultSpecifier
@@ -323,8 +327,8 @@ IfStatement
 ReturnStatement
     = ReturnToken EOL Indent Dent argument:OutlineExpression Outdent
     { return node("ReturnStatement", { argument }) }
-    / ReturnToken _ argument:InlineExpression EOL?
-    { return node("ReturnStatement", { argument }) }
+    / ReturnToken _ argument:InlineExpression? EOL
+    { return node("ReturnStatement", { argument: argument || null }) }
 
 BreakStatement
     = BreakToken EOL
@@ -409,9 +413,7 @@ Extends
 ////////////////////////////////////////////////////////////////////////////////
 
 OutlineType
-    = OutlineFunction
-    / @InlineFunction EOL
-    / @InlineType EOL
+    = @InlineType EOL
 
 InlineType
     = type:UnionType
@@ -420,12 +422,12 @@ InlineType
             = ast.BinaryExpression.is(type)
             && ast.DotExpression.is(type.left)
             && type.operator === "is"
-            && ast.Reference.is(type.right)
+            && ast.RuntimeType.is(type.right)
         return isSimpleReference ? type.right : node("TypeExpression", { value: type })
     }
 
 UnionType
-    = left:ConstrainedType right:(_ "|" _ @UnionType)?
+   = left:ConstrainedType right:(_ "|" _ @UnionType)?
     { return right ? node('BinaryExpression', { left, operator: "||", right }) : left }
 
 ConstrainedType
@@ -444,7 +446,7 @@ Constraint
     // { return node('UnaryExpression', { operator: "typeof", argument })}
 
 FunctionType
-    = params:FunctionParameters _ ":" _ returnType:InlineType
+    = params:FunctionParametersWithParentheses _ "=>" _ returnType:InlineType
     { return node("FunctionType", { params, returnType }) }
     / "(" _ @FunctionType _ ")"
 
@@ -546,7 +548,7 @@ LogicalAndExpression
     { return buildBinaryExpression(head, tail) }
 
 LogicalOrOperator
-    = "||" / XorToken
+    = "||" / "??" / XorToken
 
 LogicalOrExpression
     = head:LogicalAndExpression tail:(_ LogicalOrOperator _ LogicalAndExpression)*
@@ -580,18 +582,24 @@ Parameter
     = id:Pattern _ type:(":" _ @InlineType)? _ value:("=" !">" _ @InlineExpression)?
     { return node("Parameter", { id, type, value })}
 
-FunctionParameters
+FunctionParametersAndType
+    = params:FunctionParametersWithParentheses type:(_ ":" _ @InlineType)? { return { params, type } }
+    / params:FunctionParametersWithoutParentheses { return { params } }
+
+FunctionParametersWithParentheses
     = "(" _ ")" { return [] }
-    / id:Declarator { return [node("Parameter", { id } )] }
     / "(" _ head:Parameter tail:(_ ',' _ @Parameter)* _ ")" { return [head, ...tail] }
+
+FunctionParametersWithoutParentheses
+    = id:Declarator { return [node("Parameter", { id } )] }
 
 FunctionArrow
     = "->" { return false }
     / "=>" { return true }
 
 FunctionHead
-    = async:AsyncToken? _ generator:"*"? id:(@Identifier &"(")? params:FunctionParameters? type:(_ ":" _ @InlineType)? _ bind:FunctionArrow
-    { return { id, type, async: async != null, generator: generator != null, bind, params: params || [] } }
+    = async:AsyncToken? _ generator:"*"? id:(@Identifier &"(")? paramsAndType:FunctionParametersAndType? _ bind:FunctionArrow
+    { return { id, ...(paramsAndType ?? { params: [] }), async: async != null, generator: generator != null, bind } }
 
 InlineFunction
     = head:FunctionHead _ value:InlineExpression?

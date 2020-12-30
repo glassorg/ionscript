@@ -71,10 +71,18 @@ export default function checkReferences(root: Assembly, options: Options) {
                     return getGlobalReference(node)
                 }
                 else {
-                    let declaration = getAncestor(node, ancestorsMap, Declaration.is)
+                    let declaration = getAncestor(declarator, ancestorsMap, Declaration.is)
                     if (VariableDeclaration.is(declaration)) {
                         let cls = getAncestor(declaration, ancestorsMap, ClassDeclaration.is)
                         if (declaration.instance && cls!.instance.declarations.find(d => (d.id as Declarator)?.name === node.name)) {
+                            // check that this isn't contained within a -> function nested within the local function
+                            //  that would cause 'this' values to be not bound
+                            let func = getAncestor(node, ancestorsMap, FunctionExpression.is)
+                            if (func) {
+                                if (func !== declaration.value && !func.bind) {
+                                    options.errors.push(SemanticError(`Function implicitly references this.${node.name}, use a bound function "=>"`, node))
+                                }
+                            }
                             // add implied this. to instance property references
                             return new MemberExpression({
                                 object: new ThisExpression({}),

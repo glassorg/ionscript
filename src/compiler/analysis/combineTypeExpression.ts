@@ -32,7 +32,15 @@ export function simplifyType(type: Type | Expression | null) {
     return type
 }
 
-export default function and(left: Expression | null, right: Expression | null): Expression | null {
+export function and(left: Expression | null, right: Expression | null): Expression | null {
+    return combineTypeExpression(left, right, "&&")
+}
+
+export function or(left: Expression | null, right: Expression | null): Expression | null {
+    return combineTypeExpression(left, right, "||")
+}
+
+export default function combineTypeExpression(left: Expression | null, right: Expression | null, operator: string): Expression | null {
     if (left == null) {
         return right
     }
@@ -41,5 +49,5 @@ export default function and(left: Expression | null, right: Expression | null): 
     }
     left = simplify(normalizeExpressions(left))
     right = simplify(normalizeExpressions(right))
-    return simplify(new BinaryExpression({ left, operator: "&&", right }))
+    return simplify(new BinaryExpression({ left, operator, right }))
 }

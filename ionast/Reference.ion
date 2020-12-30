@@ -3,5 +3,5 @@ import
     .*
 
 export
-    class Reference extends Identifier, Expression, Type # Type because it could be a type.
+    class Reference extends Identifier, Expression, Type, RuntimeType # Type because it could be a type.
         var arguments: Array<Type> | Null = null

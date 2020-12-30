@@ -5,6 +5,7 @@ import * as _Object from './ion/Object';
 import * as Identifier from './Identifier';
 import * as Expression from './Expression';
 import * as Type from './Type';
+import * as RuntimeType from './RuntimeType';
 import * as Node from './Node';
 import * as Typed from './Typed';
 import * as Location from './Location';
@@ -12,7 +13,7 @@ import * as Null from './ion/Null';
 import * as String from './ion/String';
 import * as _Array from './ion/Array';
 import * as Class from './ion/Class';
-export class Reference implements _Object.Object , Identifier.Identifier , Expression.Expression , Type.Type , Node.Node , Typed.Typed {
+export class Reference implements _Object.Object , Identifier.Identifier , Expression.Expression , Type.Type , RuntimeType.RuntimeType , Node.Node , Typed.Typed {
     readonly location: Location.Location | Null.Null;
     readonly name: String.String;
     readonly path: String.String | Null.Null;
@@ -25,6 +26,7 @@ export class Reference implements _Object.Object , Identifier.Identifier , Expre
         'Identifier',
         'Expression',
         'Type',
+        'RuntimeType',
         'Node',
         'Typed'
     ]);

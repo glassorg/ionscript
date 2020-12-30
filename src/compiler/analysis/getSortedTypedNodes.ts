@@ -29,7 +29,7 @@ function getNonRecursiveReturnStatements(fn: FunctionExpression): ReturnStatemen
             }
         },
         leave(node) {
-            if (ReturnStatement.is(node)) {
+            if (ReturnStatement.is(node) && node.argument != null) {
                 // make sure the return argument doesn't contain a recursive reference to itself.
                 if (fn.id?.path == null || !contains(node.argument, check => ast.Reference.is(check) && check.path === fn.id!.path)) {
                     statements.push(node)
@@ -146,7 +146,9 @@ const predecessors: { [P in keyof typeof ast]?: (e: InstanceType<typeof ast[P]>,
         yield* node.params
         if (node.returnType === null) {
             for (let returnStatement of getNonRecursiveReturnStatements(node)) {
-                yield returnStatement.argument  
+                if (returnStatement.argument != null) {
+                    yield returnStatement.argument
+                }
             }
         }
     },

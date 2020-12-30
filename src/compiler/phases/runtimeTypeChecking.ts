@@ -1,15 +1,32 @@
 import { Options } from "../Compiler"
 import { traverse, skip, replace } from "@glas/traverse"
 import Assembly from "../ast/Assembly"
-import { AssignmentStatement, BinaryExpression, BlockStatement, CallExpression, ClassDeclaration, Declaration, Declarator, DotExpression, Expression, ExpressionStatement, FunctionExpression, Identifier, IfStatement, ImportDeclaration, ImportNamespaceSpecifier, InstanceDeclarations, Literal, MemberExpression, ObjectExpression, Parameter, Program, Property, Reference, RegularExpression, ReturnStatement, Statement, ThisExpression, ThrowStatement, Type, TypeExpression, UnaryExpression, VariableDeclaration } from "../ast"
+import { AssignmentStatement, BinaryExpression, BlockStatement, CallExpression, ClassDeclaration, Declaration, Declarator, DotExpression, Expression, ExpressionStatement, FunctionExpression, FunctionType, Identifier, IfStatement, ImportDeclaration, ImportNamespaceSpecifier, InstanceDeclarations, Literal, MemberExpression, ObjectExpression, Parameter, Program, Property, Reference, RegularExpression, ReturnStatement, RuntimeType, Statement, ThisExpression, ThrowStatement, Type, TypeExpression, UnaryExpression, VariableDeclaration } from "../ast"
 import { getLast, runtimeModuleName } from "../common"
+import toCodeString from "../toCodeString"
+import combineExpressions from "../analysis/combineExpressions"
 
 // let Vector_x = Symbol("Vector_x")
 function getSymbolName(c: ClassDeclaration, d: VariableDeclaration) {
     return `${c.id.name}_${(d.id as Reference).name}`
 }
 
-function typeCheckOrThrow(value: Expression, type: Type, name: string): Statement {
+export function throwTypeError(type: Type, valueName: string): Statement {
+    let typeName = Reference.is(type) ? type.name : "Valid"
+    let stringValue = combineExpressions([
+        new Literal({ value: `${valueName} is not ${typeName}: ` }),
+        new Reference({ name: valueName })
+    ], "+")
+    return new ThrowStatement({
+        argument: new CallExpression({
+            new: true,
+            callee: new Reference({ name: "Error" }),
+            arguments: [stringValue]
+        })
+    })
+}
+
+export function typeCheckOrThrow(value: Expression, type: Type, name: string): Statement {
     return new IfStatement({
         test: new UnaryExpression({
             operator: "!",
@@ -17,13 +34,7 @@ function typeCheckOrThrow(value: Expression, type: Type, name: string): Statemen
         }),
         consequent: new BlockStatement({
             body: [
-                new ThrowStatement({
-                    argument: new CallExpression({
-                        new: true,
-                        callee: new Reference({ name: "Error" }),
-                        arguments: name ? [new Literal({ value: `Invalid value for ${name}`})] : []
-                    })
-                })
+                throwTypeError(type, name)
             ]
         })
     })
@@ -63,6 +74,8 @@ function replaceTypedVarsWithProperties(clas: ClassDeclaration, options: Options
                         // can convert to get/set with types here, BUT that would mean suckitude.
                         // convert to type and shit
                         return replace(
+                            // EITHER provide default here OR retain property for later createRuntime usage initializing in constructor and then remove.
+                            node.patch({ inherited: true }), // we flag inherited so it can be removed 
                             new VariableDeclaration({
                                 static: node.static,
                                 kind: "get",
@@ -89,7 +102,7 @@ function replaceTypedVarsWithProperties(clas: ClassDeclaration, options: Options
                                     params: [new Parameter({ id: new Declarator({ name: "value" }) })],
                                     body: new BlockStatement({
                                         body: [
-                                            typeCheckOrThrow(new Reference({ name: "value" }), node.type, name.replace('_', ' ')),
+                                            typeCheckOrThrow(new Reference({ name: "value" }), node.type, "value"),
                                             new AssignmentStatement({
                                                 left: new MemberExpression({
                                                     object: new ThisExpression({}),
@@ -110,7 +123,14 @@ function replaceTypedVarsWithProperties(clas: ClassDeclaration, options: Options
 }
 
 export function toRuntimeType(type, name: string) {
-    if (Reference.is(type) || MemberExpression.is(type) || Literal.is(type) || RegularExpression.is(type)) {
+
+    if (FunctionType.is(type)) {
+        //  we do NOT have runtime function type checking yet
+        //  so we at least just verify that it is in fact a function.
+        return new Reference({ name: "Function" })
+    }
+
+    if (RuntimeType.is(type)) {
         return type
     }
 
@@ -121,7 +141,6 @@ export function toRuntimeType(type, name: string) {
             property: new Identifier({ name: "Type" })
         }),
         arguments: [
-            new Literal({ value: name }),
             FunctionExpression.is(type)
             ? type
             : new FunctionExpression({
@@ -145,7 +164,8 @@ export function toRuntimeType(type, name: string) {
                         })
                     ]
                 })
-            })
+            }),
+            new Literal({ value: name }),
         ]
     })
 }

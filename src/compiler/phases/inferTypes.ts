@@ -14,7 +14,7 @@ import splitExpressions from "../analysis/splitExpressions"
 import combineExpressions from "../analysis/combineExpressions"
 import getMemberTypeExpression from "../analysis/getMemberTypeExpression"
 import getFinalStatements from "../analysis/getFinalStatements"
-import and, { simplifyType } from "../analysis/combineTypeExpression"
+import { simplifyType, and, or } from "../analysis/combineTypeExpression"
 import negate from "../analysis/negate"
 import { replaceNodes } from "./runtimeTypeChecking"
 
@@ -289,9 +289,14 @@ function toTypeExpression(type: ast.Type | ast.Expression | null): ast.TypeExpre
 export const inferType: {
     [P in keyof typeof ast]?: (node: InstanceType<typeof ast[P]>, c: InferContext) => any
 } = {
-    BinaryExpression(node) {
+    BinaryExpression(node, c) {
         // for now just use the left type
         let type = binaryOperationsType[node.operator]
+        let left = c.getResolved(node.left)
+        let right = c.getResolved(node.right)
+        if (node.operator === "??") {
+            type = toTypeExpression(or(left.type, right.type)) ?? types.Any
+        }
         if (type == null) {
             throw SemanticError(`Could not find type for operator: ${node.operator}`, node)
         }
@@ -498,11 +503,13 @@ export const inferType: {
                     let dotMember = new ast.MemberExpression({ object: new ast.DotExpression({}), property: d.id })
                     switch (d.kind) {
                         case "var":
-                            if (ast.TypeExpression.is(d.type)) {
-                                yield* [...splitExpressions(d.type.value)].map(term => replaceNodes(term, ast.DotExpression.is, dotMember))
-                            }
-                            else {
-                                yield is(d.type!, dotMember)
+                            if (d.type) {
+                                if (ast.TypeExpression.is(d.type)) {
+                                    yield* [...splitExpressions(d.type.value)].map(term => replaceNodes(term, ast.DotExpression.is, dotMember))
+                                }
+                                else {
+                                    yield is(d.type, dotMember)
+                                }
                             }
                             break;
                         case "let":
@@ -555,18 +562,23 @@ export const inferType: {
                 traverse(func.body, {
                     enter(node) {
                         if (ast.ReturnStatement.is(node)) {
-                            let resolvedValue = c.getResolved(node.argument)
-                            if (resolvedValue.type != null) {
-                                returnTypes.push(resolvedValue.type)
+                            if (node.argument == null) {
+                                returnTypes.push(types.Undefined)
                             }
                             else {
-                                // throw SemanticError(`Return Value type not resolved`, node)
-                                // console.log("type not resolved ===>", toCodeString(node.argument))
-                                if (returnTypes.indexOf(types.Any) < 0) {
-                                    returnTypes.push(types.Any)
+                                let resolvedValue = c.getResolved(node.argument)
+                                if (resolvedValue.type != null) {
+                                    returnTypes.push(resolvedValue.type)
                                 }
+                                else {
+                                    // throw SemanticError(`Return Value type not resolved`, node)
+                                    // console.log("type not resolved ===>", toCodeString(node.argument))
+                                    if (returnTypes.indexOf(types.Any) < 0) {
+                                        returnTypes.push(types.Any)
+                                    }
+                                }
+                                return skip
                             }
-                            return skip
                         }
                     }
                 })

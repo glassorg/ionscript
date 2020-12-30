@@ -1,7 +1,7 @@
 import { Options } from "../Compiler";
 import { traverse, skip, replace } from "@glas/traverse";
 import Assembly from "../ast/Assembly";
-import { ArrayExpression, AssignmentStatement, BinaryExpression, BlockStatement, CallExpression, ClassDeclaration, Declarator, DotExpression, Expression, ExpressionStatement, FunctionExpression, Identifier, ImportDeclaration, ImportDefaultSpecifier, ImportNamespaceSpecifier, InstanceDeclarations, Literal, MemberExpression, ObjectExpression, Parameter, Program, Property, Reference, RegularExpression, ReturnStatement, ThisExpression, TypeExpression, VariableDeclaration, Range, ForOfStatement, UnaryExpression, SpreadElement, FunctionType } from "../ast";
+import { ArrayExpression, AssignmentStatement, BinaryExpression, BlockStatement, CallExpression, ClassDeclaration, Declarator, DotExpression, Expression, ExpressionStatement, FunctionExpression, Identifier, ImportDeclaration, ImportDefaultSpecifier, ImportNamespaceSpecifier, InstanceDeclarations, Literal, MemberExpression, ObjectExpression, Parameter, Program, Property, Reference, RegularExpression, ReturnStatement, ThisExpression, TypeExpression, VariableDeclaration, Range, ForOfStatement, UnaryExpression, SpreadElement, FunctionType, RuntimeType } from "../ast";
 import { replaceNodes, toRuntimeType } from "./runtimeTypeChecking";
 import { typeProperties } from "./inferTypes";
 import { hasDeclarator, runtimeModuleName } from "../common";
@@ -100,7 +100,7 @@ export default function createRuntime(root: Assembly, options: Options) {
                         //     return new Reference({ name: "value" })
                         // }
                         if (BinaryExpression.is(node) && node.operator === "is") {
-                            if (Reference.is(node.right) || RegularExpression.is(node.right) || MemberExpression.is(node.right)) {
+                            if (RuntimeType.is(node.right)) {
                                 usesIonscript = true
                                 return new CallExpression({
                                     callee: new MemberExpression({
@@ -140,36 +140,52 @@ export default function createRuntime(root: Assembly, options: Options) {
                                 let instanceVarsWithDefaults = node.instance.declarations.filter(d => d.kind === "var" && d.value != null)
                                 if (instanceVarsWithDefaults.length > 0) {
                                     let ctor = node.instance.declarations.find(d => (d.id as Declarator).name === "constructor")
+                                    let newCtor = ctor
                                         ?? new VariableDeclaration({
                                             kind: "let",
                                             id: new Declarator({ name: "constructor" }),
                                             value: new FunctionExpression({
                                                 params: [],
                                                 body: new BlockStatement({
-                                                    body: []
+                                                    body: node.baseClasses.length
+                                                        ? [
+                                                            new ExpressionStatement({
+                                                                expression: new CallExpression({
+                                                                    callee: new Reference({ name: "super"}),
+                                                                    arguments: []
+                                                                })
+                                                            })
+                                                        ]
+                                                        : []
                                                 })
                                             })
                                         })
-                                    let newCtor = ctor.patch({
-                                        value: (ctor.value as FunctionExpression).patch({
+                                    let newCtorBody = [
+                                        ...instanceVarsWithDefaults.map(d => new AssignmentStatement({
+                                            left: new MemberExpression({
+                                                object: new ThisExpression({}),
+                                                property: new Identifier(d.id as Declarator)
+                                            }),
+                                            right: d.value!
+                                        })),
+                                        ...(newCtor.value as FunctionExpression).body.body
+                                    ]
+                                    // move any super call back to the top.
+                                    {
+                                        let isSuper = node => node?.expression?.callee?.name === "super"
+                                        let supers = newCtorBody.filter(isSuper)
+                                        let nonSupers = newCtorBody.filter(n => !isSuper(n))
+                                        newCtorBody = [...supers, ...nonSupers]
+                                    }
+
+                                    newCtor = newCtor.patch({
+                                        value: (newCtor.value as FunctionExpression).patch({
                                             body: new BlockStatement({
-                                                body: [
-                                                    ...instanceVarsWithDefaults.map(d => new AssignmentStatement({
-                                                        left: new MemberExpression({
-                                                            object: new ThisExpression({}),
-                                                            property: new Identifier(d.id as Declarator)
-                                                        }),
-                                                        right: d.value!
-                                                    })),
-                                                    ...(ctor.value as FunctionExpression).body.body
-                                                ]
+                                                body: newCtorBody
                                             })
                                         })
                                     })
-                                    let newInstances = node.instance.declarations.map(d => d === ctor ? newCtor : d)
-                                    if (newInstances.length === node.instance.declarations.length) {
-                                        newInstances = [newCtor, ...newInstances]
-                                    }
+                                    let newInstances = [newCtor, ...node.instance.declarations.filter(d => d !== ctor)]
                                     result = result.patch({
                                         instance: new InstanceDeclarations({
                                             declarations: newInstances

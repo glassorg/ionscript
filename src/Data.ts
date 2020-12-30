@@ -44,6 +44,14 @@ export default class Data {
         }
     }
 
+    toJSON() {
+        return { "": this.constructor.name, ...this }
+    }
+
+    static coerce(properties) {
+        return new this(properties)
+    }
+
     //  validate
     //  hashValue
     //  equals

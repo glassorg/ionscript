@@ -1,7 +1,7 @@
 import { Options } from "../Compiler";
 import { traverse, skip } from "@glas/traverse"
 import { VariableDeclaration, Identifier, Literal, Assembly, ClassDeclaration, Declaration, Reference, Node, Declarator, FunctionExpression, BlockStatement, AssignmentPattern, ObjectPattern, ObjectExpression, Parameter, Property, ExpressionStatement, AssignmentStatement, MemberExpression, ThisExpression, IfStatement, DotExpression, Statement, Expression, Type, TypeExpression, BinaryExpression, UnaryExpression, ThrowStatement, CallExpression } from "../ast";
-import { replaceNodes } from "./runtimeTypeChecking";
+import { replaceNodes, throwTypeError } from "./runtimeTypeChecking";
 import { clone } from "../common";
 import combineExpressions from "../analysis/combineExpressions";
 import * as types from "../types";
@@ -105,14 +105,7 @@ function createDataClassConstructor(node: ClassDeclaration, instanceVariables: V
                             }),
                             consequent: new BlockStatement({
                                 body: [
-                                    new ThrowStatement({
-                                        argument: new CallExpression({
-                                            callee: new Reference({ location: v.location, name: "Error" }),
-                                            arguments: [
-                                                new Literal({ value: `Invalid value for ${(v.id as Declarator).name}`})
-                                            ]
-                                        })
-                                    })
+                                    throwTypeError(v.type, (v.id as Declarator).name)
                                 ]
                             })
                         })

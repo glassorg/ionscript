@@ -1,3 +1,3 @@
 import Type from "./Type";
 
-export default new Type("Undefined", a => a === undefined)
+export default new Type(a => a === undefined, "Undefined")

@@ -3,6 +3,7 @@ This file was generated from ion source. Do not edit.
 */
 import * as _Object from './ion/Object';
 import * as Type from './Type';
+import * as RuntimeType from './RuntimeType';
 import * as Expression from './Expression';
 import * as Typed from './Typed';
 import * as Node from './Node';
@@ -12,7 +13,7 @@ import * as _Array from './ion/Array';
 import * as SpreadElement from './SpreadElement';
 import * as Boolean from './ion/Boolean';
 import * as Class from './ion/Class';
-export class FunctionType implements _Object.Object , Type.Type , Expression.Expression , Typed.Typed , Node.Node {
+export class FunctionType implements _Object.Object , Type.Type , RuntimeType.RuntimeType , Expression.Expression , Typed.Typed , Node.Node {
     readonly location: Location.Location | Null.Null;
     readonly type: Type.Type | Null.Null;
     readonly params: _Array.Array<Type.Type | SpreadElement.SpreadElement>;
@@ -23,6 +24,7 @@ export class FunctionType implements _Object.Object , Type.Type , Expression.Exp
         'FunctionType',
         'ion_Object',
         'Type',
+        'RuntimeType',
         'Expression',
         'Typed',
         'Node'

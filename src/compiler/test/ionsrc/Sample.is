@@ -1,12 +1,15 @@
+//  This causes an error.
+// <div />
+//     let { foo } = bar
 
-data class One
-    var x: Number = 0
-    let doubleX = x * 2
-    let double = a -> a * 2
-    var foo: Type
+// data class One
+//     var x: Number = 0
+//     let doubleX = x * 2
+//     let double = a -> a * 2
+//     var foo: Type
 
-data class Two extends One
-    var y: Number & >= 0 = 1
+// data class Two extends One
+//     var y: Number & >= 0 = 1
 
 // let x =
 //     foo()

@@ -2,12 +2,21 @@ import { is } from "./symbols"
 
 export default class Type {
 
-    name: string
     is: (a, type) => boolean
+    name: string
 
-    constructor(name: string, is: (a, type) => boolean) {
-        this.name = name
+    constructor(is: (a, type) => boolean, name?: string) {
         this.is = is
+        if (name == null) {
+            name = is.name
+            if (name == null) {
+                name = ""
+            }
+            if (name.startsWith("is")) {
+                name = name.slice(2)
+            }
+        }
+        this.name = name
     }
 
     toString() {

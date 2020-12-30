@@ -13,7 +13,7 @@ import * as Class from './ion/Class';
 export class ReturnStatement implements _Object.Object , Statement.Statement , Typed.Typed , Node.Node {
     readonly location: Location.Location | Null.Null;
     readonly type: Type.Type | Null.Null;
-    readonly argument: Expression.Expression;
+    readonly argument: Expression.Expression | Null.Null;
     static readonly id = 'ReturnStatement';
     static readonly implements = new Set([
         'ReturnStatement',
@@ -22,17 +22,17 @@ export class ReturnStatement implements _Object.Object , Statement.Statement , T
         'Typed',
         'Node'
     ]);
-    constructor({location = null, type = null, argument}: {
+    constructor({location = null, type = null, argument = null}: {
         location?: Location.Location | Null.Null,
         type?: Type.Type | Null.Null,
-        argument: Expression.Expression
+        argument?: Expression.Expression | Null.Null
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
             throw new Error('location is not a Location | Null: ' + Class.toString(location));
         if (!(Type.isType(type) || Null.isNull(type)))
             throw new Error('type is not a Type | Null: ' + Class.toString(type));
-        if (!Expression.isExpression(argument))
-            throw new Error('argument is not a Expression: ' + Class.toString(argument));
+        if (!(Expression.isExpression(argument) || Null.isNull(argument)))
+            throw new Error('argument is not a Expression | Null: ' + Class.toString(argument));
         this.location = location;
         this.type = type;
         this.argument = argument;
@@ -41,7 +41,7 @@ export class ReturnStatement implements _Object.Object , Statement.Statement , T
     patch(properties: {
         location?: Location.Location | Null.Null,
         type?: Type.Type | Null.Null,
-        argument?: Expression.Expression
+        argument?: Expression.Expression | Null.Null
     }) {
         return new ReturnStatement({
             ...this,

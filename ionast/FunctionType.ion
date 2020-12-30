@@ -3,7 +3,7 @@ import
     .*
 
 export
-    class FunctionType extends Type
+    class FunctionType extends Type, RuntimeType
         # params can have SpreadElements NOT RestElements because SpreadElements
         # argument is a Reference which can include the generic Array type arguments
         # for instance ...Array<Number>
