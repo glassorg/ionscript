@@ -1,7 +1,7 @@
 import { Options } from "../Compiler";
 import { traverse, skip, replace } from "@glas/traverse";
 import Assembly from "../ast/Assembly";
-import { ArrayExpression, AssignmentStatement, BinaryExpression, BlockStatement, CallExpression, ClassDeclaration, Declarator, DotExpression, Expression, ExpressionStatement, FunctionExpression, Identifier, ImportDeclaration, ImportDefaultSpecifier, ImportNamespaceSpecifier, InstanceDeclarations, Literal, MemberExpression, ObjectExpression, Parameter, Program, Property, Reference, RegularExpression, ReturnStatement, ThisExpression, TypeExpression, VariableDeclaration, Range, ForOfStatement, UnaryExpression, SpreadElement, FunctionType, RuntimeType } from "../ast";
+import { ArrayExpression, AssignmentExpression, BinaryExpression, BlockStatement, CallExpression, ClassDeclaration, Declarator, DotExpression, Expression, ExpressionStatement, FunctionExpression, Identifier, ImportDeclaration, ImportDefaultSpecifier, ImportNamespaceSpecifier, InstanceDeclarations, Literal, MemberExpression, ObjectExpression, Parameter, Program, Property, Reference, RegularExpression, ReturnStatement, ThisExpression, TypeExpression, VariableDeclaration, Range, ForOfStatement, UnaryExpression, SpreadElement, FunctionType, RuntimeType } from "../ast";
 import { replaceNodes, toRuntimeType } from "./runtimeTypeChecking";
 import { typeProperties } from "./inferTypes";
 import { hasDeclarator, runtimeModuleName } from "../common";
@@ -161,12 +161,14 @@ export default function createRuntime(root: Assembly, options: Options) {
                                             })
                                         })
                                     let newCtorBody = [
-                                        ...instanceVarsWithDefaults.map(d => new AssignmentStatement({
-                                            left: new MemberExpression({
-                                                object: new ThisExpression({}),
-                                                property: new Identifier(d.id as Declarator)
-                                            }),
-                                            right: d.value!
+                                        ...instanceVarsWithDefaults.map(d => new ExpressionStatement({
+                                            expression: new AssignmentExpression({
+                                                left: new MemberExpression({
+                                                    object: new ThisExpression({}),
+                                                    property: new Identifier(d.id as Declarator)
+                                                }),
+                                                right: d.value!
+                                            })
                                         })),
                                         ...(newCtor.value as FunctionExpression).body.body
                                     ]
@@ -197,12 +199,15 @@ export default function createRuntime(root: Assembly, options: Options) {
                             // remove extends from data classes and insert single extends from ionscript.Data
                             if (node.isData) {
                                 result = result.patch({
-                                    baseClasses: [
-                                        new MemberExpression({
-                                            object: new Reference({ name: runtimeModuleName }),
-                                            property: new Identifier({ name: "Data" })
-                                        })
-                                    ],
+                                    baseClasses:
+                                        node.isStruct
+                                        ? []
+                                        : [
+                                            new MemberExpression({
+                                                object: new Reference({ name: runtimeModuleName }),
+                                                property: new Identifier({ name: "Data" })
+                                            })
+                                        ],
                                     // also remove all the instance variable declarations
                                     instance: result.instance!.patch({
                                         declarations: []
@@ -345,12 +350,14 @@ export default function createRuntime(root: Assembly, options: Options) {
                             if (staticVarsWithDefaults.length > 0) {
                                 result = replace(
                                     result,
-                                    ...staticVarsWithDefaults.map(d => new AssignmentStatement({
-                                        left: new MemberExpression({
-                                            object: new Reference(node.id),
-                                            property: new Identifier(d.id as Declarator)
-                                        }),
-                                        right: d.value!
+                                    ...staticVarsWithDefaults.map(d => new ExpressionStatement({
+                                        expression: new AssignmentExpression({
+                                            left: new MemberExpression({
+                                                object: new Reference(node.id),
+                                                property: new Identifier(d.id as Declarator)
+                                            }),
+                                            right: d.value!
+                                        })
                                     })),
                                 )
                             }

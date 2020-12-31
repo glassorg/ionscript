@@ -1,7 +1,7 @@
 import { Options } from "../Compiler"
 import { traverse, skip, replace } from "@glas/traverse"
 import Assembly from "../ast/Assembly"
-import { AssignmentStatement, BinaryExpression, BlockStatement, CallExpression, ClassDeclaration, Declaration, Declarator, DotExpression, Expression, ExpressionStatement, FunctionExpression, FunctionType, Identifier, IfStatement, ImportDeclaration, ImportNamespaceSpecifier, InstanceDeclarations, Literal, MemberExpression, ObjectExpression, Parameter, Program, Property, Reference, RegularExpression, ReturnStatement, RuntimeType, Statement, ThisExpression, ThrowStatement, Type, TypeExpression, UnaryExpression, VariableDeclaration } from "../ast"
+import { AssignmentExpression, BinaryExpression, BlockStatement, CallExpression, ClassDeclaration, Declaration, Declarator, DotExpression, Expression, ExpressionStatement, FunctionExpression, FunctionType, Identifier, IfStatement, ImportDeclaration, ImportNamespaceSpecifier, InstanceDeclarations, Literal, MemberExpression, ObjectExpression, Parameter, Program, Property, Reference, RegularExpression, ReturnStatement, RuntimeType, Statement, ThisExpression, ThrowStatement, Type, TypeExpression, UnaryExpression, VariableDeclaration } from "../ast"
 import { getLast, runtimeModuleName } from "../common"
 import toCodeString from "../toCodeString"
 import combineExpressions from "../analysis/combineExpressions"
@@ -103,12 +103,14 @@ function replaceTypedVarsWithProperties(clas: ClassDeclaration, options: Options
                                     body: new BlockStatement({
                                         body: [
                                             typeCheckOrThrow(new Reference({ name: "value" }), node.type, "value"),
-                                            new AssignmentStatement({
-                                                left: new MemberExpression({
-                                                    object: new ThisExpression({}),
-                                                    property: new Reference({ name })
-                                                }),
-                                                right: new Reference({ name: "value" }),
+                                            new ExpressionStatement({
+                                                expression: new AssignmentExpression({
+                                                    left: new MemberExpression({
+                                                        object: new ThisExpression({}),
+                                                        property: new Reference({ name })
+                                                    }),
+                                                    right: new Reference({ name: "value" }),
+                                                })
                                             })
                                         ]
                                     })

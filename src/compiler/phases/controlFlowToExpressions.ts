@@ -1,9 +1,8 @@
 import { Options } from "../Compiler"
 import { traverse, skip, remove } from "@glas/traverse"
-import { ArrayExpression, BinaryExpression, BlockStatement, CallExpression, Declarator, ElementExpression, Expression, ExpressionStatement, FunctionExpression, Identifier, ImportDeclaration, ImportNamespaceSpecifier, ImportSpecifier, Literal, Location, MemberExpression, Node, ObjectExpression, OutlineOperation, Parameter, Program, Property, Reference, ReturnStatement, SpreadElement, Statement } from "../ast"
+import { ArrayExpression, BinaryExpression, BlockStatement, CallExpression, Declarator, ElementExpression, Expression, ExpressionStatement, FunctionExpression, Identifier, ImportDeclaration, ImportNamespaceSpecifier, ImportSpecifier, Literal, Location, MemberExpression, Node, ObjectExpression, OutlineOperation, Parameter, Program, Property, Reference, ReturnStatement, SpreadElement, Statement, AssignmentExpression } from "../ast"
 import Assembly from "../ast/Assembly"
 import ArrowFunctionExpression from "../ast/ArrowFunctionExpression"
-import AssignmentStatement from "../ast/AssignmentStatement"
 import { hasDeclarator, SemanticError } from "../common"
 
 function convertExpressionWithNestedStatements(node) {
@@ -56,15 +55,18 @@ function convertExpressionWithNestedStatements(node) {
                                     })
                                 }
                                 else {
-                                    return new AssignmentStatement({
+                                    return new ExpressionStatement({
                                         location,
-                                        left: new MemberExpression({
+                                        expression: new AssignmentExpression({
                                             location,
-                                            object: containerRef,
-                                            property: e.key,
-                                        }),
-                                        operator: "=",
-                                        right: e.value as Expression,
+                                            left: new MemberExpression({
+                                                location,
+                                                object: containerRef,
+                                                property: e.key,
+                                            }),
+                                            operator: "=",
+                                            right: e.value as Expression,
+                                        })
                                     })
                                 }
                             }
@@ -210,15 +212,18 @@ function convertExpressionWithNestedStatements(node) {
                                     if (addedChildren) {
                                         throw SemanticError(`Properties must be set before children`, e)
                                     }
-                                    return new AssignmentStatement({
+                                    return new ExpressionStatement({
                                         location,
-                                        left: new MemberExpression({
+                                        expression: new AssignmentExpression({
                                             location,
-                                            object: new Reference({ location, name: propertiesName }),
-                                            property: e.key,
-                                        }),
-                                        operator: "=",
-                                        right: e.value as Expression,
+                                            left: new MemberExpression({
+                                                location,
+                                                object: new Reference({ location, name: propertiesName }),
+                                                property: e.key,
+                                            }),
+                                            operator: "=",
+                                            right: e.value as Expression,
+                                        })
                                     })
                                 }
                                 if ((Expression.is(e) || SpreadElement.is(e)) && Array.isArray(parent)) {

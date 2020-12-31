@@ -189,6 +189,7 @@ Indented Javascript
     X   Fix for incremental compile failing because of above.
         Fix module scoped 'parse' and static 'parse' function resolution incorrectly to class.parse
         Need Concise Export from Import Syntax
+        Turn AssignmentStatements into AssignmentExpression
         Fix this compile error
             <div />
                 let { foo } = bar

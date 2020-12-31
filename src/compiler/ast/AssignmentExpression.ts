@@ -2,7 +2,7 @@
 This file was generated from ion source. Do not edit.
 */
 import * as _Object from './ion/Object';
-import * as Statement from './Statement';
+import * as Expression from './Expression';
 import * as Typed from './Typed';
 import * as Node from './Node';
 import * as Location from './Location';
@@ -10,19 +10,18 @@ import * as Null from './ion/Null';
 import * as Type from './Type';
 import * as String from './ion/String';
 import * as Pattern from './Pattern';
-import * as Expression from './Expression';
 import * as Class from './ion/Class';
-export class AssignmentStatement implements _Object.Object , Statement.Statement , Typed.Typed , Node.Node {
+export class AssignmentExpression implements _Object.Object , Expression.Expression , Typed.Typed , Node.Node {
     readonly location: Location.Location | Null.Null;
     readonly type: Type.Type | Null.Null;
     readonly operator: String.String;
     readonly left: Pattern.Pattern | Expression.Expression;
     readonly right: Expression.Expression;
-    static readonly id = 'AssignmentStatement';
+    static readonly id = 'AssignmentExpression';
     static readonly implements = new Set([
-        'AssignmentStatement',
+        'AssignmentExpression',
         'ion_Object',
-        'Statement',
+        'Expression',
         'Typed',
         'Node'
     ]);
@@ -57,16 +56,16 @@ export class AssignmentStatement implements _Object.Object , Statement.Statement
         left?: Pattern.Pattern | Expression.Expression,
         right?: Expression.Expression
     }) {
-        return new AssignmentStatement({
+        return new AssignmentExpression({
             ...this,
             ...properties
         });
     }
-    static is(value): value is AssignmentStatement {
-        return isAssignmentStatement(value);
+    static is(value): value is AssignmentExpression {
+        return isAssignmentExpression(value);
     }
 }
-export function isAssignmentStatement(value): value is AssignmentStatement {
-    return Class.isInstance(AssignmentStatement, value);
+export function isAssignmentExpression(value): value is AssignmentExpression {
+    return Class.isInstance(AssignmentExpression, value);
 }
-export default AssignmentStatement;
+export default AssignmentExpression;

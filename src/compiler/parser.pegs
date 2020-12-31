@@ -292,13 +292,19 @@ AssignmentOperator
     / "*="
     / "/="
 
+AssignmentLeftOperator
+    = left:InlineExpression _ operator:AssignmentOperator
+    { return { left, operator } }
+
 AssignmentStatement
-    = left:InlineExpression _ operator:AssignmentOperator _ right:OutlineExpression
+    = leftOps:AssignmentLeftOperator+ _ right:OutlineExpression
     {
-        // if (operator.length > 1) {
-        //     right = operation(left, node("Identifier",{ name:operator.slice(0,-1) }), right)
-        // }
-        return node("AssignmentStatement", {left, operator, right})
+        // consume right to left
+        for (let i = leftOps.length - 1; i >= 0; i--) {
+            let { left, operator } = leftOps[i]
+            right = node("AssignmentExpression", { left, operator, right })
+        }
+        return node("ExpressionStatement", { expression: right })
     }
 
 BlockStatement

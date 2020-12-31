@@ -1,6 +1,6 @@
 import { Options } from "../Compiler";
 import { traverse, skip } from "@glas/traverse"
-import { Assembly, AssignmentStatement, BinaryExpression, BlockStatement, CallExpression, ClassDeclaration, Declarator, DotExpression, Expression, ExpressionStatement, ForStatement, FunctionExpression, Identifier, InstanceDeclarations, Literal, MemberExpression, Node, Parameter, Reference, ReturnStatement, ThisExpression, Type, TypeExpression, UnaryExpression, Variable, VariableDeclaration, YieldExpression } from "../ast";
+import { Assembly, AssignmentExpression, BinaryExpression, BlockStatement, CallExpression, ClassDeclaration, Declarator, DotExpression, Expression, ExpressionStatement, ForStatement, FunctionExpression, Identifier, InstanceDeclarations, Literal, MemberExpression, Node, Parameter, Reference, ReturnStatement, ThisExpression, Type, TypeExpression, UnaryExpression, Variable, VariableDeclaration, YieldExpression } from "../ast";
 import createScopeMaps, { NodeMap, ScopeMap } from "../createScopeMaps";
 import { getOriginalDeclaration, SemanticError } from "../common";
 import toCodeString from "../toCodeString";
@@ -162,7 +162,7 @@ function createTypedArrayDeclaration(cls: ClassDeclaration, fields: FieldInfo[],
             }),
             property: indexer
         })
-        return setFrom ? new AssignmentStatement({
+        return setFrom ? new AssignmentExpression({
             left: expression,
             operator: "=",
             right: new MemberExpression({
@@ -208,14 +208,14 @@ function createTypedArrayDeclaration(cls: ClassDeclaration, fields: FieldInfo[],
                                             ]
                                         })
                                     }),
-                                    new AssignmentStatement({
+                                    new AssignmentExpression({
                                         left: new MemberExpression({
                                             object: new ThisExpression({}),
                                             property: new Identifier({ name: "length" })
                                         }),
                                         right: new Reference({ name: "length" })
                                     }),
-                                    ...actualFields.map(field => new AssignmentStatement({
+                                    ...actualFields.map(field => new AssignmentExpression({
                                         left: new MemberExpression({
                                             object: new ThisExpression({}),
                                             property: new Identifier({ name: field.name })

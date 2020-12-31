@@ -685,7 +685,7 @@ export const inferType: {
         type = getChainedConditionalTypeAssertion(c, type, node, "?");
         return { type }
     },
-    AssignmentStatement(node, c) {
+    AssignmentExpression(node, c) {
         let left = c.getResolved(node.left)
         let right = c.getResolved(node.right)
         if (!c.isAssignable(left)) {

@@ -3,14 +3,10 @@ import { traverse, skip, replace, remove } from "@glas/traverse"
 import { BinaryExpression, CallExpression, ConditionalDeclaration, DotExpression, Exportable, FunctionExpression, Identifier, ImportDeclaration, Literal, Node, Parameter, Program, RegularExpression, ReturnStatement, SwitchCase, UnaryExpression } from "../ast"
 import Position from "../ast/Position"
 import VariableDeclaration from "../ast/VariableDeclaration"
-import Reference from "../ast/Reference"
 import MemberExpression from "../ast/MemberExpression"
 import Expression from "../ast/Expression"
-import Declaration from "../ast/Declaration"
 import ClassDeclaration from "../ast/ClassDeclaration"
-import AssignmentStatement from "../ast/AssignmentStatement"
 import { SemanticError } from "../common"
-import Declarator from "../ast/Declarator"
 
 const operatorMap = {
     "==": "==="
@@ -67,18 +63,6 @@ export default function toEsTree(root: Map<string, any>, options: Options) {
                             init: values.value,
                             kind: node.kind,
                         }]
-                    }
-                }
-                else if (AssignmentStatement.is(node)) {
-                    let values = { ...node, ...changes }
-                    result = {
-                        type: "ExpressionStatement",
-                        expression: {
-                            type: "AssignmentExpression",
-                            left: values.left,
-                            operator: values.operator,
-                            right: values.right,
-                        }
                     }
                 }
                 else if (Parameter.is(node)) {

@@ -14,11 +14,11 @@ export {
     default as Assembly
 } from './Assembly';
 export {
+    default as AssignmentExpression
+} from './AssignmentExpression';
+export {
     default as AssignmentPattern
 } from './AssignmentPattern';
-export {
-    default as AssignmentStatement
-} from './AssignmentStatement';
 export {
     default as AwaitExpression
 } from './AwaitExpression';
