@@ -65,6 +65,12 @@ export {
     default as ElementExpression
 } from './ElementExpression';
 export {
+    default as ExportNamedDeclaration
+} from './ExportNamedDeclaration';
+export {
+    default as ExportSpecifier
+} from './ExportSpecifier';
+export {
     default as Exportable
 } from './Exportable';
 export {

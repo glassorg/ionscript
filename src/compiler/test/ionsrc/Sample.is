@@ -1,5 +1,5 @@
-
-x = y = true
+export import foo.bar
+    as default
 
 //  This causes an error.
 // <div />

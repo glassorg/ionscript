@@ -119,7 +119,7 @@ export function getSemanticHighlights(
             }
 
             if (ImportDeclaration.is(node)) {
-                highlightStartingKeywords(node.location.start.line, 1);
+                highlightStartingKeywords(node.location.start.line, node.export ? 2 : 1);
                 if (node.path) {
                     const last = node.path[node.path.length - 1]
                     let isAutoImport = Identifier.is(last) && node.specifiers.find(s => {

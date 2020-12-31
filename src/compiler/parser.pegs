@@ -114,7 +114,7 @@ Default
 
 ExportNamedDeclaration
     = ExportToken _ declaration:(Declaration / ImportDeclaration)
-    { return node(declaration.constructor.name, { ...declaration, location: getLocation(), export: 1 }) }
+    { return declaration.patch({ location: getLocation(), export: 1 }) }
 
 ExportDefaultDeclaration
     = ExportToken _ isDefault:DefaultToken? _ value:(ClassDeclaration / OutlineExpression)
