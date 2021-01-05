@@ -15,6 +15,7 @@ Object.defineProperties(Object.prototype, {
                 let value = this[name]
                 yield [name, value]
             }
-        }
+        },
+        configurable: true,
     }
 })

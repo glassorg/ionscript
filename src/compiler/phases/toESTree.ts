@@ -1,6 +1,6 @@
 import { Options } from "../Compiler"
 import { traverse, skip, replace, remove } from "@glas/traverse"
-import { BinaryExpression, CallExpression, ConditionalDeclaration, DotExpression, Exportable, FunctionExpression, Identifier, ImportDeclaration, Literal, Node, Parameter, Program, RegularExpression, ReturnStatement, SwitchCase, UnaryExpression } from "../ast"
+import { BinaryExpression, CallExpression, ConditionalDeclaration, DotExpression, Exportable, FunctionExpression, Identifier, ImportDeclaration, Literal, Node, Parameter, Program, RegularExpression, ReturnStatement, SwitchCase, TemplateElement, UnaryExpression } from "../ast"
 import Position from "../ast/Position"
 import VariableDeclaration from "../ast/VariableDeclaration"
 import MemberExpression from "../ast/MemberExpression"
@@ -113,6 +113,10 @@ export default function toEsTree(root: Map<string, any>, options: Options) {
                             result.expression = true
                         }
                     }
+                    // remove id's that aren't identifiers
+                    if (!Identifier.is(node.id)) {
+                        result.id = null
+                    }
                 }
                 //  convert UnaryExpressions to UpdateExpressions if they use ++ or --
                 if (UnaryExpression.is(node) && (node.operator === "++" || node.operator === "--")) {
@@ -130,6 +134,9 @@ export default function toEsTree(root: Map<string, any>, options: Options) {
                     // EsTree SwitchCase.consequent: Array<Statement>
                     // Ours is BlockStatement, so we convert to theirs.
                     result.consequent = result.consequent?.body ?? []
+                }
+                if (TemplateElement.is(node)) {
+                    result.value = { raw: result.valueRaw, cooked: result.valueCooked }
                 }
                 if (CallExpression.is(node) && node.new) {
                     result.type = "NewExpression"
@@ -174,13 +181,13 @@ export default function toEsTree(root: Map<string, any>, options: Options) {
                 if (Exportable.is(node) && node.export > 0) {
                     if (ImportDeclaration.is(node)) {
                         throw new Error("This is not implemented right")
-                        result = replace({
-                            type: "ExpressionStatement",
-                            expression: { type: "Literal", value: "???" },
-                        }, {
-                            type: "ExpressionStatement",
-                            expression: { type: "Literal", value: "???" },
-                        })
+                        // result = replace({
+                        //     type: "ExpressionStatement",
+                        //     expression: { type: "Literal", value: "???" },
+                        // }, {
+                        //     type: "ExpressionStatement",
+                        //     expression: { type: "Literal", value: "???" },
+                        // })
                     }
                     else {
                         if (node.export === 2) {

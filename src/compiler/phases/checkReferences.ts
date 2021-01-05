@@ -71,35 +71,35 @@ export default function checkReferences(root: Assembly, options: Options) {
                     return getGlobalReference(node)
                 }
                 else {
-                    let declaration = getAncestor(declarator, ancestorsMap, Declaration.is)
-                    if (VariableDeclaration.is(declaration)) {
-                        let cls = getAncestor(declaration, ancestorsMap, ClassDeclaration.is)
-                        if (declaration.instance && cls!.instance.declarations.find(d => (d.id as Declarator)?.name === node.name)) {
-                            // check that this isn't contained within a -> function nested within the local function
-                            //  that would cause 'this' values to be not bound
-                            let func = getAncestor(node, ancestorsMap, FunctionExpression.is)
-                            if (func) {
-                                if (func !== declaration.value && !func.bind) {
-                                    options.errors.push(SemanticError(`Function implicitly references this.${node.name}, use a bound function "=>"`, node))
-                                }
-                            }
-                            // add implied this. to instance property references
-                            return new MemberExpression({
-                                object: new ThisExpression({}),
-                                property: new Identifier(node)
-                            })
-                        }
-                        else if (declaration.static && cls!.static.find(d => (d.id as Declarator)?.name === node.name)) {
-                            //  add implied Class. to static property references
-                            let classDeclaration = getAncestor(node, ancestorsMap, ClassDeclaration.is)
-                            // declaratorAncestors[declaratorAncestors.length - 3] as ClassDeclaration
-                            return new MemberExpression({
-                                object: new Reference(classDeclaration!.id),
-                                property: new Identifier(node)
-                            })
-                        }
-                    }
-                    return node.patch({ path: getName(declarator) })
+                    // let declaration = getAncestor(declarator, ancestorsMap, Declaration.is)
+                    // if (VariableDeclaration.is(declaration)) {
+                    //     let cls = getAncestor(declaration, ancestorsMap, ClassDeclaration.is)
+                    //     if (declaration.instance && cls!.instance.declarations.find(d => (d.id as Declarator)?.name === node.name)) {
+                    //         // check that this isn't contained within a -> function nested within the local function
+                    //         //  that would cause 'this' values to be not bound
+                    //         let func = getAncestor(node, ancestorsMap, FunctionExpression.is)
+                    //         if (func) {
+                    //             if (func !== declaration.value && !func.bind) {
+                    //                 options.errors.push(SemanticError(`Function implicitly references this.${node.name}, use a bound function "=>"`, node))
+                    //             }
+                    //         }
+                    //         // add implied this. to instance property references
+                    //         return new MemberExpression({
+                    //             object: new ThisExpression({}),
+                    //             property: new Identifier(node)
+                    //         })
+                    //     }
+                    //     else if (declaration.static && cls!.static.find(d => (d.id as Declarator)?.name === node.name)) {
+                    //         //  add implied Class. to static property references
+                    //         let classDeclaration = getAncestor(node, ancestorsMap, ClassDeclaration.is)
+                    //         // declaratorAncestors[declaratorAncestors.length - 3] as ClassDeclaration
+                    //         return new MemberExpression({
+                    //             object: new Reference(classDeclaration!.id),
+                    //             property: new Identifier(node)
+                    //         })
+                    //     }
+                    // }
+                    // return node.patch({ path: getName(declarator) })
                 }
             }
             // semantic checks.

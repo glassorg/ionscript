@@ -36,7 +36,7 @@ const defaultPhases = [
     controlFlowToExpressions,
     checkReferences, // probably leave this here.
     // createConditionalDeclarations,
-    // // addDataClassConstructors,    // removed as part of refactoring to isolated file compilation with Data.properties
+    addDataClassConstructors,
     // inferTypes,
 
     addTypedStructArrays,
@@ -45,6 +45,7 @@ const defaultPhases = [
     runtimeTypeChecking,
     createRuntime,
     toEsTree,
+    identity,
     codegen,
     toModuleFiles,
 

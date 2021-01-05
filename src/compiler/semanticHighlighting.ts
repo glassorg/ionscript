@@ -1,5 +1,5 @@
 import { traverse } from "@glas/traverse";
-import { ArrayPattern, AwaitExpression, BinaryExpression, BreakStatement, CallExpression, ClassDeclaration, ContinueStatement, Declarator, ElementExpression, ForOfStatement, ForStatement, FunctionExpression, Identifier, IfStatement, ImportDeclaration, ImportDefaultSpecifier, ImportNamespaceSpecifier, Literal, MemberExpression, ModuleSpecifier, Parameter, Pattern, Property, Reference, RegularExpression, ReturnStatement, ThisExpression, ThrowStatement, TryStatement, Typed, TypeExpression, UnaryExpression, VariableDeclaration, YieldExpression } from "./ast";
+import { ArrayPattern, AwaitExpression, BinaryExpression, BreakStatement, CallExpression, ClassDeclaration, ContinueStatement, Declarator, ElementExpression, ForOfStatement, ForStatement, FunctionExpression, Identifier, IfStatement, ImportDeclaration, ImportDefaultSpecifier, ImportNamespaceSpecifier, Literal, MemberExpression, ModuleSpecifier, Parameter, Pattern, Property, Reference, RegularExpression, ReturnStatement, ThisExpression, ThrowStatement, TryStatement, Typed, TypeExpression, UnaryExpression, VariableDeclaration, YieldExpression, WhileStatement, BlockStatement, ExpressionStatement, TemplateLiteral, TemplateElement } from "./ast";
 import Parser from "./parser";
 import reservedWords from "./reservedWords";
 import toCodeString from "./toCodeString";
@@ -145,6 +145,16 @@ export function getSemanticHighlights(
                 push(node.value, ...typeTokenTypes);
             }
 
+            if (WhileStatement.is(node)) {
+                // colorize the while
+                push({ start: node.location.start, end: add(node.location.start, "while".length) }, "keyword");
+            }
+
+            if (BlockStatement.is(node) || ExpressionStatement.is(node) && CallExpression.is(node.expression)) {
+                // *could* be a do statement
+                highlightStartingKeywords(node.location.start.line, 1);
+            }
+
             if (IfStatement.is(node)) {
                 // colorize the if
                 push({ start: node.location.start, end: add(node.location.start, "if".length) }, "keyword");
@@ -278,6 +288,22 @@ export function getSemanticHighlights(
             if (Reference.is(node)) {
                 push(node, ...(isType(node.name) ? typeTokenTypes : ["variable"]))
             }
+            if (TemplateElement.is(node)) {
+                push(node, "string")
+            }
+            if (TemplateLiteral.is(node)) {
+                // we highlight the first and last char of the location since the first and last quasi TemplateElements above won't cover them.
+                {
+                    let { line, column } = node.location.start
+                    push({ start: { line, column }, end: { line, column: column + 1 }}, "string")
+                }
+                {
+                    let { line, column } = node.location.end
+                    push({ start: { line, column: column - 1 }, end: { line, column }}, "string")
+                }
+            }
+        },
+        leave(node) {
         }
     });
 

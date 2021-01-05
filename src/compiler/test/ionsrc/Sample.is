@@ -1,5 +1,15 @@
-export import foo.bar
-    as default
+`Very cool ${x.foo()} Kanye${bar}foo${x+2}what`
+
+"hello"
+
+// import Vector4 from "./Vector4"
+
+// export default data struct Color
+//     var red: number
+//     var green: number
+//     var blue: number
+//     var alpha: number
+
 
 //  This causes an error.
 // <div />

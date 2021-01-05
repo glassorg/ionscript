@@ -3,8 +3,7 @@ import { getDeclarator, SemanticError } from "../common";
 import { traverse, skip } from "@glas/traverse"
 import { VariableDeclaration, Identifier, Literal, Assembly, ClassDeclaration, Declaration, Reference, Node, Declarator, FunctionExpression, BlockStatement, AssignmentPattern, ObjectPattern, ObjectExpression, Parameter, Property, ExpressionStatement, AssignmentExpression, MemberExpression, ThisExpression, IfStatement, DotExpression, Statement, Expression, Type, TypeExpression, BinaryExpression, UnaryExpression, ThrowStatement, CallExpression } from "../ast";
 import createScopeMaps from "../createScopeMaps";
-import { replaceNodes } from "./runtimeTypeChecking";
-import { Ref } from "react";
+import toCodeString from "../toCodeString";
 
 function mergeDeclarations(base: VariableDeclaration, sub: VariableDeclaration) {
     // this should actually check that the types can be merged.
@@ -32,7 +31,9 @@ export default function inheritBaseClasses(root: Assembly, options: Options) {
             function addDeclarations(declarations: Iterable<VariableDeclaration>, patch?) {
                 for (let declaration of declarations) {
                     if (!Identifier.is(declaration.id)) {
-                        throw SemanticError("invalid destructuring on class variable", declaration.id)
+                        baseDeclarations.set(JSON.stringify(declaration.id), declaration)
+                        continue
+                        // throw SemanticError("invalid destructuring on class variable", declaration.id)
                     }
                     if (declaration.id.name === "constructor") {
                         // we don't inherit constructors, they are added automatically one per concrete class

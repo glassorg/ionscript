@@ -137,7 +137,7 @@ export default function createRuntime(root: Assembly, options: Options) {
                             let result = node
                             if (!node.isData) {
                                 //  iterate and find var variables with a default value
-                                let instanceVarsWithDefaults = node.instance.declarations.filter(d => d.kind === "var" && d.value != null)
+                                let instanceVarsWithDefaults = node.instance.declarations.filter(d => d.kind === "var" && d.value != null && Identifier.is(d.id))
                                 if (instanceVarsWithDefaults.length > 0) {
                                     let ctor = node.instance.declarations.find(d => (d.id as Declarator).name === "constructor")
                                     let newCtor = ctor
@@ -209,9 +209,9 @@ export default function createRuntime(root: Assembly, options: Options) {
                                             })
                                         ],
                                     // also remove all the instance variable declarations
-                                    instance: result.instance!.patch({
-                                        declarations: []
-                                    })
+                                    // instance: result.instance!.patch({
+                                    //     declarations: []
+                                    // })
                                 })
                             }
                             //  handle static vars and typed vars
@@ -271,7 +271,7 @@ export default function createRuntime(root: Assembly, options: Options) {
                                                                 })
                                                             })
                                                         ) as any,
-                                                        ...node.instance.declarations.filter(d => !d.inherited && d.instance && (d.id as any).name !== "constructor").map(
+                                                        ...node.instance.declarations.filter(d => !d.inherited && d.instance && Identifier.is(d.id) && d.id.name !== "constructor").map(
                                                             d => {
                                                                 let name = (d.id as Declarator).name
                                                                 return new ArrayExpression({

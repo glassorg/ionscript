@@ -168,7 +168,22 @@ function convertExpressionWithNestedStatements(node) {
         })
     }
     else if (ElementExpression.is(node)) {
-        let hasNonPropertyStatements = node.children.find(a => Statement.is(a)) != null
+        let { children } = node
+        // convert Named FunctionExpressions into equivalent Property's.
+        children = children.map(child => {
+            if (FunctionExpression.is(child) && child.id != null) {
+                return new Property({
+                    location,
+                    key: child.id,
+                    value: child,
+                    method: true,
+                })
+            }
+            return child
+        })
+
+        let hasNonPropertyStatements = children.find(Statement.is) != null
+        console.log({ hasNonPropertyStatements })
         const propertiesName = "$"
         const childrenName = "children"
         let kind = node.kind
@@ -190,7 +205,7 @@ function convertExpressionWithNestedStatements(node) {
                     expression: false,
                     body: new BlockStatement({
                         location,
-                        body: traverse(node.children, {
+                        body: traverse(children, {
                             enter(e) {
                                 //  don't traverse into call expressions
                                 //  also don't recurse into expressions or expression statements
@@ -206,6 +221,11 @@ function convertExpressionWithNestedStatements(node) {
                                 if (ExpressionStatement.is(e)) {
                                     e = e.expression
                                 }
+                                if (FunctionExpression.is(e) && e.id != null) {
+                                    // convert a named function expression into an equivalent property
+                                    e = new Property({ key: e.id, value: e })
+                                }
+                    
                                 if (Property.is(e) && Array.isArray(parent)) {
                                     //  we do NOT allow properties to be set AFTER children have been added
                                     //  it would make it difficult to differentiate the properties from the children.
@@ -288,40 +308,51 @@ function convertExpressionWithNestedStatements(node) {
             })
         }
         // we are converting this into a simple createElement(kind, properties, ...children) function call
-        let properties = [ ...node.properties ]
-        let children: Array<any> = []
-        for (let child of node.children) {
-            if (Property.is(child)) {
-                properties.push(child)
-            }
-            else {
-                if (!(Expression.is(child) || SpreadElement.is(child))) {
-                    throw SemanticError("Expected Expression or SpreadElement", child)
+        {
+            let properties = [ ...node.properties ]
+            let children: Array<any> = []
+            for (let child of node.children) {
+                if (Property.is(child)) {
+                    properties.push(child)
                 }
-                children.push(child)
-            }
-        }
-        //  TODO: We should probably just output JSX
-        let args: Array<any> = [
-            kind,
-            new ObjectExpression({
-                location,
-                properties: [
-                    ...properties,
-                    new Property({
+                else if (FunctionExpression.is(child) && child.id != null) {
+                    properties.push(new Property({
                         location,
-                        key: new Identifier({ location, name: "children" }),
-                        value: new ArrayExpression({ location, elements: children })
-                    })
-                ]
+                        key: child.id,
+                        value: child,
+                        method: true,
+                    }))
+                }
+                else {
+                    console.log("------", child)
+                    if (!(Expression.is(child) || SpreadElement.is(child))) {
+                        throw SemanticError("Expected Expression or SpreadElement", child)
+                    }
+                    children.push(child)
+                }
+            }
+            //  TODO: We should probably just output JSX
+            let args: Array<any> = [
+                kind,
+                new ObjectExpression({
+                    location,
+                    properties: [
+                        ...properties,
+                        new Property({
+                            location,
+                            key: new Identifier({ location, name: "children" }),
+                            value: new ArrayExpression({ location, elements: children })
+                        })
+                    ]
+                })
+                // ...children
+            ]
+            return new CallExpression({
+                location,
+                callee: new Reference({ location, name: "jsx" }),
+                arguments: args
             })
-            // ...children
-        ]
-        return new CallExpression({
-            location,
-            callee: new Reference({ location, name: "jsx" }),
-            arguments: args
-        })
+        }
     }
 }
 
@@ -395,7 +426,7 @@ export default function controlFlowToExpressions(root: Assembly, options: Option
                                         imported: new Reference({ name: "jsx", location })
                                     })
                                 ],
-                                source: new Literal({ value: "react/jsx-runtime", location })
+                                source: new Literal({ value: "preact/jsx-runtime", location })
                             }),
                             ...program.body
                         ]

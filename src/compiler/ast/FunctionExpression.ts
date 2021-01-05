@@ -18,7 +18,7 @@ import * as Class from './ion/Class';
 export class FunctionExpression implements _Object.Object , Expression.Expression , Scope.Scope , Type.Type , Typed.Typed , Node.Node {
     readonly location: Location.Location | Null.Null;
     readonly type: Type.Type | Null.Null;
-    readonly id: Identifier.Identifier | Null.Null;
+    readonly id: Identifier.Identifier | (Expression.Expression | Null.Null);
     readonly bind: Boolean.Boolean;
     readonly params: _Array.Array<Parameter.Parameter>;
     readonly body: BlockStatement.BlockStatement;
@@ -48,7 +48,7 @@ export class FunctionExpression implements _Object.Object , Expression.Expressio
     }: {
         location?: Location.Location | Null.Null,
         type?: Type.Type | Null.Null,
-        id?: Identifier.Identifier | Null.Null,
+        id?: Identifier.Identifier | (Expression.Expression | Null.Null),
         bind?: Boolean.Boolean,
         params: _Array.Array<Parameter.Parameter>,
         body: BlockStatement.BlockStatement,
@@ -60,8 +60,8 @@ export class FunctionExpression implements _Object.Object , Expression.Expressio
             throw new Error('location is not a Location | Null: ' + Class.toString(location));
         if (!(Type.isType(type) || Null.isNull(type)))
             throw new Error('type is not a Type | Null: ' + Class.toString(type));
-        if (!(Identifier.isIdentifier(id) || Null.isNull(id)))
-            throw new Error('id is not a Identifier | Null: ' + Class.toString(id));
+        if (!(Identifier.isIdentifier(id) || (Expression.isExpression(id) || Null.isNull(id))))
+            throw new Error('id is not a Identifier | Expression | Null: ' + Class.toString(id));
         if (!Boolean.isBoolean(bind))
             throw new Error('bind is not a Boolean: ' + Class.toString(bind));
         if (!_Array.isArray(params))
@@ -88,7 +88,7 @@ export class FunctionExpression implements _Object.Object , Expression.Expressio
     patch(properties: {
         location?: Location.Location | Null.Null,
         type?: Type.Type | Null.Null,
-        id?: Identifier.Identifier | Null.Null,
+        id?: Identifier.Identifier | (Expression.Expression | Null.Null),
         bind?: Boolean.Boolean,
         params?: _Array.Array<Parameter.Parameter>,
         body?: BlockStatement.BlockStatement,

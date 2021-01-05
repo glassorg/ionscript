@@ -188,6 +188,12 @@ export {
     default as SwitchStatement
 } from './SwitchStatement';
 export {
+    default as TemplateElement
+} from './TemplateElement';
+export {
+    default as TemplateLiteral
+} from './TemplateLiteral';
+export {
     default as ThisExpression
 } from './ThisExpression';
 export {
