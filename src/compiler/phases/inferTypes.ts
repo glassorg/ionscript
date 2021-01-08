@@ -547,7 +547,7 @@ export const inferType: {
         let returnType = func.returnType
         if (returnType == null) {
             // see if we are a constructor...
-            if (func.id?.name === "constructor") {
+            if ((func.id as any)?.name === "constructor") {
                 let parent = c.getParent(func)
                 if (ast.VariableDeclaration.is(parent) && parent.instance) {
                     let clas = c.getAncestor(parent, ast.ClassDeclaration.is)
@@ -737,7 +737,6 @@ export const inferType: {
                         //  if it only might be invalid then we
                         c.semanticError(`Argument of type (${toCodeString(arg.type)}) is not valid for expected parameter type (${toCodeString(paramType)})`, arg)
                     }
-                    // console.log("(" + check + ") >>>>> " + toCodeString(arg) + " type " + toCodeString(arg.type) + " ::: " + toCodeString(paramType))
                 }
             }
         }

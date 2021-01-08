@@ -94,7 +94,7 @@ export default function toEsTree(root: Map<string, any>, options: Options) {
 
                 if (
                     VariableDeclaration.is(node) && FunctionExpression.is(node.value)
-                    && Identifier.is(node.id) && node.id.name === node.value.id?.name
+                    && Identifier.is(node.id) && node.id.name === (node.value.id as any)?.name
                     && !node.value.bind
                 ) {
                     let cls = ancestors.find(ClassDeclaration.is)
@@ -179,32 +179,20 @@ export default function toEsTree(root: Map<string, any>, options: Options) {
                 }
                 // finally, handle exports
                 if (Exportable.is(node) && node.export > 0) {
-                    if (ImportDeclaration.is(node)) {
-                        throw new Error("This is not implemented right")
-                        // result = replace({
-                        //     type: "ExpressionStatement",
-                        //     expression: { type: "Literal", value: "???" },
-                        // }, {
-                        //     type: "ExpressionStatement",
-                        //     expression: { type: "Literal", value: "???" },
-                        // })
+                    if (node.export === 2 || (node.id as any).name === "default") {
+                        result = {
+                            type: "ExportDefaultDeclaration",
+                            declaration: VariableDeclaration.is(node) ? result.declarations[0].init : result,
+                            specifiers: [],
+                            source: null,
+                        }
                     }
                     else {
-                        if (node.export === 2) {
-                            result = {
-                                type: "ExportDefaultDeclaration",
-                                declaration: VariableDeclaration.is(node) ? result.declarations[0].init : result,
-                                specifiers: [],
-                                source: null,
-                            }
-                        }
-                        else {
-                            result = {
-                                type: "ExportNamedDeclaration",
-                                declaration: result,
-                                specifiers: [],
-                                source: null,
-                            }
+                        result = {
+                            type: "ExportNamedDeclaration",
+                            declaration: result,
+                            specifiers: [],
+                            source: null,
                         }
                     }
                 }

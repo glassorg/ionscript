@@ -269,7 +269,24 @@ export function difference(a: Set<any>, b: Set<any>) {
 //  File operations
 ////////////////////////////////////////////////////////////////////////////////
 
-const ionExt = '.is'
+export const ionExt = '.is'
+
+export function getFilesRecursive(directory, pattern?: RegExp, rootDirectory = directory, allFiles = new Array<string>()) {
+    for (let name of fs.readdirSync(directory)) {
+        let filename = np.join(directory, name)
+        let fileInfo = fs.statSync(filename)
+        if (fileInfo.isFile()) {
+            let relativeFilename = np.relative(rootDirectory, filename)
+            if (pattern == null || pattern.test(relativeFilename)) {
+                allFiles.push(relativeFilename)
+            }
+        }
+        else {
+            getFilesRecursive(filename, pattern, rootDirectory, allFiles)
+        }
+    }
+    return allFiles
+}
 
 export function findPackage(dir = process.cwd()) {
     let checkFilename = np.join(dir, "package.json")
@@ -302,18 +319,10 @@ export function getInputFilesRecursive(directory: string | string[], namespace: 
     else {
         if (rootDirectory == null)
             rootDirectory = directory
-        for (let name of fs.readdirSync(directory)) {
-            let filename = np.join(directory, name)
-            let fileInfo = fs.statSync(filename)
-            if (fileInfo.isFile()) {
-                if (name.endsWith(ionExt)) {
-                    let path = getPathFromFilename(namespace, filename.substring(rootDirectory.length + 1))
-                    allFiles[path] = read(filename)
-                }
-            }
-            else {
-                getInputFilesRecursive(filename, namespace, rootDirectory, allFiles)
-            }
+        let files = getFilesRecursive(directory, new RegExp(ionExt + "$"))
+        for (let filename of files) {
+            let path = getPathFromFilename(namespace, filename)
+            allFiles[path] = read(np.join(rootDirectory, filename))
         }
     }
     return allFiles

@@ -87,6 +87,46 @@
         )
     }
 
+    function buildTemplateLiteral(sections) {
+        let quasis = []
+        let expressions = []
+        let wasPreviousExpression = true
+        let maybePushEmptyQuasi = () => {
+            if (wasPreviousExpression) {
+                quasis.push(node("TemplateElement", { location: getEmptyLocation() }))
+            }
+        }
+        for (let section of sections) {
+            if (ast.Expression.is(section)) {
+                maybePushEmptyQuasi()
+                expressions.push(section)
+                wasPreviousExpression = true
+            }
+            else {
+                if (!wasPreviousExpression && quasis.length > 0) {
+                    // we need to merge quasis.
+                    let last = quasis[quasis.length - 1]
+                    quasis[quasis.length - 1] = last.patch({
+                        location: new ast.Location({
+                            start: last.location.start,
+                            end: section.location.end,
+                            filename: last.location.filename,
+                        }),
+                        valueRaw: last.valueRaw + section.valueRaw,
+                        valueCooked: last.valueCooked + section.valueCooked,
+                    })
+                }
+                else {
+                    quasis.push(section)
+                }
+                wasPreviousExpression = false
+            }
+        }
+        maybePushEmptyQuasi()
+        quasis[quasis.length - 1] = quasis[quasis.length - 1].patch({ tail: true })
+        return node("TemplateLiteral", { quasis, expressions })    
+    }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -263,6 +303,7 @@ ExpressionStatement
 
 Declaration
     = ClassDeclaration
+    / EnumDeclaration
     / VariableDeclaration
     / FunctionDeclaration
 
@@ -289,11 +330,13 @@ VariableDeclarationType
 
 VariableModifiers
     = &StaticToken id:Identifier _ { return { static: id } }
-    / &. _ { return {} }
+    / &. { return {} }
 
 VariableDeclaration
     = modifiers:VariableModifiers TypeToken _ id:Declarator _ "=" _ value:OutlineType
     { return node("VariableDeclaration", { kind: "type", id, value, ...modifiers }) }
+    / modifiers:VariableModifiers kind:GetOrSetDeclarationType _ value:NamedOutlineFunction
+    { return node("VariableDeclaration", { kind, id: value.id, value, ...modifiers }) }
     / meta:MetaProperties modifiers:VariableModifiers declarationType:VariableDeclarationType
         _ id:(Pattern / "[" _ @InlineExpression _ "]") _ type:(":" _ @InlineType)? _ value:('=' _ @OutlineExpression / EOL {return null})?
     { return node("VariableDeclaration", { ...declarationType, id, type, value, meta, ...modifiers }) }
@@ -332,7 +375,7 @@ AssignmentLeftOperator
     { return { left, operator } }
 
 AssignmentStatement
-    = leftOps:AssignmentLeftOperator+ _ right:OutlineExpression
+    = leftOps:(@AssignmentLeftOperator _)+ right:OutlineExpression
     {
         // consume right to left
         for (let i = leftOps.length - 1; i >= 0; i--) {
@@ -420,6 +463,18 @@ AssignmentProperty
     { return node("Property", { key, value: value || node("Reference", key), shorthand: value == null } ) }
 
 ////////////////////////////////////////////////////////////////////////////////
+//  Enums and Flags
+////////////////////////////////////////////////////////////////////////////////
+
+EnumProperty
+    = Dent key:Identifier _ "=" _ value:OutlineExpression
+    { return node("Property", { key, value })}
+
+EnumDeclaration
+    = EnumToken _ id:Declarator EOL Indent properties:EnumProperty+ Outdent
+    { return node("EnumDeclaration", { id, properties }) }
+
+////////////////////////////////////////////////////////////////////////////////
 //  Class
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -480,7 +535,7 @@ Constraint
     { return node('BinaryExpression', { left: node('DotExpression'), operator: ast.RegularExpression.is(right) ? 'is' : '==', right }) }
     / right:(FunctionType / TemplateReference /* Regex */)
     { return node('BinaryExpression', { left:node('DotExpression'), operator: 'is', right }) }
-    / left:MemberExpression? _ operator:(RelationalOperator / EqualityOperator) _ right:MemberExpression
+    / left:(@MemberExpression _)? operator:(RelationalOperator / EqualityOperator) _ right:MemberExpression
     { return node('BinaryExpression', { left: left || node('DotExpression'), operator, right }) }
     / GroupExpression
     // / TypeofToken _ argument:Reference
@@ -541,7 +596,7 @@ UnaryOperator
     = "+" / "-" / "!" / TypeofToken / DeleteToken
 
 UnaryExpression
-    = operator:UnaryOperator? _ argument:UpdateExpression
+    = operator:(@UnaryOperator _)? argument:UpdateExpression
     { return operator ? operation(argument, operator) : argument }
 
 ExponentiationOperator "operator"
@@ -582,7 +637,7 @@ EqualityExpression
     { return buildBinaryExpression(head, tail) }
 
 BitwiseAndOperator
-    = "|"
+    = "&"
 
 BitwiseAndExpression
     = head:EqualityExpression tail:(_ BitwiseAndOperator _ EqualityExpression)*
@@ -628,6 +683,13 @@ ConditionalExpression
         )?
     { return body ? node('ConditionalExpression', { test, ...body }) : test }
 
+AssignmentExpression
+    = head:ConditionalExpression tail:(_ AssignmentOperator _ AssignmentExpression)?
+    {
+        let [,op,,right] = tail
+        return tail ? node("AssignmentExpression", { left: head, operator, right }) : head
+    }
+
 RangeOperator
     = "..." { return true }
     / ".." { return false }
@@ -637,16 +699,23 @@ RangeExpression
     { return node("Range", { start, end, inclusive, step: step || null }) }
 
 ////////////////////////////////////////////////////////////////////////////////
-//  Functions
+//  Functions                                                                 //
 ////////////////////////////////////////////////////////////////////////////////
 
 Parameter
-    = id:Pattern _ type:(":" _ @InlineType)? _ value:("=" !">" _ @InlineExpression)?
-    { return node("Parameter", { id, type, value })}
+    = id:Pattern optional:"?"? _ type:(":" _ @InlineType)? _ value:("=" !">" _ @InlineExpression)?
+    { return node("Parameter", { id, type, value, optional: optional != null })}
 
 FunctionParametersAndType
-    = params:FunctionParametersWithParentheses type:(_ ":" _ @InlineType)? { return { params, type } }
-    / params:FunctionParametersWithoutParentheses { return { params } }
+    = params:FunctionParametersWithParentheses type:(_ ":" _ @InlineType)? _ bind:FunctionArrow { return { params, type, bind } }
+    / params:FunctionParametersWithoutParentheses _ bind:FunctionArrow { return { params, bind } }
+    / bind:FunctionArrow { return { params: [], bind }}
+    / OutlineFunctionParametersAndType
+
+OutlineFunctionParametersAndType
+    = "()" type:(_ ":" _ @InlineType)? EOL
+        Indent params:(Dent @Parameter EOL)+ Dent bind:FunctionArrow Outdent
+    { return { params, type, bind } }
 
 FunctionParametersWithParentheses
     = "(" _ ")" { return [] }
@@ -660,22 +729,26 @@ FunctionArrow
     / "=>" { return true }
 
 FunctionHead
-    = async:AsyncToken? _ generator:"*"? id:(@(Identifier / "[" _ @InlineExpression _ "]") &"(")? paramsAndType:FunctionParametersAndType? _ bind:FunctionArrow
-    { return { id, ...(paramsAndType ?? { params: [] }), async: async != null, generator: generator != null, bind } }
+    = async:AsyncToken? _ generator:"*"? id:(@(Identifier / "[" _ @InlineExpression _ "]") &"(")? paramsAndType:FunctionParametersAndType
+    { return { id, ...(paramsAndType ?? { params: [] }), async: async != null, generator: generator != null } }
 
 NamedFunctionHead
     = head:FunctionHead &{ return head.id != null }
 
+InlineFunctionHeadAndValue
+    = !FunctionArrow head:FunctionHead _ value:InlineExpression? { return { head, value } }
+    / head:FunctionHead _ value:InlineExpression { return { head, value } }
+
 InlineFunction
-    = head:FunctionHead _ value:InlineExpression?
-    { return node("FunctionExpression", { ...head, body: node("BlockStatement", { body: !value ? [] : [node("ReturnStatement", { argument: value } )] } ) } ) }
+    = a:InlineFunctionHeadAndValue
+    { return node("FunctionExpression", { ...a.head, body: node("BlockStatement", { body: !a.value ? [] : [ast.Statement.is(a.value) ? a.value : node("ReturnStatement", { argument: a.value } )] } ) } ) }
 
 NamedInlineFunction
     = &NamedFunctionHead @InlineFunction
 
 OutlineFunction
-    = head:FunctionHead _ body:BlockStatement
-    { return node("FunctionExpression", { ...head, body }) }
+    = head:FunctionHead _ body:(BlockStatement / ThrowStatement)
+    { return node("FunctionExpression", { ...head, body: ast.BlockStatement.is(body) ? body : node("BlockStatement", { location: body.location, body: [body] }) }) }
 
 NamedOutlineFunction
     = &NamedFunctionHead @(OutlineFunction / (@InlineFunction EOL))
@@ -700,6 +773,7 @@ OutlineExpressionStartsThisLine
     / OutlineCallExpression
     / OutlineNewExpression
     / OutlineStringLiteral
+    / OutlineTemplateLiteral
     / OutlineSpreadElement
     / OutlineOperation
     / @InlineExpression EOL
@@ -757,7 +831,6 @@ InlineExpression
     / InlineYieldExpression
     / InlineAwaitExpression
     / InlineFunction
-    / InlineNewExpression
     / RangeExpression
     / ConditionalExpression
 
@@ -779,6 +852,7 @@ PrimaryExpression
     / ThisExpression
     / DotExpression
     / GroupExpression
+    / InlineNewExpression
     / InlineArrayExpression
     / InlineObjectExpression
     / InlineJSXElementExpression
@@ -945,8 +1019,8 @@ OutlineArrayArguments
 OutlineArrayExpression
     = "[]" elements: OutlineArrayArguments
     { return node("ArrayExpression", { elements: elements.flat() }) }
-    / "||" elements: OutlineArrayArguments
-    { return node("ArrayExpression", { elements: elements.flat(), isSet: true }) }
+    // / "||" elements: OutlineArrayArguments
+    // { return node("ArrayExpression", { elements: elements.flat(), isSet: true }) }
 
 OutlineObjectExpression
     = e:InlineObjectExpression properties:OutlinePropertyList
@@ -956,26 +1030,26 @@ OutlineObjectExpression
 //     = e:InlineMapExpression properties:OutlineMapPropertyList
 //     { return node("MapExpression", {properties: [...e.properties, ...properties] }) }
 
-OutlineMapPropertyList
-    = EOL Indent @(Dent @(OutlineMapProperty / Statement))+ Outdent
+// OutlineMapPropertyList
+//     = EOL Indent @(Dent @(OutlineMapProperty / Statement))+ Outdent
 
-OutlineMapProperty
-    = key:InlineExpression _ ":" _ value:OutlineExpression
-    { return node("Property", { key, value, computed: true })}
+// OutlineMapProperty
+//     = key:InlineExpression _ ":" _ value:OutlineExpression
+//     { return node("Property", { key, value, computed: true })}
 
 OutlinePropertyList
     = EOL Indent @(Dent @(OutlineProperty / Statement))+ Outdent
 
 PropertyStatement
     = OutlineProperty
-    / OutlineMapProperty
+    // / OutlineMapProperty
     // { return node("PropertyStatement", { property }) }
 
 OutlineProperty
     = @InlineSpreadElement EOL
     / "[" _ key:InlineExpression _ "]" _ ":" _ value: OutlineExpression
     { return node("Property", { key, value, computed: true }) }
-    / key:(@Identifier _ ":") _ value:OutlineExpression
+    / key:(@(Identifier / InlineStringLiteral) _ ":") _ value:OutlineExpression
     { return node("Property", { key, value }) }
     / GetToken _ value:NamedOutlineFunction
     { return node("Property", { key: value.id, value, kind: "get", method: true }) }
@@ -999,8 +1073,8 @@ InlineMapPropertyList
 InlineObjectExpression
     = "{" _ properties:InlinePropertyList? _ "}"
     { return node("ObjectExpression", {properties: properties || []}) }
-    / "(" _ properties:InlineMapPropertyList? _ ")"
-    { return node("ObjectExpression", { properties: properties || [], isMap: true }) }
+    // / "(" _ properties:InlineMapPropertyList? _ ")"
+    // { return node("ObjectExpression", { properties: properties || [], isMap: true }) }
 
 InlineProperty
     = InlineSpreadElement
@@ -1048,7 +1122,7 @@ DecimalLiteral
     { return node('Literal', { value: parseFloat(text()) })}
 
 HexDigit
-    = [0-9A-F]
+    = [0-9A-Fa-f]
 
 HexIntegerLiteral
     = '0x' HexDigit+ !IdPart { return node('Literal', {value: parseInt(text(), 16) }) }
@@ -1068,43 +1142,31 @@ DoubleStringChar
 
 InlineTemplateStringLiteral
     = "`" sections:(InlineTemplateExpression / InlineTemplateElement)* "`"
-    {
-        let quasis = []
-        let expressions = []
-        let wasPreviousExpression = true
-        let maybePushEmptyQuasi = () => {
-            if (wasPreviousExpression) {
-                quasis.push(node("TemplateElement", { location: getEmptyLocation() }))
-            }
-        }
-        for (let section of sections) {
-            if (ast.Expression.is(section)) {
-                maybePushEmptyQuasi()
-                expressions.push(section)
-                wasPreviousExpression = true
-            }
-            else {
-                quasis.push(section)
-                wasPreviousExpression = false
-            }
-        }
-        maybePushEmptyQuasi()
-        quasis[quasis.length - 1] = quasis[quasis.length - 1].patch({ tail: true })
-        return node("TemplateLiteral", { quasis, expressions })
-    }
+    { return buildTemplateLiteral(sections) }
 
 InlineTemplateExpression
     = "${" _ @InlineExpression _ "}"
 
 InlineTemplateElement
-    = (!"${" ("\\`" / !"`" .))+ { return node("TemplateElement", { valueRaw: text(), valueCooked: text() }) }
+    = (!("${" / LineTerminatorSequence) ("\\`" / !"`" .))+ { return node("TemplateElement", { valueRaw: text(), valueCooked: text() }) }
+
+OutlineTemplateLineTerminator
+    = tail:LineTerminatorSequence { return node("TemplateElement", { valueRaw: tail, valueCooked: tail }) }
+
+OutlineTemplateLiteralLine
+    = _ @OutlineTemplateLineTerminator
+    / Dent sections:(InlineTemplateExpression / InlineTemplateElement)+ tail:OutlineTemplateLineTerminator { return [...sections, tail].flat() }
+
+OutlineTemplateLiteral
+    = '``' EOL Indent lines:OutlineTemplateLiteralLine+ Outdent
+    { return buildTemplateLiteral(lines.flat()) }
 
 OutlineStringLiteralLine
     = _ LineTerminatorSequence { return '' }
     / Dent line:[^\r\n]* LineTerminatorSequence { return line.join('') }
 
 OutlineStringLiteral
-    = '""' EOL Indent lines:OutlineStringLiteralLine* Outdent
+    = '""' EOL Indent lines:OutlineStringLiteralLine+ Outdent
     { return node('Literal', { value: lines.join('\n') }) }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1141,7 +1203,6 @@ Declarator
         return node("Declarator", { name })
     }
 
-
 ////////////////////////////////////////////////////////////////////////////////
 //  Tokens and Keywords
 ////////////////////////////////////////////////////////////////////////////////
@@ -1160,27 +1221,29 @@ OrToken         = @"or"         !IdPart
 XorToken        = @"xor"        !IdPart
 NotToken        = @"not"        !IdPart
 TypeofToken     = @"typeof"     !IdPart
-DeleteToken     = @"delete"     !IdPart
-NewToken        = @"new"        !IdPart
+DeleteToken     = @"delete "
+NewToken        = @"new "
 // WhereToken      = @"where"      !IdPart
 FunctionToken   = @"function"   !IdPart
-ImportToken     = @"import"     !IdPart
-ExportToken     = @"export"     !IdPart
+ImportToken     = @"import "
+ExportToken     = @"export "
 DefaultToken    = @"default"    !IdPart
-ClassToken      = @"class"      !IdPart
+ClassToken      = @"class "
+EnumToken       = @"enum"       !IdPart
+FlagsToken      = @"flags"      !IdPart
 StructToken     = @"struct"     !IdPart
-VarToken        = @"var"        !IdPart
-LetToken        = @"let"        !IdPart
+VarToken        = @"var "
+LetToken        = @"let "
 PropertyToken   = @"property"   !IdPart
 MetaToken       = @"meta"       !IdPart
-StaticToken     = @"static"     !IdPart
+StaticToken     = @"static "
 DataToken       = @"data"       !IdPart
-ExtendsToken    = @"extends"    !IdPart
-ForToken        = @"for"        !IdPart
-WhileToken      = @"while"      !IdPart
-InToken         = @"in"         !IdPart
+ExtendsToken    = @"extends "
+ForToken        = @"for "
+WhileToken      = @"while "
+InToken         = @"in "
 OfToken         = @"of"         !IdPart
-IfToken         = @"if"         !IdPart
+IfToken         = @"if "
 ElseToken       = @"else"       !IdPart
 ReturnToken     = @"return"     !IdPart
 BreakToken      = @"break"      !IdPart
@@ -1190,12 +1253,12 @@ ThrowToken      = @"throw"      !IdPart
 TryToken        = @"try"        !IdPart
 CatchToken      = @"catch"      !IdPart
 FinallyToken    = @"finally"    !IdPart
-GetToken        = @"get"        !IdPart
-SetToken        = @"set"        !IdPart
+GetToken        = @"get "
+SetToken        = @"set "
 SwitchToken     = @"switch"     !IdPart
 AsyncToken      = @"async"      !IdPart
-AwaitToken      = @"await"      !IdPart
-YieldToken      = @"yield"      !IdPart
+AwaitToken      = @"await "
+YieldToken      = @"yield "
 DoToken         = @"do"         !IdPart
 
 Keyword

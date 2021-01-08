@@ -31,7 +31,7 @@ function getNonRecursiveReturnStatements(fn: FunctionExpression): ReturnStatemen
         leave(node) {
             if (ReturnStatement.is(node) && node.argument != null) {
                 // make sure the return argument doesn't contain a recursive reference to itself.
-                if (fn.id?.path == null || !contains(node.argument, check => ast.Reference.is(check) && check.path === fn.id!.path)) {
+                if ((fn.id as any)?.path == null || !contains(node.argument, check => ast.Reference.is(check) && check.path === (fn.id as any)!.path)) {
                     statements.push(node)
                 }
             }

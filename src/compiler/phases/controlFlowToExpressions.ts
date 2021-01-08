@@ -183,7 +183,6 @@ function convertExpressionWithNestedStatements(node) {
         })
 
         let hasNonPropertyStatements = children.find(Statement.is) != null
-        console.log({ hasNonPropertyStatements })
         const propertiesName = "$"
         const childrenName = "children"
         let kind = node.kind
@@ -324,7 +323,6 @@ function convertExpressionWithNestedStatements(node) {
                     }))
                 }
                 else {
-                    console.log("------", child)
                     if (!(Expression.is(child) || SpreadElement.is(child))) {
                         throw SemanticError("Expected Expression or SpreadElement", child)
                     }

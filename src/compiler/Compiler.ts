@@ -5,6 +5,7 @@ import defaultPhases, { noEmit } from "./phases";
 import Parser = require("../../lib/compiler/parser");
 import watchDirectory from "./watchDirectory";
 import toModuleFiles, { moduleExtension } from "./phases/toModuleFiles";
+import { copyResource } from "./phases/copyResources";
 
 type Logger = (names?: string | string[], ast?: any) => void
 const NullLogger = () => {}
@@ -109,18 +110,25 @@ export default class Compiler {
         for (let input of options.inputs) {
             watchDirectory(input, {}, (filename, previous, current, change) => {
                 //  incrementally recompile just this file
-                let start = Date.now()
-                let content = common.read(filename)
-                let path = common.getPathFromFilename(options.namespace, filename.slice(input.length + 1))
-                // console.log({ filename, change, path, content })
-                //  we *really* should also kickoff a full recompile in a separate thread
-                //  or maybe the fast compile should be in the other thread
-                // always reset options errors
-                options.errors.length = 0
-                this.compile(options, { [path]: content }, defaultPhases, NullLogger)
-                let stop = Date.now()
-                let time = stop - start
-                console.log(`${filename} => ${time}ms`)
+                if (filename.endsWith(common.ionExt)) {
+                    let start = Date.now()
+                    let content = common.read(filename)
+                    let path = common.getPathFromFilename(options.namespace, filename.slice(input.length + 1))
+                    // console.log({ filename, change, path, content })
+                    //  we *really* should also kickoff a full recompile in a separate thread
+                    //  or maybe the fast compile should be in the other thread
+                    // always reset options errors
+                    options.errors.length = 0
+                    this.compile(options, { [path]: content }, defaultPhases, NullLogger)
+                    let stop = Date.now()
+                    let time = stop - start
+                    console.log(`${filename} => ${time}ms`)
+                }
+                else {
+                    // we just copy it as content.
+                    let path = filename.slice(input.length + 1)
+                    copyResource(path, filename, options)
+                }
             })
         }
     }

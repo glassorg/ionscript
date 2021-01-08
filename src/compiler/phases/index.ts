@@ -9,12 +9,11 @@ import createRuntime from "./createRuntime"
 import runtimeTypeChecking from "./runtimeTypeChecking"
 import semanticAnalysis from "./semanticAnalysis"
 import inheritBaseClasses from "./inheritBaseClasses"
-import createConditionalDeclarations from "./createConditionalDeclarations"
-import inferTypes from "./inferTypes"
 import addDataClassConstructors from "./addDataClassConstructors"
 import addTypedStructArrays from "./addTypedStructArrays"
 import toModuleFiles from "./toModuleFiles"
 import identity from "./identity"
+import copyResources from "./copyResources"
 
 export const fast = [
     parsing,
@@ -41,13 +40,15 @@ const defaultPhases = [
 
     addTypedStructArrays,
 
-    // we could skip this.
+    // we could skip this
     runtimeTypeChecking,
     createRuntime,
     toEsTree,
     identity,
     codegen,
     toModuleFiles,
+    // now load resources
+    copyResources,
 
     // no emit
     writeFiles,

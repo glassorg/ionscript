@@ -1,7 +1,7 @@
 import { Options } from "../Compiler"
 import { traverse, skip, replace } from "@glas/traverse"
 import Assembly from "../ast/Assembly"
-import { AssignmentExpression, BinaryExpression, BlockStatement, CallExpression, ClassDeclaration, Declaration, Declarator, DotExpression, Expression, ExpressionStatement, FunctionExpression, FunctionType, Identifier, IfStatement, ImportDeclaration, ImportNamespaceSpecifier, InstanceDeclarations, Literal, MemberExpression, ObjectExpression, Parameter, Program, Property, Reference, RegularExpression, ReturnStatement, RuntimeType, Statement, ThisExpression, ThrowStatement, Type, TypeExpression, UnaryExpression, VariableDeclaration } from "../ast"
+import { AssignmentExpression, BinaryExpression, BlockStatement, CallExpression, ClassDeclaration, Declaration, Declarator, DotExpression, EnumDeclaration, Expression, ExpressionStatement, FunctionExpression, FunctionType, Identifier, IfStatement, ImportDeclaration, ImportNamespaceSpecifier, InstanceDeclarations, Literal, MemberExpression, ObjectExpression, Parameter, Program, Property, Reference, RegularExpression, ReturnStatement, RuntimeType, Statement, ThisExpression, ThrowStatement, Type, TypeExpression, UnaryExpression, VariableDeclaration } from "../ast"
 import { getLast, runtimeModuleName } from "../common"
 import toCodeString from "../toCodeString"
 import combineExpressions from "../analysis/combineExpressions"
@@ -157,7 +157,8 @@ export function toRuntimeType(type, name: string) {
                                     if (DotExpression.is(node)) {
                                         return new Reference({ name: "_" })
                                     }
-                                    // type checks should NOT throw null so we implicitly convert all dot expressions to optional
+                                    // type checks should NOT throw null so we implicitly
+                                    // convert all dot expressions to optional
                                     if (MemberExpression.is(node) && !node.optional) {
                                         return node.patch({ optional: true })
                                     }
@@ -186,12 +187,8 @@ export default function runtimeTypeChecking(root: Assembly, options: Options) {
         },
         leave(node) {
             if (Program.is(node)) {
-                // let hasIonReference = false
                 let result = traverse(node, {
                     enter(node) {
-                        // if (Reference.is(node) && node.name === runtimeModuleName) {
-                        //     hasIonReference = true
-                        // }
                         if (TypeExpression.is(node)) {
                             return skip
                         }
@@ -246,21 +243,6 @@ export default function runtimeTypeChecking(root: Assembly, options: Options) {
                         }
                     }
                 })
-                // if (hasIonReference) {
-                //     result = result.patch({
-                //         body: [
-                //             new ImportDeclaration({
-                //                 specifiers: [
-                //                     new ImportNamespaceSpecifier({
-                //                         local: new Declarator({ name: runtimeModuleName })
-                //                     })
-                //                 ],
-                //                 source: new Literal({ value: runtimeModuleName }),
-                //             }),
-                //             ...result.body
-                //         ]
-                //     })
-                // }
                 return result
             }
         }

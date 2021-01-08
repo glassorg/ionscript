@@ -1,8 +1,8 @@
 import { Options } from "../Compiler";
 import { traverse, skip } from "@glas/traverse"
-import { VariableDeclaration, Identifier, Literal, Assembly, ClassDeclaration, Declaration, Reference, Node, Declarator, FunctionExpression, BlockStatement, AssignmentPattern, ObjectPattern, ObjectExpression, Parameter, Property, ExpressionStatement, MemberExpression, ThisExpression, IfStatement, DotExpression, Statement, Expression, Type, TypeExpression, BinaryExpression, UnaryExpression, ThrowStatement, CallExpression, AssignmentExpression } from "../ast";
+import { VariableDeclaration, Identifier, Literal, Assembly, ClassDeclaration, Declaration, Reference, Node, Declarator, FunctionExpression, BlockStatement, AssignmentPattern, ObjectPattern, ObjectExpression, Parameter, Property, ExpressionStatement, MemberExpression, ThisExpression, IfStatement, DotExpression, Statement, Expression, Type, TypeExpression, BinaryExpression, UnaryExpression, ThrowStatement, CallExpression, AssignmentExpression, EnumDeclaration } from "../ast";
 import { replaceNodes, throwTypeError } from "./runtimeTypeChecking";
-import { clone } from "../common";
+import { clone, SemanticError } from "../common";
 import combineExpressions from "../analysis/combineExpressions";
 import * as types from "../types";
 import toCodeString from "../toCodeString";
@@ -19,6 +19,9 @@ function toTypeCheck(type: Type, value: Reference) {
 }
 
 function createDataClassConstructor(node: ClassDeclaration, instanceVariables: VariableDeclaration[], isStruct: boolean, options: Options) {
+    if (node.isStruct && instanceVariables.length === 0) {
+        throw SemanticError("Structs must contain at least one property", node)
+    }
     return new VariableDeclaration({
         kind: "let",
         instance: true,

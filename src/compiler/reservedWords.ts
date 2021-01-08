@@ -10,12 +10,15 @@ export default new Set([
     "default",
     "delete",
     "do",
+    "enum",
     "else",
     "export",
     "extends",
     "finally",
     "for",
     "function",
+    "get",
+    "set",
     "if",
     "is",       //  ionscript
     "isnt",     //  ionscript

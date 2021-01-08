@@ -1,7 +1,7 @@
 import { Options } from "../Compiler";
 import { traverse, skip, replace } from "@glas/traverse";
 import Assembly from "../ast/Assembly";
-import { ArrayExpression, AssignmentExpression, BinaryExpression, BlockStatement, CallExpression, ClassDeclaration, Declarator, DotExpression, Expression, ExpressionStatement, FunctionExpression, Identifier, ImportDeclaration, ImportDefaultSpecifier, ImportNamespaceSpecifier, InstanceDeclarations, Literal, MemberExpression, ObjectExpression, Parameter, Program, Property, Reference, RegularExpression, ReturnStatement, ThisExpression, TypeExpression, VariableDeclaration, Range, ForOfStatement, UnaryExpression, SpreadElement, FunctionType, RuntimeType } from "../ast";
+import { ArrayExpression, AssignmentExpression, BinaryExpression, BlockStatement, CallExpression, ClassDeclaration, Declarator, DotExpression, Expression, ExpressionStatement, FunctionExpression, Identifier, ImportDeclaration, ImportDefaultSpecifier, ImportNamespaceSpecifier, InstanceDeclarations, Literal, MemberExpression, ObjectExpression, Parameter, Program, Property, Reference, RegularExpression, ReturnStatement, ThisExpression, TypeExpression, VariableDeclaration, Range, ForOfStatement, UnaryExpression, SpreadElement, FunctionType, RuntimeType, EnumDeclaration } from "../ast";
 import { replaceNodes, toRuntimeType } from "./runtimeTypeChecking";
 import { typeProperties } from "./inferTypes";
 import { hasDeclarator, runtimeModuleName } from "../common";
@@ -28,6 +28,30 @@ export default function createRuntime(root: Assembly, options: Options) {
                         // }
                     },
                     leave(node, ancestors, path) {
+                        if (EnumDeclaration.is(node)) {
+                            usesIonscript = true
+                            // we will convert this to something else.
+                            let { location } = node
+                            return new VariableDeclaration({
+                                location,
+                                export: node.export,
+                                kind: "let",
+                                id: new Declarator(node.id),
+                                value: new CallExpression({
+                                    location,
+                                    new: true,
+                                    callee: new MemberExpression({
+                                        location,
+                                        object: new Reference({ location, name: runtimeModuleName }),
+                                        property: new Identifier({ location, name: "Enum" }),
+                                    }),
+                                    arguments: [
+                                        new Literal({ location, value: node.id.name }),
+                                        new ObjectExpression({ properties: node.properties })
+                                    ]
+                                })
+                            })
+                        }
                         //  types here.
                         if (Reference.is(node)) {
                             if (node.name === runtimeModuleName) {
@@ -96,9 +120,6 @@ export default function createRuntime(root: Assembly, options: Options) {
                             //  so we at least just verify that it is in fact a function.
                             return new Reference({ name: "Function" })
                         }
-                        // if (DotExpression.is(node)) {
-                        //     return new Reference({ name: "value" })
-                        // }
                         if (BinaryExpression.is(node) && node.operator === "is") {
                             if (RuntimeType.is(node.right)) {
                                 usesIonscript = true
@@ -114,25 +135,26 @@ export default function createRuntime(root: Assembly, options: Options) {
                                 return replaceNodes(node.right, DotExpression.is, node.left)
                             }
                         }
-            
                         //  checked variables and things.
-                        if (VariableDeclaration.is(node)) {
-                            if (node.static || node.instance) {
-                                if (node.kind === "let" && node.value != null && !FunctionExpression.is(node.value)) {
-                                    return node.patch({
-                                        kind: "get",
-                                        value: new FunctionExpression({
-                                            params: [],
-                                            body: new BlockStatement({
-                                                body: [
-                                                    new ReturnStatement({ argument: node.value })
-                                                ]
-                                            })
-                                        })
-                                    })
-                                }
-                            }
-                        }
+                        //  we NO longer convert let statements to get functions.
+                        // if (VariableDeclaration.is(node)) {
+                        //     if (node.static || node.instance) {
+                        //         // for now.... TODO: Fix, convert let to var
+                        //         // if (node.kind === "let" && node.value != null && !FunctionExpression.is(node.value)) {
+                        //         //     return node.patch({
+                        //         //         kind: "get",
+                        //         //         value: new FunctionExpression({
+                        //         //             params: [],
+                        //         //             body: new BlockStatement({
+                        //         //                 body: [
+                        //         //                     new ReturnStatement({ argument: node.value })
+                        //         //                 ]
+                        //         //             })
+                        //         //         })
+                        //         //     })
+                        //         // }
+                        //     }
+                        // }
                         if (ClassDeclaration.is(node)) {
                             let result = node
                             if (!node.isData) {
@@ -215,7 +237,7 @@ export default function createRuntime(root: Assembly, options: Options) {
                                 })
                             }
                             //  handle static vars and typed vars
-                            let staticVarsWithDefaults = node.static.filter(d => d.kind === "var" && d.value != null)
+                            let staticVarsWithDefaults = node.static.filter(d => (d.kind === "var" || d.kind === "let") && d.value != null)
                             if (node.isData) {
                                 usesIonscript = true
                                 staticVarsWithDefaults.push(

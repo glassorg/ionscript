@@ -65,6 +65,9 @@ export {
     default as ElementExpression
 } from './ElementExpression';
 export {
+    default as EnumDeclaration
+} from './EnumDeclaration';
+export {
     default as ExportNamedDeclaration
 } from './ExportNamedDeclaration';
 export {

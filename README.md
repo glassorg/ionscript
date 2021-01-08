@@ -187,14 +187,18 @@ Indented Javascript
     X Data class implementation needs to NOT require external linkage at compile time.
     X   But... if it's dynamic using properties then that would decrease runtime performance.
     X   Fix for incremental compile failing because of above.
-        Fix module scoped 'parse' and static 'parse' function resolution incorrectly to class.parse
-        Need Concise Export from Import Syntax
-        Turn AssignmentStatements into AssignmentExpression
-        Fix this compile error
-            <div />
-                let { foo } = bar
-        Outline || Operator is ambiguous with Set literal declaration.
-
+    X   Fix module scoped 'parse' and static 'parse' function resolution incorrectly to class.parse
+    X   Need Concise Export from Import Syntax
+    X   Turn AssignmentStatements into AssignmentExpression
+    -   Outline || Operator is ambiguous with Set literal declaration
+    X Implement Enumerations and similar Flags
+      Let instance declarations ought to be assigned and fixed as dependent variables during construction
+      Come up with new consistent class/instance variable values
+      Compiler needs to copy any unrecognized files to the output
+      Javascript files should also be copied and/or parsed and converted
+      Need AssignmentExpressions to actually work, they are useful
+      Probably need "abstract" modifier on classes and methods
+    X Allow throw expressions from lambdas right side
 
 ### Related Links
 

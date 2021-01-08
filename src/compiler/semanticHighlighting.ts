@@ -1,5 +1,5 @@
 import { traverse } from "@glas/traverse";
-import { ArrayPattern, AwaitExpression, BinaryExpression, BreakStatement, CallExpression, ClassDeclaration, ContinueStatement, Declarator, ElementExpression, ForOfStatement, ForStatement, FunctionExpression, Identifier, IfStatement, ImportDeclaration, ImportDefaultSpecifier, ImportNamespaceSpecifier, Literal, MemberExpression, ModuleSpecifier, Parameter, Pattern, Property, Reference, RegularExpression, ReturnStatement, ThisExpression, ThrowStatement, TryStatement, Typed, TypeExpression, UnaryExpression, VariableDeclaration, YieldExpression, WhileStatement, BlockStatement, ExpressionStatement, TemplateLiteral, TemplateElement } from "./ast";
+import { ArrayPattern, AwaitExpression, BinaryExpression, BreakStatement, CallExpression, ClassDeclaration, ContinueStatement, Declarator, ElementExpression, ForOfStatement, ForStatement, FunctionExpression, Identifier, IfStatement, ImportDeclaration, ImportDefaultSpecifier, ImportNamespaceSpecifier, Literal, MemberExpression, ModuleSpecifier, Parameter, Pattern, Property, Reference, RegularExpression, ReturnStatement, ThisExpression, ThrowStatement, TryStatement, Typed, TypeExpression, UnaryExpression, VariableDeclaration, YieldExpression, WhileStatement, BlockStatement, ExpressionStatement, TemplateLiteral, TemplateElement, EnumDeclaration } from "./ast";
 import Parser from "./parser";
 import reservedWords from "./reservedWords";
 import toCodeString from "./toCodeString";
@@ -42,16 +42,21 @@ export function getSemanticHighlights(
         let [tokenType, ...modifiers] = tokenTypeAndModifiers
         let { start, end } = locationOrNode.location ?? locationOrNode;
 
-        let length = (start.line === end.line ? end.column : lines[start.line].length + 1) - start.column;
-        //	TODO: add absolute positions to location information to simplify length calculation.
-        // console.log(tokenType + ":" + modifiers.join(","))
-        results.push({
-            line: start.line - 1,
-            column: start.column - 1,
-            length,
-            tokenType,
-            modifiers
-        })
+        for (let line = start.line; line <= end.line; line++) {
+            let startColumn = line === start.line ? start.column : 1
+            let endColumn = line === end.line ? end.column : (lines[line].length) + 1
+            let length = endColumn - startColumn
+            // console.log("---" + lines[line] + ":" + startColumn + "," + endColumn + " => " + JSON.stringify({ line, startLine: start.line, endLine: end.line, startColumn: start.column, endColumn: end.column }))
+            //	TODO: add absolute positions to location information to simplify length calculation.
+            // console.log(tokenType + ":" + modifiers.join(","))
+            results.push({
+                line: line - 1,
+                column: startColumn - 1,
+                length,
+                tokenType,
+                modifiers
+            })
+        }
     }
 
     function highlightStartingKeywords(line: number, max = 3) {
@@ -97,7 +102,7 @@ export function getSemanticHighlights(
 
             if (BinaryExpression.is(node)) {
                 if (reservedWords.has(node.operator)) {
-                    push({ start: node.left.location!.end, end: node.right.location!.start }, "keyword")
+                    push({ start: node.left.location!.end, end: add(node.right.location!.start, -1) }, "keyword")
                 }
             }
 
@@ -228,7 +233,7 @@ export function getSemanticHighlights(
             }
 
             if (ThrowStatement.is(node)) {
-                highlightStartingKeywords(node.location.start.line, 1)
+                push({ start: node.location.start, end: add(node.location.start, "throw".length) }, "keyword");
             }
 
             if (TryStatement.is(node)) {
@@ -241,7 +246,7 @@ export function getSemanticHighlights(
                 }
             }
 
-            if (ClassDeclaration.is(node)) {
+            if (ClassDeclaration.is(node) || EnumDeclaration.is(node)) {
                 highlightStartingKeywords(node.location.start.line, 4)
                 push(node.id, "struct")
             }
@@ -254,9 +259,10 @@ export function getSemanticHighlights(
             }
 
             if (Literal.is(node) && !ImportDeclaration.is(ancestors[ancestors.length - 1])) {
+                push(node, "string")
 
                 if (typeof node.value === "string") {
-                    push(node, "string");
+                    // push(node, "string");
                     // could be an outline string.
                     let parent = ancestors[ancestors.length - 1]
                     if (node.location.start.line < node.location.end.line) {
@@ -291,19 +297,25 @@ export function getSemanticHighlights(
             if (TemplateElement.is(node)) {
                 push(node, "string")
             }
-            if (TemplateLiteral.is(node)) {
-                // we highlight the first and last char of the location since the first and last quasi TemplateElements above won't cover them.
-                {
-                    let { line, column } = node.location.start
-                    push({ start: { line, column }, end: { line, column: column + 1 }}, "string")
-                }
-                {
-                    let { line, column } = node.location.end
-                    push({ start: { line, column: column - 1 }, end: { line, column }}, "string")
+        },
+        leave(node, ancestors) {
+            if (node.location) {
+                if (TemplateLiteral.is(node)) {
+                    let { start, end } = node.location
+                    if (start.line !== end.line) {
+                        push({ start, end: add(start, 3) }, "string")
+                    }
+                    // we highlight the first and last char of the location since the first and last quasi TemplateElements above won't cover them.
+                    {
+                        let { line, column } = node.location!.start
+                        push({ start: { line, column }, end: { line, column: column + 1 }}, "string")
+                    }
+                    {
+                        let { line, column } = node.location!.end
+                        push({ start: { line, column: column - 1 }, end: { line, column }}, "string")
+                    }
                 }
             }
-        },
-        leave(node) {
         }
     });
 

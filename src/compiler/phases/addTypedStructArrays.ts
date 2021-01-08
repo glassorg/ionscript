@@ -208,25 +208,29 @@ function createTypedArrayDeclaration(cls: ClassDeclaration, fields: FieldInfo[],
                                             ]
                                         })
                                     }),
-                                    new AssignmentExpression({
-                                        left: new MemberExpression({
-                                            object: new ThisExpression({}),
-                                            property: new Identifier({ name: "length" })
+                                    new ExpressionStatement({
+                                        expression: new AssignmentExpression({
+                                            left: new MemberExpression({
+                                                object: new ThisExpression({}),
+                                                property: new Identifier({ name: "length" })
+                                            }),
+                                            right: new Reference({ name: "length" })
                                         }),
-                                        right: new Reference({ name: "length" })
                                     }),
-                                    ...actualFields.map(field => new AssignmentExpression({
-                                        left: new MemberExpression({
-                                            object: new ThisExpression({}),
-                                            property: new Identifier({ name: field.name })
-                                        }),
-                                        right: new CallExpression({
-                                            new: true,
-                                            callee: new Reference({ name: `${field.type}Array` }),
-                                            arguments: [
-                                                new Reference({ name: "buffer" }),
-                                                new Literal({ value: field.offset }),
-                                            ]
+                                    ...actualFields.map(field => new ExpressionStatement({
+                                        expression: new AssignmentExpression({
+                                            left: new MemberExpression({
+                                                object: new ThisExpression({}),
+                                                property: new Identifier({ name: field.name })
+                                            }),
+                                            right: new CallExpression({
+                                                new: true,
+                                                callee: new Reference({ name: `${field.type}Array` }),
+                                                arguments: [
+                                                    new Reference({ name: "buffer" }),
+                                                    new Literal({ value: field.offset }),
+                                                ]
+                                            })
                                         })
                                     })),
                                     options.debug ? new ExpressionStatement({
@@ -279,7 +283,7 @@ function createTypedArrayDeclaration(cls: ClassDeclaration, fields: FieldInfo[],
                                 }),
                             ],
                             body: new BlockStatement({
-                                body: fields.map(field => createFieldGetterOrSetter(field, new Reference({ name: "value" }))).flat()
+                                body: [] // fields.map(field => createFieldGetterOrSetter(field, new Reference({ name: "value" }))).flat()
                             })
                         })
                     }),
@@ -347,38 +351,40 @@ function createTypedArrayDeclaration(cls: ClassDeclaration, fields: FieldInfo[],
 }
 
 export default function addTypedStructArrays(root: Assembly, options: Options) {
-    let ancestors = new Map<Node,Node>()
-    let scopes = createScopeMaps(root, { ancestorsMap: ancestors })
-    return traverse(root, {
-        enter(node) {
-            if (TypeExpression.is(node)) {
-                return skip
-            }
-        },
-        leave(node) {
-            if (ClassDeclaration.is(node) && node.isStruct && node.isData) {
-                let [fields,naturalSize] = getFieldInfos(node, scopes, ancestors, 0)
-                let actualFields = assignActualFields(fields)
-                //  calculate stride for each actual field to move to the next element
-                //  we have to pad each structure so that it ends at an even
-                //  location to the largest contained type
-                let largestTypeBytes = 0
-                for (let field of actualFields) {
-                    largestTypeBytes = Math.max(fieldTypes[field.type])
-                }
-                //  we pad the size if needed so it ends at an even unit same as largest type size
-                let paddedSize = Math.ceil(naturalSize / largestTypeBytes) * largestTypeBytes
-                for (let field of actualFields) {
-                    field.stride = paddedSize / fieldTypes[field.type]
-                }
+    console.log("SKIPPING TypedStructArrays for now")
+    return root
+    // let ancestors = new Map<Node,Node>()
+    // let scopes = createScopeMaps(root, { ancestorsMap: ancestors })
+    // return traverse(root, {
+    //     enter(node) {
+    //         if (TypeExpression.is(node)) {
+    //             return skip
+    //         }
+    //     },
+    //     leave(node) {
+    //         if (ClassDeclaration.is(node) && node.isStruct && node.isData) {
+    //             let [fields,naturalSize] = getFieldInfos(node, scopes, ancestors, 0)
+    //             let actualFields = assignActualFields(fields)
+    //             //  calculate stride for each actual field to move to the next element
+    //             //  we have to pad each structure so that it ends at an even
+    //             //  location to the largest contained type
+    //             let largestTypeBytes = 0
+    //             for (let field of actualFields) {
+    //                 largestTypeBytes = Math.max(fieldTypes[field.type])
+    //             }
+    //             //  we pad the size if needed so it ends at an even unit same as largest type size
+    //             let paddedSize = Math.ceil(naturalSize / largestTypeBytes) * largestTypeBytes
+    //             for (let field of actualFields) {
+    //                 field.stride = paddedSize / fieldTypes[field.type]
+    //             }
 
-                // calculate stride for each actual field
-                // console.log("==========> ", JSON.stringify(fields, null, 2), actualFields)
-                console.log({ largestTypeBytes, naturalSize, paddedSize, actualFields })
-                return node.patch({
-                    static: [...node.static, createTypedArrayDeclaration(node, fields, actualFields, paddedSize, options)]
-                })
-            }
-        }
-    })
+    //             // calculate stride for each actual field
+    //             // console.log("==========> ", JSON.stringify(fields, null, 2), actualFields)
+    //             // console.log({ largestTypeBytes, naturalSize, paddedSize, actualFields })
+    //             return node.patch({
+    //                 static: [...node.static, createTypedArrayDeclaration(node, fields, actualFields, paddedSize, options)]
+    //             })
+    //         }
+    //     }
+    // })
 }
