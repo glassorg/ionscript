@@ -311,7 +311,7 @@ FunctionDeclaration
     = FunctionToken _ @MethodDeclaration
 
 MethodDeclaration
-    = modifiers:VariableModifiers kind:(_ @GetOrSetDeclarationType _)? func:NamedOutlineFunction
+    = modifiers:PropertyModifiers kind:(_ @GetOrSetDeclarationType _)? func:NamedOutlineFunction
     {
         let id = ast.Identifier.is(func.id) ? node("Declarator", func.id) : func.id
         return node("VariableDeclaration", { kind: "let", id, value: func, ...modifiers, ...kind })
@@ -332,14 +332,26 @@ VariableModifiers
     = &StaticToken id:Identifier _ { return { static: id } }
     / &. { return {} }
 
+AbstractModifier
+    = &AbstractToken id:Identifier _ { return { /* abstract: id */ } }
+
+PropertyModifiers
+    = AbstractModifier
+    / VariableModifiers
+
 VariableDeclaration
     = modifiers:VariableModifiers TypeToken _ id:Declarator _ "=" _ value:OutlineType
     { return node("VariableDeclaration", { kind: "type", id, value, ...modifiers }) }
-    / modifiers:VariableModifiers kind:GetOrSetDeclarationType _ value:NamedOutlineFunction
-    { return node("VariableDeclaration", { kind, id: value.id, value, ...modifiers }) }
     / meta:MetaProperties modifiers:VariableModifiers declarationType:VariableDeclarationType
         _ id:(Pattern / "[" _ @InlineExpression _ "]") _ type:(":" _ @InlineType)? _ value:('=' _ @OutlineExpression / EOL {return null})?
     { return node("VariableDeclaration", { ...declarationType, id, type, value, meta, ...modifiers }) }
+
+TempClassPropertyDeclaration
+    = modifiers:PropertyModifiers kind:GetOrSetDeclarationType _ value:NamedOutlineFunction
+    { return node("VariableDeclaration", { kind, id: value.id, value, ...modifiers }) }
+    / meta:MetaProperties modifiers:PropertyModifiers declarationType:VariableDeclarationType?
+        _ id:(Pattern / "[" _ @InlineExpression _ "]") _ type:(":" _ @InlineType)? _ value:('=' _ @OutlineExpression / EOL {return null})?
+    { return node("VariableDeclaration", { ...(declarationType ?? { kind: "var" }), id, type, value, meta, ...modifiers }) }
 
 MetaProperties
  = (@DynamicOutlineProperty Dent)*
@@ -409,7 +421,7 @@ IfStatement
     { return node("IfStatement", { test, consequent, alternate }) }
 
 ReturnStatement
-    = ReturnToken EOL Indent Dent argument:OutlineExpression Outdent
+    = ReturnToken _ argument:OutlineExpression
     { return node("ReturnStatement", { argument }) }
     / ReturnToken _ argument:InlineExpression? EOL
     { return node("ReturnStatement", { argument: argument || null }) }
@@ -480,6 +492,7 @@ EnumDeclaration
 
 ClassModifiers
     = DataToken _ { return { isData: true } }
+    / AbstractModifier
     / &. { return {} }
 
 ClassDeclaration
@@ -487,7 +500,7 @@ ClassDeclaration
         modifiers:ClassModifiers isStruct:(ClassToken { return false } / StructToken { return true })
         _ id:Declarator params:TemplateParameters? _ baseClasses:Extends? EOL
         Indent
-            declarations:(Dent @(MethodDeclaration / VariableDeclaration))*
+            declarations:(Dent @(MethodDeclaration / TempClassPropertyDeclaration))*
         Outdent
         {
             return node("ClassDeclaration", {
@@ -557,6 +570,10 @@ TemplateArguments
 TemplateReference
     = reference:Reference args:TemplateArguments?
     { return node("Reference", { ...reference, arguments: args || null }) }
+
+TemplateIdentifier
+    = id:Identifier args:TemplateArguments?
+    { return node("Identifier", { ...id, arguments: args || null }) }
 
 // Quantifier
 //     = "?" { return [0,1] }
@@ -729,7 +746,7 @@ FunctionArrow
     / "=>" { return true }
 
 FunctionHead
-    = async:AsyncToken? _ generator:"*"? id:(@(Identifier / "[" _ @InlineExpression _ "]") &"(")? paramsAndType:FunctionParametersAndType
+    = async:AsyncToken? _ generator:"*"? id:(@(TemplateIdentifier / "[" _ @InlineExpression _ "]") &"(")? paramsAndType:FunctionParametersAndType
     { return { id, ...(paramsAndType ?? { params: [] }), async: async != null, generator: generator != null } }
 
 NamedFunctionHead
@@ -1236,6 +1253,7 @@ VarToken        = @"var "
 LetToken        = @"let "
 PropertyToken   = @"property"   !IdPart
 MetaToken       = @"meta"       !IdPart
+AbstractToken   = @"abstract "
 StaticToken     = @"static "
 DataToken       = @"data"       !IdPart
 ExtendsToken    = @"extends "

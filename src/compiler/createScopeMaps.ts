@@ -123,7 +123,6 @@ export default function createScopeMaps(
                 enter(node) {
                     if (Declarator.is(node)) {
                         declare(node)
-                        return skip
                     }
                 }
             })

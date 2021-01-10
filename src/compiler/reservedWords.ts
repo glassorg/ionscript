@@ -1,5 +1,6 @@
 
 export default new Set([
+    "abstract", //  ionscript
     "break",
     "case",
     "catch",

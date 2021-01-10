@@ -1,6 +1,12 @@
 // import .FirstTriangle
 
-export FirstTriangle
+for a in foo
+    console.log(a, i)
+
+// foo() ->
+//     return bar()
+//         1
+//         2
 
 // let foo = () -> throw new Error()
 //     1

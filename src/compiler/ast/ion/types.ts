@@ -15,11 +15,11 @@ import * as BlockStatement from '../BlockStatement';
 import * as Reference from '../Reference';
 import * as MemberExpression from '../MemberExpression';
 import * as Identifier from '../Identifier';
+import * as _Array from './Array';
 import * as Property from '../Property';
 import * as Literal from '../Literal';
 import * as VariableDeclaration from '../VariableDeclaration';
 import * as IfStatement from '../IfStatement';
-import * as _Array from './Array';
 import * as Boolean from './Boolean';
 import * as Number from './Number';
 import * as RestElement from '../RestElement';
@@ -41,6 +41,7 @@ export type Reference_Reference_or_MemberExpression_MemberExpression = Reference
 export type Expression_Expression_or_ion_Null_Null = Expression.Expression | Null.Null;
 export type Identifier_Identifier_or_ion_Null_Null = Identifier.Identifier | Null.Null;
 export type ion_String_String_or_ion_Null_Null = String.String | Null.Null;
+export type ion_types____TemplateReference____or_ion_Null_Null = _Array.Array<Type.Type> | Null.Null;
 export type Property_Property_or_SpreadElement_SpreadElement = Property.Property | SpreadElement.SpreadElement;
 export type SpreadElement_SpreadElement_or_Statement_Statement = SpreadElement.SpreadElement | Statement.Statement;
 export type Expression_Expression_or_ion_types_SpreadElement_SpreadElement_or_Statement_Statement = Expression.Expression | (SpreadElement.SpreadElement | Statement.Statement);
@@ -53,7 +54,6 @@ export type Type_Type_or_SpreadElement_SpreadElement = Type.Type | SpreadElement
 export type IfStatement_IfStatement_or_ion_Null_Null = IfStatement.IfStatement | Null.Null;
 export type BlockStatement_BlockStatement_or_ion_types_IfStatement_IfStatement_or_ion_Null_Null = BlockStatement.BlockStatement | (IfStatement.IfStatement | Null.Null);
 export type Literal_Literal_or_Identifier_Identifier = Literal.Literal | Identifier.Identifier;
-export type ion_types____TemplateReference____or_ion_Null_Null = _Array.Array<Literal.Literal | Identifier.Identifier> | Null.Null;
 export type ion_Boolean_Boolean_or_ion_Null_Null = Boolean.Boolean | Null.Null;
 export type ion_Number_Number_or_ion_types_ion_Boolean_Boolean_or_ion_Null_Null = Number.Number | (Boolean.Boolean | Null.Null);
 export type ion_String_String_or_ion_types_ion_Number_Number_or_ion_types_ion_Boolean_Boolean_or_ion_Null_Null = String.String | (Number.Number | (Boolean.Boolean | Null.Null));

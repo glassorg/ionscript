@@ -1,10 +1,10 @@
 import { Options } from "../Compiler"
 import { traverse, skip, replace } from "@glas/traverse"
-import { BinaryExpression, ClassDeclaration, Declarator, ElementExpression, FunctionExpression, Program, Reference, UnaryExpression, VariableDeclaration, YieldExpression } from "../ast"
+import { BinaryExpression, ClassDeclaration, Declarator, ElementExpression, FunctionExpression, Program, Reference, RestElement, UnaryExpression, VariableDeclaration, YieldExpression } from "../ast"
 import { getAncestor, SemanticError } from "../common"
 import Assembly from "../ast/Assembly"
 import toCodeString from "../toCodeString"
-import { WSASERVICE_NOT_FOUND } from "constants"
+import * as types from "../types";
 
 export default function semanticAnalysis(root: Assembly, options: Options) {
     return traverse(root, {
@@ -62,6 +62,28 @@ export default function semanticAnalysis(root: Assembly, options: Options) {
                         prefix: true,
                         argument: node.patch({ operator: "is" }),
                     })
+                }
+            }
+            if (FunctionExpression.is(node)) {
+                // check that only a single RestElement max and is final arg
+                for (let i = 0; i < node.params.length; i++) {
+                    let param = node.params[i]
+                    if (RestElement.is(param.id)) {
+                        // must be last parameter
+                        if (i + 1 < node.params.length) {
+                            throw SemanticError(`Rest element must be final parameter`, param)
+                        }
+                        let { type } = param
+                        if (type) {
+                            if (!Reference.is(type) || type.path !== types.Array.path) {
+                                if ((type as any).name === "Array") {
+                                    console.log("TODO: Fix semanticAnalysis type is 'Array' but not global:Array")
+                                    return
+                                }
+                                throw SemanticError(`Rest element type must be an Array`, type)
+                            }
+                        }
+                    }
                 }
             }
         }

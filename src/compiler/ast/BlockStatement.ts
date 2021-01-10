@@ -11,7 +11,6 @@ import * as Null from './ion/Null';
 import * as Type from './Type';
 import * as _Array from './ion/Array';
 import * as Class from './ion/Class';
-import { exception } from 'console';
 export class BlockStatement implements _Object.Object , Statement.Statement , Scope.Scope , Typed.Typed , Node.Node {
     readonly location: Location.Location | Null.Null;
     readonly type: Type.Type | Null.Null;
@@ -36,11 +35,6 @@ export class BlockStatement implements _Object.Object , Statement.Statement , Sc
             throw new Error('type is not a Type | Null: ' + Class.toString(type));
         if (!_Array.isArray(body))
             throw new Error('body is not a Array: ' + Class.toString(body));
-        for (let s of body) {
-            if (Array.isArray(s)) {
-                throw new Error("Invalid Item.");
-            }
-        }
         this.location = location;
         this.type = type;
         this.body = body;

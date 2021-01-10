@@ -62,7 +62,8 @@ export default function checkReferences(root: Assembly, options: Options) {
                     //  so we will use our unmutated ancestors scope if needed
                     scope = scopes.get(ancestors[ancestors.length - 1])
                     if (scope == null) {
-                        console.log("scope not found for: ", node)
+                        console.log("scope not found for: ", node.location?.filename + " " + node.name)
+                        return
                     }
                 }
                 let declarator = scope[node.name]
@@ -102,25 +103,25 @@ export default function checkReferences(root: Assembly, options: Options) {
                     // return node.patch({ path: getName(declarator) })
                 }
             }
-            // semantic checks.
-            if (FunctionExpression.is(node)) {
-                // check that only a single RestElement max and is final arg
-                for (let i = 0; i < node.params.length; i++) {
-                    let param = node.params[i]
-                    if (RestElement.is(param.id)) {
-                        // must be last parameter
-                        if (i + 1 < node.params.length) {
-                            throw SemanticError(`Rest element must be final parameter`, param)
-                        }
-                        let { type } = param
-                        if (type) {
-                            if (!Reference.is(type) || type.path !== types.Array.path) {
-                                throw SemanticError(`Rest element type must be an Array`, type)
-                            }
-                        }
-                    }
-                }
-            }            
+            // // semantic checks.
+            // if (FunctionExpression.is(node)) {
+            //     // check that only a single RestElement max and is final arg
+            //     for (let i = 0; i < node.params.length; i++) {
+            //         let param = node.params[i]
+            //         if (RestElement.is(param.id)) {
+            //             // must be last parameter
+            //             if (i + 1 < node.params.length) {
+            //                 throw SemanticError(`Rest element must be final parameter`, param)
+            //             }
+            //             let { type } = param
+            //             if (type) {
+            //                 if (!Reference.is(type) || type.path !== types.Array.path) {
+            //                     throw SemanticError(`Rest element type must be an Array`, type)
+            //                 }
+            //             }
+            //         }
+            //     }
+            // }            
         }
     })
 }
