@@ -1,7 +1,8 @@
-// import .FirstTriangle
-
-for a in foo
-    console.log(a, i)
+// import @glas:platform:graphics:math:{Color, Matrix4, Vector3}
+// import @glas:platform:graphics:elements:Dock
+// import @glas:platform:graphics:Graphics.{useGraphics}
+//     useGraphics
+// import @glas:platform:graphics:Graphics3D
 
 // foo() ->
 //     return bar()

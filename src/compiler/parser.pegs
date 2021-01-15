@@ -617,7 +617,7 @@ UnaryExpression
     { return operator ? operation(argument, operator) : argument }
 
 ExponentiationOperator "operator"
-    = "**" / "<<" / ">>"
+    = "**" / "<<" / ">>>" / ">>"
 
 ExponentiationExpression
     = left:UnaryExpression right:(_ operator:ExponentiationOperator _ right:ExponentiationExpression {return {operator,right}})?

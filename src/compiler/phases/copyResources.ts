@@ -3,10 +3,15 @@ import * as common from "../common";
 import * as np from "path";
 
 export function copyResource(path: string, fullpath: string, options: Options) {
-    let content = common.read(fullpath)
-    let outputPath = np.join(options.output, path)
-    console.log("Writing: " + np.relative(process.cwd(), outputPath))
-    common.write(outputPath, content)
+    try {
+        let content = common.read(fullpath)
+        let outputPath = np.join(options.output, path)
+        console.log("Writing: " + np.relative(process.cwd(), outputPath))
+        common.write(outputPath, content)
+    }
+    catch (e) {
+        console.warn(`Error copying ${path}: `, e)
+    }
 }
 
 export default function copyResources(output, options: Options) {

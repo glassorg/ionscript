@@ -954,6 +954,14 @@
     "@glas/test" "^1.0.3"
     "@types/node" "^14.6.2"
 
+"@glas/traverse@^1.0.6":
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/@glas/traverse/-/traverse-1.0.6.tgz#a3b8d8e40f4f8a2c66f9c5f39303d55335823e6c"
+  integrity sha512-1nM/AzPUkZ69blHCReZ+DSjuAumQRhHRPKWA9KjOdvNqDp//IgAiqEN656vfP4mvbcHMHdgLrXDl146PzMwqfQ==
+  dependencies:
+    "@glas/test" "^1.0.3"
+    "@types/node" "^14.6.2"
+
 "@iarna/toml@^2.2.0":
   version "2.2.5"
   resolved "https://registry.yarnpkg.com/@iarna/toml/-/toml-2.2.5.tgz#b32366c89b43c6f8cefbdefac778b9c828e3ba8c"

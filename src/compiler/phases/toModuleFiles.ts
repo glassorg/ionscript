@@ -3,10 +3,13 @@ import { Options } from "../Compiler";
 const babel_options = {
     plugins: [
         [
-            "@babel/plugin-transform-modules-commonjs",
-            {
-               noInterop: true,
-            }
+            require.resolve("@babel/plugin-transform-modules-commonjs"), { noInterop: true }
+        ],
+        [
+            require.resolve("@babel/plugin-proposal-nullish-coalescing-operator")
+        ],
+        [
+            require.resolve("@babel/plugin-proposal-optional-chaining")
         ]
     ]
 }

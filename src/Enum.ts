@@ -1,8 +1,23 @@
 import Type from "./Type"
 
 function toTypeCheck(properties) {
-    let set = new Set(Object.values(properties))
-    return (value) => set.has(value)
+    // if it's flags, it's OK.
+    let allNumbers = true
+    let set = new Set()
+    for (let value of Object.values(properties)) {
+        if (typeof value !== "number") {
+            allNumbers = false
+            break
+        }
+    }
+
+    if (allNumbers) {
+        return (value) => typeof value === "number"
+    }
+
+    return (value) => {
+        return set.has(value)
+    }
 }
 
 export default class Enum extends Type {

@@ -1,5 +1,6 @@
 import * as HtmlLogger from "./HtmlLogger";
 import * as common from "./common";
+import fs from "fs";
 import defaultPhases, { noEmit } from "./phases";
 // we need the path to lib so the code works in normal compile and in parcel
 import Parser = require("../../lib/compiler/parser");
@@ -126,8 +127,11 @@ export default class Compiler {
                 }
                 else {
                     // we just copy it as content.
-                    let path = filename.slice(input.length + 1)
-                    copyResource(path, filename, options)
+                    let stats = fs.statSync(filename)
+                    if (stats && !stats.isDirectory()) {
+                        let path = filename.slice(input.length + 1)
+                        copyResource(path, filename, options)
+                    }
                 }
             })
         }

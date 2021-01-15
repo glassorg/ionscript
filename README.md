@@ -134,6 +134,18 @@ Indented Javascript
         Conditional Meta data removal basd on Debug/Release build
         Inline Unit Tests using meta data ideally
 
+### Ionscript self compiling reboot
+
+    Use Ionscript for AST.
+    Compile normal .js javascript files in parallel.
+    Investigate compiling .ts typescript files as well?
+    Incremental compiler that takes into account adjacent files.
+    Consider *smart* imports and whether or not we want isolated independent file compilation.
+    Better type analysis system.
+        Intermediate Type table to avoid duplication on each node.
+        Try to get everything on single pass but break circular dependencies.
+        Then follow up on subsequent passes till everything is typed.
+
 ## Todo
 
     X ClassDeclaration

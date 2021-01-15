@@ -92,8 +92,8 @@ export default function createRuntime(root: Assembly, options: Options) {
                             usesIonscript = true
                             let { location } = node
                             let args = [node.start, node.end]
-                            if (node.inclusive) {
-                                args.push(new Literal({ location, value: true }))
+                            if (node.inclusive || node.step) {
+                                args.push(new Literal({ location, value: node.inclusive }))
                             }
                             if (node.step) {
                                 args.push(node.step)
