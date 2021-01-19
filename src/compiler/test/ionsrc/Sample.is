@@ -1,3 +1,29 @@
+
+meta Indexed: Boolean = true
+
+data class Vector2
+
+    [Indexed]
+    x: Number
+
+    [Indexed]
+    y: Number
+
+    get foo() -> 12
+
+// data struct Vector3
+//     x: F32
+//     y: F32
+//     z: F32
+
+// data struct Sphere
+//     radius: F32
+//     center: Vector3
+//     center2: Vector3
+
+// import @glas.platform.graphics.(Graphics3D)
+// import (ionscript) { Range, is }
+
 // import @glas:platform:graphics:math:{Color, Matrix4, Vector3}
 // import @glas:platform:graphics:elements:Dock
 // import @glas:platform:graphics:Graphics.{useGraphics}

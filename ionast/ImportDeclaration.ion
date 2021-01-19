@@ -6,7 +6,7 @@ import
 export
     type Specifier = ImportSpecifier | ImportDefaultSpecifier | ImportNamespaceSpecifier
     class ImportDeclaration extends Declaration
-        var specifiers: Array<Specifier>
+        var specifiers: Array<Specifier | ImportDeclaration>
         var path: Array<Literal | Identifier> | Null = null
         var source: Literal
         var absoluteSource: String | Null = null

@@ -125,6 +125,9 @@ export {
     default as MemberExpression
 } from './MemberExpression';
 export {
+    default as Meta
+} from './Meta';
+export {
     default as MethodDefinition
 } from './MethodDefinition';
 export {

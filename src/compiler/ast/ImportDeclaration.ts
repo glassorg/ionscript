@@ -27,7 +27,7 @@ export class ImportDeclaration implements _Object.Object , Declaration.Declarati
     readonly location: Location.Location | Null.Null;
     readonly type: Type.Type | Null.Null;
     readonly export: Integer.Integer;
-    readonly specifiers: _Array.Array<Specifier>;
+    readonly specifiers: _Array.Array<Specifier | ImportDeclaration>;
     readonly path: _Array.Array<Literal.Literal | Identifier.Identifier> | Null.Null;
     readonly source: Literal.Literal;
     readonly absoluteSource: String.String | Null.Null;
@@ -53,7 +53,7 @@ export class ImportDeclaration implements _Object.Object , Declaration.Declarati
         location?: Location.Location | Null.Null,
         type?: Type.Type | Null.Null,
         export?: Integer.Integer,
-        specifiers: _Array.Array<Specifier>,
+        specifiers: _Array.Array<Specifier | ImportDeclaration>,
         path?: _Array.Array<Literal.Literal | Identifier.Identifier> | Null.Null,
         source: Literal.Literal,
         absoluteSource?: String.String | Null.Null
@@ -85,7 +85,7 @@ export class ImportDeclaration implements _Object.Object , Declaration.Declarati
         location?: Location.Location | Null.Null,
         type?: Type.Type | Null.Null,
         export?: Integer.Integer,
-        specifiers?: _Array.Array<Specifier>,
+        specifiers?: _Array.Array<Specifier | ImportDeclaration>,
         path?: _Array.Array<Literal.Literal | Identifier.Identifier> | Null.Null,
         source?: Literal.Literal,
         absoluteSource?: String.String | Null.Null

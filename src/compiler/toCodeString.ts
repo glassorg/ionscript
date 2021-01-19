@@ -51,13 +51,13 @@ const codeToString: { [P in keyof typeof ast]?: (node: InstanceType<typeof ast[P
     Property(node) {
         if (node.key != null) {
             if (ast.Identifier.is(node.key)) {
-                return `${s(node.key)}:${s(node.value)}`
+                return `${s(node.key)}:${s(node.value!)}`
             }
             else {
-                return `[${s(node.key)}]:${s(node.value)}`
+                return `[${s(node.key)}]:${s(node.value!)}`
             }
         }
-        return `${s(node.value)}`
+        return `${s(node.value!)}`
     },
     Parameter(node) {
         let value = s(node.id)

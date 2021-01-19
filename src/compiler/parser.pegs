@@ -180,12 +180,14 @@ ExportDefaultDeclaration
 ////////////////////////////////////////////////////////////////////////////////
 
 ImportDeclaration
-    = ImportToken _ source:(InlineStringLiteral / Path) _ specifiers:(InlineSpecifiers / OutlineSpecifiers)
+    = ImportToken _ @ImportBody
+ImportBody
+    = source:(InlineStringLiteral / Path) _ specifiers:(InlineSpecifiers / OutlineSpecifiers)
     {
         let path = null
         if (Array.isArray(source) /* is Path */) {
             let local = source[source.length - 1]
-            if (local.name === "*" || !specifiers.find(d => ast.ImportDefaultSpecifier.is(d) || ast.ImportNamespaceSpecifier.is(d) || d.local.name === local.name)) {
+            if (local.name === "*" || !specifiers.find(d => ast.ImportDeclaration.is(d) || ast.ImportDefaultSpecifier.is(d) || ast.ImportNamespaceSpecifier.is(d) || d.local?.name === local.name)) {
                 // smart import
                 let type = "ImportDefaultSpecifier"
                 if (local.name === "*") {
@@ -209,7 +211,7 @@ InlineSpecifiers
     { return [head, ...tail] }
 
 OutlineSpecifiers
-    = EOL Indent @(Dent @Specifier EOL)* Outdent
+    = EOL Indent @(Dent @(@Specifier EOL / &"." @ImportBody))* Outdent
 
 Path
     // TODO: add support for .*
@@ -324,6 +326,7 @@ GetOrSetDeclarationType
 VariableDeclarationType
     = VarToken { return { kind: "var" } }
     / LetToken { return { kind: "let" } }
+    / MetaToken { return { kind: "meta" } }
     / GetOrSetDeclarationType
     // / PropertyToken { return { assignable: false, property: true }}
     // / MetaToken { return { assignable: false, meta: true }}
@@ -340,18 +343,18 @@ PropertyModifiers
     / VariableModifiers
 
 VariableDeclaration
-    = modifiers:VariableModifiers TypeToken _ id:Declarator _ "=" _ value:OutlineType
-    { return node("VariableDeclaration", { kind: "type", id, value, ...modifiers }) }
+    = modifiers:VariableModifiers kind:TypeToken _ id:Declarator _ "=" _ value:OutlineType
+    { return node("VariableDeclaration", { kind, id, value, ...modifiers }) }
     / meta:MetaProperties modifiers:VariableModifiers declarationType:VariableDeclarationType
         _ id:(Pattern / "[" _ @InlineExpression _ "]") _ type:(":" _ @InlineType)? _ value:('=' _ @OutlineExpression / EOL {return null})?
-    { return node("VariableDeclaration", { ...declarationType, id, type, value, meta, ...modifiers }) }
+    { return node("VariableDeclaration", { ...declarationType, id, type, value, meta: meta || null, ...modifiers }) }
 
 TempClassPropertyDeclaration
     = modifiers:PropertyModifiers kind:GetOrSetDeclarationType _ value:NamedOutlineFunction
     { return node("VariableDeclaration", { kind, id: value.id, value, ...modifiers }) }
     / meta:MetaProperties modifiers:PropertyModifiers declarationType:VariableDeclarationType?
         _ id:(Pattern / "[" _ @InlineExpression _ "]") _ type:(":" _ @InlineType)? _ value:('=' _ @OutlineExpression / EOL {return null})?
-    { return node("VariableDeclaration", { ...(declarationType ?? { kind: "var" }), id, type, value, meta, ...modifiers }) }
+    { return node("VariableDeclaration", { ...(declarationType ?? { kind: "var" }), id, type, value, meta: meta || null, ...modifiers }) }
 
 MetaProperties
  = (@DynamicOutlineProperty Dent)*
@@ -506,6 +509,7 @@ ClassDeclaration
             return node("ClassDeclaration", {
                 id, ...modifiers, isStruct, params: params || [], baseClasses: baseClasses || [],
                 static: declarations.filter(d => d.static),
+                meta: meta || null,
                 instance: node("InstanceDeclarations", { declarations: declarations.filter(d => !d.static).map(d => d.patch({ instance: true })) })
             })
         }
@@ -1229,6 +1233,7 @@ NullToken       = @"null"       !IdPart
 TrueToken       = @"false"      !IdPart
 FalseToken      = @"true"       !IdPart
 TypeToken       = @"type"       !IdPart
+MetaToken       = @"meta "
 IsToken         = @"is"         !IdPart
 ByToken         = @"by"         !IdPart
 IsntToken       = @"isnt"       !IdPart

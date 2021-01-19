@@ -1,11 +1,26 @@
 import { is } from "./symbols"
 
+export type ReadValue = (f: Float32Array, u: Uint32Array, index: number) => any
+export type WriteValue = (f: Float32Array, u: Uint32Array, index: number, value) => void
+
 export default class Type {
 
-    is: (a, type) => boolean
+    is: (a) => boolean
     name: string
+    // fields for primitive types
+    size?: number
+    read?: ReadValue
+    write?: WriteValue
 
-    constructor(is: (a, type) => boolean, name?: string) {
+    constructor(is: (a) => boolean, name?: string)
+    constructor(is: (a) => boolean, name: string, size: number, read: ReadValue, write: WriteValue)
+    constructor(
+        is: (a) => boolean,
+        name?: string,
+        size?: number,
+        read?: ReadValue,
+        write?: WriteValue,
+    ) {
         this.is = is
         if (name == null) {
             name = is.name
@@ -17,6 +32,9 @@ export default class Type {
             }
         }
         this.name = name
+        this.size = size
+        this.read = read
+        this.write = write
     }
 
     toString() {

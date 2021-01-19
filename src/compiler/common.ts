@@ -52,7 +52,7 @@ export function hasDeclarator(statements: Array<Statement>, name: string) {
     for (let s of statements) {
         if (ImportDeclaration.is(s)) {
             for (let specifier of s.specifiers) {
-                if (specifier.local.name === name) {
+                if (ModuleSpecifier.is(specifier) && specifier.local.name === name) {
                     return true
                 }
             }

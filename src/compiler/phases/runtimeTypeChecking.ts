@@ -158,8 +158,9 @@ export function toRuntimeType(type, name: string) {
                                         return new Reference({ name: "_" })
                                     }
                                     // type checks should NOT throw null so we implicitly
-                                    // convert all dot expressions to optional
-                                    if (MemberExpression.is(node) && !node.optional) {
+                                    // convert all dot expressions to optional, but not
+                                    if (MemberExpression.is(node) && !node.optional &&
+                                        !(Reference.is(node.object) && node.object.name === runtimeModuleName)) {
                                         return node.patch({ optional: true })
                                     }
                                 }

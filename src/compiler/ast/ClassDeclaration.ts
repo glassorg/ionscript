@@ -2,27 +2,30 @@
 This file was generated from ion source. Do not edit.
 */
 import * as _Object from './ion/Object';
+import * as Meta from './Meta';
 import * as Declaration from './Declaration';
 import * as Expression from './Expression';
+import * as Node from './Node';
 import * as Statement from './Statement';
 import * as Exportable from './Exportable';
 import * as Typed from './Typed';
-import * as Node from './Node';
 import * as Location from './Location';
 import * as Null from './ion/Null';
+import * as _Array from './ion/Array';
+import * as Property from './Property';
 import * as Type from './Type';
 import * as Integer from './ion/Integer';
 import * as Boolean from './ion/Boolean';
 import * as Declarator from './Declarator';
-import * as _Array from './ion/Array';
 import * as Parameter from './Parameter';
 import * as Reference from './Reference';
 import * as MemberExpression from './MemberExpression';
 import * as VariableDeclaration from './VariableDeclaration';
 import * as InstanceDeclarations from './InstanceDeclarations';
 import * as Class from './ion/Class';
-export class ClassDeclaration implements _Object.Object , Declaration.Declaration , Expression.Expression , Statement.Statement , Exportable.Exportable , Typed.Typed , Node.Node {
+export class ClassDeclaration implements _Object.Object , Meta.Meta , Declaration.Declaration , Expression.Expression , Node.Node , Statement.Statement , Exportable.Exportable , Typed.Typed {
     readonly location: Location.Location | Null.Null;
+    readonly meta: _Array.Array<Property.Property> | Null.Null;
     readonly type: Type.Type | Null.Null;
     readonly export: Integer.Integer;
     readonly isStruct: Boolean.Boolean;
@@ -37,15 +40,17 @@ export class ClassDeclaration implements _Object.Object , Declaration.Declaratio
     static readonly implements = new Set([
         'ClassDeclaration',
         'ion_Object',
+        'Meta',
         'Declaration',
         'Expression',
+        'Node',
         'Statement',
         'Exportable',
-        'Typed',
-        'Node'
+        'Typed'
     ]);
     constructor({
         location = null,
+        meta = null,
         type = null,
         export: _export = 0,
         isStruct = false,
@@ -58,6 +63,7 @@ export class ClassDeclaration implements _Object.Object , Declaration.Declaratio
         instanceType = null
     }: {
         location?: Location.Location | Null.Null,
+        meta?: _Array.Array<Property.Property> | Null.Null,
         type?: Type.Type | Null.Null,
         export?: Integer.Integer,
         isStruct?: Boolean.Boolean,
@@ -71,6 +77,8 @@ export class ClassDeclaration implements _Object.Object , Declaration.Declaratio
     }) {
         if (!(Location.isLocation(location) || Null.isNull(location)))
             throw new Error('location is not a Location | Null: ' + Class.toString(location));
+        if (!(_Array.isArray(meta) || Null.isNull(meta)))
+            throw new Error('meta is not a Array | Null: ' + Class.toString(meta));
         if (!(Type.isType(type) || Null.isNull(type)))
             throw new Error('type is not a Type | Null: ' + Class.toString(type));
         if (!Integer.isInteger(_export))
@@ -92,6 +100,7 @@ export class ClassDeclaration implements _Object.Object , Declaration.Declaratio
         if (!(Type.isType(instanceType) || Null.isNull(instanceType)))
             throw new Error('instanceType is not a Type | Null: ' + Class.toString(instanceType));
         this.location = location;
+        this.meta = meta;
         this.type = type;
         this.export = _export;
         this.isStruct = isStruct;
@@ -106,6 +115,7 @@ export class ClassDeclaration implements _Object.Object , Declaration.Declaratio
     }
     patch(properties: {
         location?: Location.Location | Null.Null,
+        meta?: _Array.Array<Property.Property> | Null.Null,
         type?: Type.Type | Null.Null,
         export?: Integer.Integer,
         isStruct?: Boolean.Boolean,

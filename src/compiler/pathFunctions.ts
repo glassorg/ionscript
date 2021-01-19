@@ -4,6 +4,14 @@ import Type from "../Type"
 import Property from "../Property"
 import Integer from "../Integer"
 import Any from "../Any"
+import U8 from "../U8"
+import U16 from "../U16"
+import U32 from "../U32"
+import I8 from "../I8"
+import I16 from "../I16"
+import I32 from "../I32"
+import F32 from "../F32"
+import F64 from "../F64"
 // // absolute path related functions
 // import np from "path"
 
@@ -23,6 +31,14 @@ const ionGlobals = new Set([
     Property.name,
     Integer.name,
     Any.name,
+    U8.name,
+    U16.name,
+    U32.name,
+    I8.name,
+    I16.name,
+    I32.name,
+    F32.name,
+    F64.name,
 ])
 
 const globalPrefix = "global:"

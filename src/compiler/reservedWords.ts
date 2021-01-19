@@ -27,6 +27,7 @@ export default new Set([
     "import",
     "in",
     "instanceof",
+    "meta",     //  ionscript
     "new",
     "return",
     "super",

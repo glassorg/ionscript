@@ -3,7 +3,7 @@ import
     .*
 
 export
-    class ClassDeclaration extends Declaration, Expression
+    class ClassDeclaration extends Meta, Declaration, Expression
         var isStruct: Boolean = false
         var isData: Boolean = false
         var id: Declarator

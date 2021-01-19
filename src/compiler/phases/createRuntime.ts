@@ -1,10 +1,10 @@
 import { Options } from "../Compiler";
 import { traverse, skip, replace } from "@glas/traverse";
 import Assembly from "../ast/Assembly";
-import { ArrayExpression, AssignmentExpression, BinaryExpression, BlockStatement, CallExpression, ClassDeclaration, Declarator, DotExpression, Expression, ExpressionStatement, FunctionExpression, Identifier, ImportDeclaration, ImportDefaultSpecifier, ImportNamespaceSpecifier, InstanceDeclarations, Literal, MemberExpression, ObjectExpression, Parameter, Program, Property, Reference, RegularExpression, ReturnStatement, ThisExpression, TypeExpression, VariableDeclaration, Range, ForOfStatement, UnaryExpression, SpreadElement, FunctionType, RuntimeType, EnumDeclaration } from "../ast";
+import { ArrayExpression, AssignmentExpression, BinaryExpression, BlockStatement, CallExpression, ClassDeclaration, Declarator, DotExpression, Expression, ExpressionStatement, FunctionExpression, Identifier, ImportDeclaration, ImportDefaultSpecifier, ImportNamespaceSpecifier, InstanceDeclarations, Literal, MemberExpression, ObjectExpression, Parameter, Program, Property, Reference, RegularExpression, ReturnStatement, ThisExpression, TypeExpression, VariableDeclaration, Range, ForOfStatement, UnaryExpression, SpreadElement, FunctionType, RuntimeType, EnumDeclaration, Variable } from "../ast";
 import { replaceNodes, toRuntimeType } from "./runtimeTypeChecking";
 import { typeProperties } from "./inferTypes";
-import { hasDeclarator, runtimeModuleName } from "../common";
+import { hasDeclarator, runtimeModuleName, SemanticError } from "../common";
 import createTypeCheck from "../../createTypeCheck";
 
 export default function createRuntime(root: Assembly, options: Options) {
@@ -114,6 +114,27 @@ export default function createRuntime(root: Assembly, options: Options) {
                                 return null
                             }
                             return node.value
+                        }
+                        if (VariableDeclaration.is(node) && node.kind === "meta") {
+                            usesIonscript = true
+                            if (!Declarator.is(node.id)) {
+                                throw SemanticError("Meta must be an id, not a destructuring pattern", node.id)
+                            }
+                            return node.patch({
+                                kind: "let",
+                                value: new CallExpression({
+                                    callee: new MemberExpression({
+                                        object: new Reference({ name: runtimeModuleName }),
+                                        property: new Identifier({ name: "MetaProperty" })
+                                    }),
+                                    arguments: [
+                                        new Literal({ value: node.id.name}),
+                                        // new Literal({ value: node.id.path}),
+                                        toRuntimeType(node.type, node.id.name),
+                                        ...(node.value ? [node.value] : []),
+                                    ]
+                                })
+                            })
                         }
                         if (FunctionType.is(node)) {
                             //  we do NOT have runtime function type checking yet
@@ -231,13 +252,13 @@ export default function createRuntime(root: Assembly, options: Options) {
                                             })
                                         ],
                                     // also remove all the instance variable declarations
-                                    // instance: result.instance!.patch({
-                                    //     declarations: []
-                                    // })
+                                    instance: result.instance!.patch({
+                                        declarations: []
+                                    })
                                 })
                             }
                             //  handle static vars and typed vars
-                            let staticVarsWithDefaults = node.static.filter(d => (d.kind === "var" || d.kind === "let") && d.value != null)
+                            let staticVarsWithDefaults = node.static.filter(d => (d.kind === "var" || d.kind === "let") && d.value != null && !FunctionExpression.is(d.value))
                             if (node.isData) {
                                 usesIonscript = true
                                 staticVarsWithDefaults.push(
@@ -348,6 +369,23 @@ export default function createRuntime(root: Assembly, options: Options) {
                                                                                                         key: new Identifier({ name: "value" }),
                                                                                                         method: FunctionExpression.is(d.value),
                                                                                                         value: d.value,
+                                                                                                    })
+                                                                                                )
+                                                                                            }
+                                                                                        }
+                                                                                        if (d.meta) {
+                                                                                            for (let meta of d.meta) {
+                                                                                                properties.push(
+                                                                                                    new Property({
+                                                                                                        key: new MemberExpression({
+                                                                                                            object: new Reference(meta.key as Reference),
+                                                                                                            property: new Identifier({ name: "symbol" })
+                                                                                                        }),
+                                                                                                        computed: true,
+                                                                                                        value: meta.value ? meta.value : new MemberExpression({
+                                                                                                            object: new Reference(meta.key as Reference),
+                                                                                                            property: new Identifier({ name: "defaultValue" })
+                                                                                                        })
                                                                                                     })
                                                                                                 )
                                                                                             }

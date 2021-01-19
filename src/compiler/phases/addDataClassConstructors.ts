@@ -8,7 +8,7 @@ import * as types from "../types";
 import toCodeString from "../toCodeString";
 
 function toTypeCheck(type: Type, value: Reference) {
-    if (Reference.is(type)) {
+    if (Reference.is(type) || MemberExpression.is(type)) {
         return new BinaryExpression({
             left: value,
             operator: "is",

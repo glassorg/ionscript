@@ -188,7 +188,6 @@ export default function createScopeMaps(
         },
         leave(node) {
             if (Scope.is(node)) {
-                // console.log('----')
                 scopes.pop()
             }
         }
