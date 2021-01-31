@@ -87,6 +87,10 @@
         )
     }
 
+    function isValidId(name) {
+        return (/^[a-z_$][a-z_$0-9]*$/i).test(name)
+    }
+
     function buildTemplateLiteral(sections) {
         let quasis = []
         let expressions = []
@@ -143,7 +147,6 @@ Module
 
 ModuleDeclaration
     = ImportDeclaration
-    // / Declaration
     / Statement
     / ExportDeclaration
 
@@ -166,13 +169,13 @@ ExportNamedDeclaration
     { return declaration.patch({ location: getLocation(), export: 1 }) }
 
 ExportDefaultDeclaration
-    = ExportToken _ isDefault:DefaultToken? _ value:(Declaration / OutlineExpression)
+    = exportLocation:Export _ defaultLocation:Default? _ value:(Declaration / OutlineExpression)
     {
         if (ast.Declaration.is(value)) {
-            return node(value.constructor.name, { ...value, export: isDefault ? 2 : 1 })
+            return node(value.constructor.name, { ...value, export: defaultLocation ? 2 : 1 })
         }
         // we NEED to have some Declarator for this default export.
-        return node("VariableDeclaration", { kind: "let", id: node("Declarator", { name: "default"}), value, export: isDefault ? 2 : 1})
+        return node("VariableDeclaration", { kind: "let", id: node("Declarator", { name: "default", location:defaultLocation || exportLocation }), value, export: defaultLocation ? 2 : 1})
     }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -182,26 +185,34 @@ ExportDefaultDeclaration
 ImportDeclaration
     = ImportToken _ @ImportBody
 ImportBody
-    = source:(InlineStringLiteral / Path) _ specifiers:(InlineSpecifiers / OutlineSpecifiers)
+    = source:(InlineStringLiteral / Path / &. { return [] }) _ specifiers:(InlineSpecifiers / OutlineSpecifiers)
     {
         let path = null
         if (Array.isArray(source) /* is Path */) {
-            let local = source[source.length - 1]
-            if (local.name === "*" || !specifiers.find(d => ast.ImportDeclaration.is(d) || ast.ImportDefaultSpecifier.is(d) || ast.ImportNamespaceSpecifier.is(d) || d.local?.name === local.name)) {
-                // smart import
-                let type = "ImportDefaultSpecifier"
-                if (local.name === "*") {
-                    //  remove it from the source path
-                    source = source.slice(0, -1)
-                    //  make the local the previous name
-                    local = source[source.length - 1]
-                    //  convert to import namespace
-                    type = "ImportNamespaceSpecifier"
+            if (source.length > 0) {
+                let local = source[source.length - 1]
+                if (local.name === "*" || !specifiers.find(d => ast.ImportDeclaration.is(d) || ast.ImportDefaultSpecifier.is(d) || ast.ImportNamespaceSpecifier.is(d) || d.local?.name === local.name)) {
+                    // smart import
+                    let type = "ImportDefaultSpecifier"
+                    if (local.name === "*") {
+                        //  remove it from the source path
+                        source = source.slice(0, -1)
+                        //  make the local the previous name
+                        local = source[source.length - 1]
+                        //  convert to import namespace
+                        type = "ImportNamespaceSpecifier"
+                    }
+                    if (isValidId(local.name)) {
+                        specifiers.push(node(type, { local: new ast.Declarator(local), location: local.location }))
+                    }
                 }
-                specifiers.push(node(type, { local: new ast.Declarator(local), location: local.location }))
             }
             path = source
-            source = node("Literal", { value: source.map(id => id.name || id).join(pathSeparator) })
+            let value = source.map(id => id.name || id).join(pathSeparator)
+            if (source.length == 0) {
+                value = "." + value
+            }
+            source = node("Literal", { value })
         }
         return node("ImportDeclaration", { specifiers, path, source })
     }
@@ -215,12 +226,12 @@ OutlineSpecifiers
 
 Path
     // TODO: add support for .*
-    = relative:(".")* head:AtIdentifier tail:("." @Identifier)* final:(".*" { return node("Identifier", { name: "*"})})?
+    = relative:(".")* head:AtIdentifier tail:("." @AtIdentifier)* final:(".*" { return node("Identifier", { name: "*"})})?
     { return [...getRelativePrefixSteps(relative.length), head, ...tail, ...(final ? [final] : [])] }
 
 AtIdentifier
-    = at:"@"? id:Identifier
-    { return at ? id.patch({ name: text() }) : id }
+    = [@a-zA-Z$_0-9\-]+
+    { return node("Identifier", { name: text() } ) }
 
 Specifier
     = ImportDefaultSpecifier
@@ -247,6 +258,7 @@ ImportNamespaceSpecifier
 
 Statement
     = Declaration
+    / DebuggerStatement
     / AssignmentStatement
     / IfStatement
     / ForOfStatement
@@ -260,6 +272,10 @@ Statement
     / TryStatement
     / SwitchStatement
     / PropertyStatement
+
+DebuggerStatement
+    = "debugger" EOL
+    { return node("DebuggerStatement") }
 
 SwitchStatement
     = SwitchToken _ discriminant:InlineExpression EOL
@@ -313,10 +329,10 @@ FunctionDeclaration
     = FunctionToken _ @MethodDeclaration
 
 MethodDeclaration
-    = modifiers:PropertyModifiers kind:(_ @GetOrSetDeclarationType _)? func:NamedOutlineFunction
+    = meta:MetaProperties modifiers:PropertyModifiers kind:(_ @GetOrSetDeclarationType _)? func:NamedOutlineFunction
     {
         let id = ast.Identifier.is(func.id) ? node("Declarator", func.id) : func.id
-        return node("VariableDeclaration", { kind: "let", id, value: func, ...modifiers, ...kind })
+        return node("VariableDeclaration", { kind: "let", id, value: func, meta, ...modifiers, ...kind })
     }
 
 GetOrSetDeclarationType
@@ -350,8 +366,8 @@ VariableDeclaration
     { return node("VariableDeclaration", { ...declarationType, id, type, value, meta: meta || null, ...modifiers }) }
 
 TempClassPropertyDeclaration
-    = modifiers:PropertyModifiers kind:GetOrSetDeclarationType _ value:NamedOutlineFunction
-    { return node("VariableDeclaration", { kind, id: value.id, value, ...modifiers }) }
+    = meta:MetaProperties modifiers:PropertyModifiers kind:GetOrSetDeclarationType _ value:NamedOutlineFunction
+    { return node("VariableDeclaration", { kind, id: value.id, value, meta, ...modifiers }) }
     / meta:MetaProperties modifiers:PropertyModifiers declarationType:VariableDeclarationType?
         _ id:(Pattern / "[" _ @InlineExpression _ "]") _ type:(":" _ @InlineType)? _ value:('=' _ @OutlineExpression / EOL {return null})?
     { return node("VariableDeclaration", { ...(declarationType ?? { kind: "var" }), id, type, value, meta: meta || null, ...modifiers }) }
@@ -768,8 +784,13 @@ NamedInlineFunction
     = &NamedFunctionHead @InlineFunction
 
 OutlineFunction
-    = head:FunctionHead _ body:(BlockStatement / ThrowStatement)
-    { return node("FunctionExpression", { ...head, body: ast.BlockStatement.is(body) ? body : node("BlockStatement", { location: body.location, body: [body] }) }) }
+    = head:FunctionHead _ body:(BlockStatement / ThrowStatement / OutlineExpression)
+    {
+        if (ast.Expression.is(body)) {
+            body = node("ReturnStatement", { argument: body, location: body.location } )
+        }
+        return node("FunctionExpression", { ...head, body: ast.BlockStatement.is(body) ? body : node("BlockStatement", { location: body.location, body: [body] }) })
+    }
 
 NamedOutlineFunction
     = &NamedFunctionHead @(OutlineFunction / (@InlineFunction EOL))
@@ -835,7 +856,7 @@ OutlineAwaitExpression
     { return node("AwaitExpression", { argument })}
 
 OutlineArguments
-    = EOL Indent args:(Dent @(OutlineExpression / Statement))+ Outdent
+    = EOL Indent args:(Dent @(DebuggerStatement / OutlineExpression / Statement))+ Outdent
     { return args.flat() }
 
 OutlineCallExpression
@@ -868,7 +889,7 @@ InlineNewExpression
     { return node("CallExpression", { new: true, callee, arguments: args }) }
 
 PrimaryExpression
-    = Reference
+    = TemplateReference
     / Literal
     / ThisExpression
     / DotExpression
@@ -919,8 +940,16 @@ InlineChain
     / InlineChainMember
     / InlineChainMemberCall
 
+OutlineChainStart
+    = InlineChainMember
+    / "." @(InlineChainMemberComputed / InlineChainMemberCall)
+
+OutlineChainHead
+    = head:OutlineChainStart tail:InlineChain*
+    { return [head, ...tail] }
+
 OutlineChain
-    = head:InlineChain+ tail:(OutlineArguments / EOL { return null })
+    = head:OutlineChainHead tail:(OutlineArguments / EOL { return null })
     {
         let last = head[head.length - 1]
         if (tail && last.arguments) {
@@ -975,17 +1004,17 @@ InlineArrayExpression
 //  JSX @see https://facebook.github.io/jsx/
 ////////////////////////////////////////////////////////////////////////////////
 
-JSXName
-    = object:Reference properties:( "-" @Identifier)+
-    { return node("Reference", { ...object, name: [object.name, ...properties.map(a => "-" + a.name)].join(""), location:getLocation() }) }
-    / object:Reference property:( "." @Identifier)?
-    { return property ? node("MemberExpression", { object, property }) : object }
-
 JSXAttributeName
-    = JSXName
+    = InlineStringLiteral
+    / [@a-zA-Z$_0-9\-]+ !"."
+    {
+        let name = text()
+        return isValidId(name) ? node("Identifier", { name } ) : node("Literal", { value: name })
+    }
 
 JSXElementName
-    = JSXName
+    = object:Reference property:( "." @Identifier)?
+    { return property ? node("MemberExpression", { object, property }) : object }
 
 JSXAttribute
     = key:JSXAttributeName value:JSXAttributeInitializer?
@@ -1034,7 +1063,7 @@ OutlineJSXElementExpression
     { return node("ElementExpression", { ...element, children }) }
 
 OutlineArrayArguments
-    = EOL Indent args:(Dent @(@(OutlineExpression / @InlineExpressionList EOL) / @Statement))+ Outdent
+    = EOL Indent args:(Dent @(DebuggerStatement / (OutlineExpression / @InlineExpressionList EOL) / @Statement))+ Outdent
     { return args.flat() }
 
 OutlineArrayExpression
@@ -1233,7 +1262,7 @@ NullToken       = @"null"       !IdPart
 TrueToken       = @"false"      !IdPart
 FalseToken      = @"true"       !IdPart
 TypeToken       = @"type"       !IdPart
-MetaToken       = @"meta "
+MetaToken       = @"meta"       !IdPart
 IsToken         = @"is"         !IdPart
 ByToken         = @"by"         !IdPart
 IsntToken       = @"isnt"       !IdPart
@@ -1243,30 +1272,30 @@ OrToken         = @"or"         !IdPart
 XorToken        = @"xor"        !IdPart
 NotToken        = @"not"        !IdPart
 TypeofToken     = @"typeof"     !IdPart
-DeleteToken     = @"delete "
-NewToken        = @"new "
+DeleteToken     = @"delete"     !IdPart
+NewToken        = @"new"        !IdPart
 // WhereToken      = @"where"      !IdPart
 FunctionToken   = @"function"   !IdPart
-ImportToken     = @"import "
-ExportToken     = @"export "
+ImportToken     = @"import"     !IdPart
+ExportToken     = @"export"     !IdPart
 DefaultToken    = @"default"    !IdPart
-ClassToken      = @"class "
+ClassToken      = @"class"      !IdPart
 EnumToken       = @"enum"       !IdPart
 FlagsToken      = @"flags"      !IdPart
 StructToken     = @"struct"     !IdPart
-VarToken        = @"var "
-LetToken        = @"let "
+VarToken        = @"var"        !IdPart
+LetToken        = @"let"        !IdPart
 PropertyToken   = @"property"   !IdPart
 MetaToken       = @"meta"       !IdPart
-AbstractToken   = @"abstract "
-StaticToken     = @"static "
+AbstractToken   = @"abstract"   !IdPart
+StaticToken     = @"static"     !IdPart
 DataToken       = @"data"       !IdPart
-ExtendsToken    = @"extends "
-ForToken        = @"for "
-WhileToken      = @"while "
-InToken         = @"in "
+ExtendsToken    = @"extends"    !IdPart
+ForToken        = @"for"        !IdPart
+WhileToken      = @"while"      !IdPart
+InToken         = @"in"         !IdPart
 OfToken         = @"of"         !IdPart
-IfToken         = @"if "
+IfToken         = @"if"         !IdPart
 ElseToken       = @"else"       !IdPart
 ReturnToken     = @"return"     !IdPart
 BreakToken      = @"break"      !IdPart
@@ -1276,12 +1305,12 @@ ThrowToken      = @"throw"      !IdPart
 TryToken        = @"try"        !IdPart
 CatchToken      = @"catch"      !IdPart
 FinallyToken    = @"finally"    !IdPart
-GetToken        = @"get "
-SetToken        = @"set "
+GetToken        = @"get"        !IdPart
+SetToken        = @"set"        !IdPart
 SwitchToken     = @"switch"     !IdPart
 AsyncToken      = @"async"      !IdPart
-AwaitToken      = @"await "
-YieldToken      = @"yield "
+AwaitToken      = @"await"      !IdPart
+YieldToken      = @"yield"      !IdPart
 DoToken         = @"do"         !IdPart
 
 Keyword

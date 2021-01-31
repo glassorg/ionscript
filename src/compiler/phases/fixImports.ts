@@ -9,9 +9,6 @@ import { SemanticError } from "../common"
 import Assembly from "../ast/Assembly"
 
 function toImportSpecifier(m: ModuleSpecifier) {
-    if (ImportDeclaration.is(m)) {
-        debugger
-    }
     return m.local.name === "default" ? m.patch({local:m.local.patch({ name: "_default" })}) : m
 }
 
@@ -49,8 +46,9 @@ export default function fixImports(root: Assembly, options: Options) {
                         if (subDeclaration.path?.[0] as any !== ".") {
                             throw SemanticError("Nested imports must begin with a single .", subDeclaration)
                         }
-                        let newPath = [...node.path!, ...(subDeclaration.path as any).slice(1)]
+                        let newPath = [...node.path!, ...(subDeclaration.path as any).slice(node.path!.length > 0 ? 1 : 0)]
                         let newSource = subDeclaration.source.patch({ value: newPath.map(id => id.name || id).join("/") })
+                        // console.log({ nodePath: node.path, subDeclarationPath: subDeclaration.path, newPath, newSource })
                         newDeclarations.push(subDeclaration.patch({
                             path: newPath,
                             source: newSource

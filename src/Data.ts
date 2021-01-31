@@ -1,10 +1,6 @@
 import Property from "./Property"
 import is from "./is"
 
-function isWritable(property: Property) {
-    return property.writable
-}
-
 let writableProperties = Symbol("ionscript.Data.writableProperties")
 function getWritableProperties(object): Map<string,Property> {
     let wprops = object.constructor[writableProperties]
@@ -37,7 +33,7 @@ export default class Data {
                     value = prop.value
                 }
                 else if (!is(value, prop.type)) {
-                    throw new Error(`${name} property is not a valid ${prop.type.name}: ${value}`)
+                    throw new Error(`${name} property is not a valid ${prop.type.name || prop.type}: ${value}`)
                 }
             }
             this[name] = value

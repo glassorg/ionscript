@@ -6,6 +6,48 @@ import { replaceNodes, toRuntimeType } from "./runtimeTypeChecking";
 import { typeProperties } from "./inferTypes";
 import { hasDeclarator, runtimeModuleName, SemanticError } from "../common";
 import createTypeCheck from "../../createTypeCheck";
+import toCodeString from "../toCodeString";
+
+function mergeGetSetPairs(properties: Array<ArrayExpression>) {
+    let mergedProperties = new Map<string, ArrayExpression>()
+    for (let keyValueArrayExpression of properties) {
+        let [key, value] = keyValueArrayExpression.elements
+        let keyString = key!.constructor.name + "_" + toCodeString(key!)
+        let existingProperty = mergedProperties.get(keyString)
+        if (existingProperty != null) {
+            mergedProperties.set(keyString, new ArrayExpression({
+                elements: [
+                    key,
+                    newProperties(
+                        [
+                            ...(existingProperty.elements[1] as any).arguments[0].properties,
+                            ...(value as any).arguments[0].properties,
+                        ]
+                    )
+                ]
+            }))
+        }
+        else {
+            mergedProperties.set(keyString, keyValueArrayExpression)
+        }
+    }
+    return [...mergedProperties.values()]
+}
+
+function newProperties(properties) {
+    return new CallExpression({
+        new: true,
+        callee: new MemberExpression({
+            object: new Reference({ name: runtimeModuleName }),
+            property: new Identifier({ name: "Property" })
+        }),
+        arguments: [
+            new ObjectExpression({
+                properties    
+            })
+        ]
+    })
+}
 
 export default function createRuntime(root: Assembly, options: Options) {
     return traverse(root, {
@@ -61,14 +103,21 @@ export default function createRuntime(root: Assembly, options: Options) {
                         // add external count if needed to for arrays
                         if (ForOfStatement.is(node) && node.count != null) {
                             let { location } = node
+                            let insideCountName = (node.count.id as Declarator).name
+                            let outsideCountName = "_" + insideCountName + "_"
                             return new BlockStatement({
                                 location,
                                 body: [
-                                    new VariableDeclaration({ ...node.count, kind: "var", value: new Literal({ location, value: 0 }) }),
+                                    new VariableDeclaration({ ...node.count, id: (node.count.id as Declarator).patch({ name: outsideCountName }), kind: "var", value: new Literal({ location, value: 0 }) }),
                                     node.patch({
                                         count: null,
                                         body: node.body.patch({
                                             body: [
+                                                new VariableDeclaration({
+                                                    kind: "let",
+                                                    id: new Declarator({ name: insideCountName }),
+                                                    value: new Reference({ name: outsideCountName }),
+                                                }),
                                                 ...node.body.body,
                                                 new ExpressionStatement({
                                                     location,
@@ -77,7 +126,7 @@ export default function createRuntime(root: Assembly, options: Options) {
                                                         operator: "++",
                                                         argument: new Reference({
                                                             location: node.count.location,
-                                                            name: (node.count.id as Declarator).name,
+                                                            name: outsideCountName,
                                                         })
                                                     })
                                                 })
@@ -123,6 +172,7 @@ export default function createRuntime(root: Assembly, options: Options) {
                             return node.patch({
                                 kind: "let",
                                 value: new CallExpression({
+                                    new: true,
                                     callee: new MemberExpression({
                                         object: new Reference({ name: runtimeModuleName }),
                                         property: new Identifier({ name: "MetaProperty" })
@@ -143,13 +193,19 @@ export default function createRuntime(root: Assembly, options: Options) {
                         }
                         if (BinaryExpression.is(node) && node.operator === "is") {
                             if (RuntimeType.is(node.right)) {
+                                let templateArgs = Reference.is(node.right) ? node.right.arguments || [] : []
+                                // we only support reference template args for now
+                                if (!templateArgs.every(Reference.is)) {
+                                    templateArgs = []
+                                }
+                                // only allow templateArgs
                                 usesIonscript = true
                                 return new CallExpression({
                                     callee: new MemberExpression({
                                         object: new Reference({ name: runtimeModuleName }),
                                         property: new Identifier({ name: "is" }),
                                     }),
-                                    arguments: [ node.left, node.right ],
+                                    arguments: [ node.left, node.right, ...templateArgs ],
                                 })
                             }
                             else {
@@ -314,92 +370,80 @@ export default function createRuntime(root: Assembly, options: Options) {
                                                                 })
                                                             })
                                                         ) as any,
-                                                        ...node.instance.declarations.filter(d => !d.inherited && d.instance && Identifier.is(d.id) && d.id.name !== "constructor").map(
+                                                        ...mergeGetSetPairs(node.instance.declarations.filter(d => !d.inherited && d.instance && Identifier.is(d.id) && d.id.name !== "constructor").map(
                                                             d => {
                                                                 let name = (d.id as Declarator).name
                                                                 return new ArrayExpression({
                                                                     elements: [
                                                                         new Literal({ value: name }),
-                                                                        new CallExpression({
-                                                                            new: true,
-                                                                            callee: new MemberExpression({
-                                                                                object: new Reference({ name: runtimeModuleName }),
-                                                                                property: new Identifier({ name: "Property" })
-                                                                            }),
-                                                                            arguments: [
-                                                                                new ObjectExpression({
-                                                                                    properties: (() => {
-                                                                                        let writable = d.kind === "var"
-                                                                                        let properties = new Array<Property>()
-                                                                                        // writable
-                                                                                        if (writable) {
-                                                                                            properties.push(
-                                                                                                new Property({
-                                                                                                    key: new Identifier({ name: "writable" }),
-                                                                                                    value: new Literal({ value: writable }),
-                                                                                                }),
-                                                                                                // we also make any writable properties enumerable as well
-                                                                                                new Property({
-                                                                                                    key: new Identifier({ name: "enumerable" }),
-                                                                                                    value: new Literal({ value: writable }),
-                                                                                                }),
-                                                                                            )
-                                                                                        }
-                                                                                        if (d.type) {
-                                                                                            properties.push(
-                                                                                                new Property({
-                                                                                                    key: new Identifier({ name: "type" }),
-                                                                                                    value: toRuntimeType(d.type, `${node.id.name}.${name}.Type`),
-                                                                                                })
-                                                                                            )
-                                                                                        }
-                                                                                        if (d.value) {
-                                                                                            if (d.kind === "get") {
-                                                                                                properties.push(
-                                                                                                    new Property({
-                                                                                                        key: new Identifier({ name: "get" }),
-                                                                                                        method: true,
-                                                                                                        value: d.value!,
-                                                                                                    })
-                                                                                                )
-                                                                                            }
-                                                                                            else {
-                                                                                                properties.push(
-                                                                                                    new Property({
-                                                                                                        key: new Identifier({ name: "value" }),
-                                                                                                        method: FunctionExpression.is(d.value),
-                                                                                                        value: d.value,
-                                                                                                    })
-                                                                                                )
-                                                                                            }
-                                                                                        }
-                                                                                        if (d.meta) {
-                                                                                            for (let meta of d.meta) {
-                                                                                                properties.push(
-                                                                                                    new Property({
-                                                                                                        key: new MemberExpression({
-                                                                                                            object: new Reference(meta.key as Reference),
-                                                                                                            property: new Identifier({ name: "symbol" })
-                                                                                                        }),
-                                                                                                        computed: true,
-                                                                                                        value: meta.value ? meta.value : new MemberExpression({
-                                                                                                            object: new Reference(meta.key as Reference),
-                                                                                                            property: new Identifier({ name: "defaultValue" })
-                                                                                                        })
-                                                                                                    })
-                                                                                                )
-                                                                                            }
-                                                                                        }
-                                                                                        return properties
-                                                                                    })() as any
-                                                                                })
-                                                                            ]
-                                                                        })
-                                                                        // need a new Property implementation.
+                                                                        newProperties((() => {
+                                                                            let writable = d.kind === "var"
+                                                                            let properties = new Array<Property>()
+                                                                            // writable
+                                                                            if (writable) {
+                                                                                properties.push(
+                                                                                    new Property({
+                                                                                        key: new Identifier({ name: "writable" }),
+                                                                                        value: new Literal({ value: writable }),
+                                                                                    }),
+                                                                                    // we also make any writable properties enumerable as well
+                                                                                    new Property({
+                                                                                        key: new Identifier({ name: "enumerable" }),
+                                                                                        value: new Literal({ value: writable }),
+                                                                                    }),
+                                                                                )
+                                                                            }
+                                                                            if (d.type) {
+                                                                                properties.push(
+                                                                                    new Property({
+                                                                                        key: new Identifier({ name: "type" }),
+                                                                                        value: toRuntimeType(d.type, `${node.id.name}.${name}.Type`),
+                                                                                    })
+                                                                                )
+                                                                            }
+                                                                            if (d.value) {
+                                                                                if (d.kind === "get" || d.kind === "set") {
+                                                                                    properties.push(
+                                                                                        new Property({
+                                                                                            key: new Identifier({ name: d.kind }),
+                                                                                            method: true,
+                                                                                            value: d.value!,
+                                                                                        })
+                                                                                    )
+                                                                                }
+                                                                                else {
+                                                                                    properties.push(
+                                                                                        new Property({
+                                                                                            key: new Identifier({ name: "value" }),
+                                                                                            method: FunctionExpression.is(d.value),
+                                                                                            value: d.value,
+                                                                                        })
+                                                                                    )
+                                                                                }
+                                                                            }
+                                                                            if (d.meta) {
+                                                                                for (let meta of d.meta) {
+                                                                                    properties.push(
+                                                                                        new Property({
+                                                                                            key: new MemberExpression({
+                                                                                                object: new Reference(meta.key as Reference),
+                                                                                                property: new Identifier({ name: "symbol" })
+                                                                                            }),
+                                                                                            computed: true,
+                                                                                            value: meta.value ? meta.value : new MemberExpression({
+                                                                                                object: new Reference(meta.key as Reference),
+                                                                                                property: new Identifier({ name: "defaultValue" })
+                                                                                            })
+                                                                                        })
+                                                                                    )
+                                                                                }
+                                                                            }
+                                                                            return properties
+                                                                        })() as any)
                                                                     ]
                                                                 })
                                                             }
-                                                        )
+                                                        ))
                                                     ]
                                                 })
                                             ],

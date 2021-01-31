@@ -5,6 +5,22 @@ import Assembly from "../ast/Assembly"
 import ArrowFunctionExpression from "../ast/ArrowFunctionExpression"
 import { hasDeclarator, SemanticError } from "../common"
 
+var nextKeyIndex = 0
+function nextKeyLiteral() {
+    return new Literal({ value: "_" + (nextKeyIndex++) + "_" })
+}
+export function findProperty(properties, key = "key") {
+    return properties.find(p => Property.is(p) && Identifier.is(p.key) && p.key.name === key)
+}
+function getKeyPropertyValue(properties) {
+    let keyValue = findProperty(properties)
+    if (keyValue) {
+        properties.splice(properties.indexOf(keyValue), 1)
+        return keyValue.value
+    }
+    return nextKeyLiteral()
+}
+
 function convertExpressionWithNestedStatements(node) {
     const { location } = node
     const containerName = "$"
@@ -182,6 +198,8 @@ function convertExpressionWithNestedStatements(node) {
             return child
         })
 
+        let properties = [...node.properties]
+        let keyValue = getKeyPropertyValue(properties)
         let hasNonPropertyStatements = children.find(Statement.is) != null
         const propertiesName = "$"
         const childrenName = "children"
@@ -284,7 +302,7 @@ function convertExpressionWithNestedStatements(node) {
                                     arguments: [
                                         kind,
                                         new Reference({ location, name: propertiesName }),
-                                        // new Reference({ location, name: childrenName }),
+                                        keyValue,
                                     ]
                                 })
                             })
@@ -295,7 +313,7 @@ function convertExpressionWithNestedStatements(node) {
                     new ObjectExpression({
                         location,
                         properties: [
-                            ...node.properties,
+                            ...properties,
                             new Property({
                                 location,
                                 key: new Identifier({ location, name: childrenName }),
@@ -329,6 +347,9 @@ function convertExpressionWithNestedStatements(node) {
                     children.push(child)
                 }
             }
+            // extract key field since JSX expects it as 3rd argument
+            let keyValue: Expression | null = getKeyPropertyValue(properties)
+
             //  TODO: We should probably just output JSX
             let args: Array<any> = [
                 kind,
@@ -339,12 +360,14 @@ function convertExpressionWithNestedStatements(node) {
                         new Property({
                             location,
                             key: new Identifier({ location, name: "children" }),
-                            value: new ArrayExpression({ location, elements: children })
+                            value: children.length === 1 ? children[0] : new ArrayExpression({ location, elements: children })
                         })
                     ]
                 })
-                // ...children
             ]
+            if (keyValue) {
+                args.push(keyValue)
+            }
             return new CallExpression({
                 location,
                 callee: new Reference({ location, name: "jsx" }),
@@ -424,7 +447,7 @@ export default function controlFlowToExpressions(root: Assembly, options: Option
                                         imported: new Reference({ name: "jsx", location })
                                     })
                                 ],
-                                source: new Literal({ value: "preact/jsx-runtime", location })
+                                source: new Literal({ value: "react/jsx-runtime", location })
                             }),
                             ...program.body
                         ]

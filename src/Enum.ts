@@ -1,10 +1,10 @@
 import Type from "./Type"
 
-function toTypeCheck(properties) {
+function toTypeCheck(values) {
     // if it's flags, it's OK.
     let allNumbers = true
     let set = new Set()
-    for (let value of Object.values(properties)) {
+    for (let value of Object.values(values)) {
         if (typeof value !== "number") {
             allNumbers = false
             break
@@ -22,9 +22,25 @@ function toTypeCheck(properties) {
 
 export default class Enum extends Type {
 
-    constructor(name, properties) {
-        super(toTypeCheck(properties), name)
-        Object.assign(this, properties)
+    readonly values: { [name: string]: any }
+
+    constructor(name, values) {
+        super(toTypeCheck(values), name)
+        Object.assign(this, values)
+        this.values = values
+    }
+
+    getValue(name) {
+        return this.values[name]
+    }
+
+    getName(value) {
+        for (let [k, v] of this.values as any) {
+            if (v === value) {
+                return k
+            }
+        }
+        return null
     }
 
 }

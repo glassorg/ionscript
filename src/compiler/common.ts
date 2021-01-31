@@ -106,7 +106,9 @@ export function getOriginalDeclarator(declarator: Declarator, scopes: NodeMap<Sc
                 if (!throwErrors) {
                     return null
                 }
-                throw SemanticError(`${importDeclaration.source.value} ${name} is not exported`, parent)
+                console.warn(`${importDeclaration.source.value} ${name} is not exported`)
+                return null
+                // throw SemanticError(`${importDeclaration.source.value} ${name} is not exported`, parent)
             }
             // recurse in case this exported value is also a reference or re-export
             // return sourceDeclarator

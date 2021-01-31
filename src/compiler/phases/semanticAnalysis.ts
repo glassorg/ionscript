@@ -1,14 +1,30 @@
 import { Options } from "../Compiler"
 import { traverse, skip, replace } from "@glas/traverse"
-import { BinaryExpression, ClassDeclaration, Declarator, ElementExpression, FunctionExpression, Program, Reference, RestElement, UnaryExpression, VariableDeclaration, YieldExpression } from "../ast"
+import { BinaryExpression, ClassDeclaration, Declarator, ElementExpression, Expression, ForOfStatement, FunctionExpression, Identifier, Literal, Program, Reference, RestElement, ReturnStatement, UnaryExpression, VariableDeclaration, YieldExpression } from "../ast"
 import { getAncestor, SemanticError } from "../common"
 import Assembly from "../ast/Assembly"
 import toCodeString from "../toCodeString"
 import * as types from "../types";
+import LoopStatement from "../ast/LoopStatement"
+import { findProperty } from "./controlFlowToExpressions"
+import { Property } from "../.."
+
+function isFirstAncestorLoopOrElement(ancestors: any[]) {
+    for (let i = ancestors.length; i >= 0; i--) {
+        let node = ancestors[i]
+        if (LoopStatement.is(node)) {
+            return true
+        }
+        if (ElementExpression.is(node) || ReturnStatement.is(node) || FunctionExpression.is(node)) {
+            return false
+        }
+    }
+    return false
+}
 
 export default function semanticAnalysis(root: Assembly, options: Options) {
     return traverse(root, {
-        enter(node, ancestors) {
+        enter(node, ancestors, path) {
             if (VariableDeclaration.is(node)) {
                 let container = ancestors[ancestors.length - 2]
                 if (node.static && !ClassDeclaration.is(container)) {
@@ -16,7 +32,15 @@ export default function semanticAnalysis(root: Assembly, options: Options) {
                 }
                 let parent = ancestors[ancestors.length - 1]
                 if (node.kind !== "var" && !ClassDeclaration.is(parent) && node.value == null) {
-                    throw SemanticError("Variable must be initialized", node)
+                    if (!(ForOfStatement.is(parent) && path[path.length - 1] === "count")) {
+                        throw SemanticError("Variable must be initialized", node)
+                    }
+                }
+                if (Declarator.is(node.id) && node.id.name === "properties" && (node.instance || node.static)) {
+                    let containingClass = ancestors.reverse().find(ClassDeclaration.is)
+                    if (ClassDeclaration.is(containingClass) && containingClass.isData) {
+                        throw SemanticError("Data Classes/Structs can not have a variable named 'properties'", node.id)
+                    }
                 }
             }
             if (ClassDeclaration.is(node)) {
@@ -27,6 +51,17 @@ export default function semanticAnalysis(root: Assembly, options: Options) {
             if (ElementExpression.is(node)) {
                 if (node.close != null && toCodeString(node.kind) !== toCodeString(node.close)) {
                     throw SemanticError("Closing element does not match opening element", node.close)
+                }
+                // check that if this element has a for loop parent... that it provides a 'key'
+                if (isFirstAncestorLoopOrElement(ancestors)) {
+                    let keyProperty = findProperty(node.properties) as Property | null
+                    if (keyProperty == null) {
+                        throw SemanticError(`JSXElement within loop needs a key property`, node)
+                    }
+                    if (Literal.is(keyProperty.value)) {
+                        // we could check that the declared value isn't a constant, but meh.
+                        throw SemanticError(`JSXElement key within loop should vary each iteration`, keyProperty.value)
+                    }
                 }
             }
             if (YieldExpression.is(node)) {

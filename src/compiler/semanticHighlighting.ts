@@ -1,8 +1,7 @@
 import { traverse } from "@glas/traverse";
-import { ArrayPattern, AwaitExpression, BinaryExpression, BreakStatement, CallExpression, ClassDeclaration, ContinueStatement, Declarator, ElementExpression, ForOfStatement, ForStatement, FunctionExpression, Identifier, IfStatement, ImportDeclaration, ImportDefaultSpecifier, ImportNamespaceSpecifier, Literal, MemberExpression, ModuleSpecifier, Parameter, Pattern, Property, Reference, RegularExpression, ReturnStatement, ThisExpression, ThrowStatement, TryStatement, Typed, TypeExpression, UnaryExpression, VariableDeclaration, YieldExpression, WhileStatement, BlockStatement, ExpressionStatement, TemplateLiteral, TemplateElement, EnumDeclaration } from "./ast";
+import { ArrayPattern, AwaitExpression, BinaryExpression, BreakStatement, CallExpression, ClassDeclaration, ContinueStatement, Declarator, ElementExpression, ForOfStatement, ForStatement, FunctionExpression, Identifier, IfStatement, ImportDeclaration, ImportDefaultSpecifier, ImportNamespaceSpecifier, Literal, MemberExpression, ModuleSpecifier, Parameter, Pattern, Property, Reference, RegularExpression, ReturnStatement, ThisExpression, ThrowStatement, TryStatement, Typed, TypeExpression, UnaryExpression, VariableDeclaration, YieldExpression, WhileStatement, BlockStatement, ExpressionStatement, TemplateLiteral, TemplateElement, EnumDeclaration, SpreadElement, RestElement } from "./ast";
 import Parser from "./parser";
 import reservedWords from "./reservedWords";
-import toCodeString from "./toCodeString";
 const parser = Parser();
 
 function add(position, offset) {
@@ -81,7 +80,6 @@ export function getSemanticHighlights(
     let ast = parser.parse(text, fileName);
     traverse(ast, {
         enter(node, ancestors) {
-            // console.log("????????" + node.constructor.name, node)
             if (node.location == null) {
                 return;
             }
@@ -94,6 +92,10 @@ export function getSemanticHighlights(
                 if (Parameter.is(parent) || Pattern.is(ancestors[ancestors.length - 2])) {
                     push(node, ...(isType(node.name) ? typeTokenTypes : declarationTokenTypes))
                 }
+            }
+
+            if (SpreadElement.is(node) || RestElement.is(node)) {
+                push(node.argument, ...declarationTokenTypes)
             }
 
             if (ThisExpression.is(node)) {
@@ -167,6 +169,7 @@ export function getSemanticHighlights(
                     highlightStartingKeywords(node.alternate.location!.start.line, 1);
                 }
             }
+
             if (ForOfStatement.is(node) || ForStatement.is(node)) {
                 push({ start: node.location.start, end: add(node.location.start, "for".length) }, "keyword");
                 if (ForOfStatement.is(node)) {
@@ -208,12 +211,6 @@ export function getSemanticHighlights(
                     push(callee, "function");
                 }
             }
-
-            // if (Typed.is(node)) {
-            //     if (node.type) {
-            //         push(node.type, "type");
-            //     }
-            // }
 
             if (VariableDeclaration.is(node)) {
                 // let right = (node.export === 2 ? node.value : node.id)!.location;

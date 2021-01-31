@@ -1,15 +1,28 @@
 
-meta Indexed: Boolean = true
+import
+    .TextField
+    .PhoneEditor
 
-data class Vector2
+// docRef
+// .then()
 
-    [Indexed]
-    x: Number
+// let all = []
+//     foo
+//     .[12][5]
+//     foo(1,2)
+//     (5)
 
-    [Indexed]
-    y: Number
+// meta Indexed: Boolean = true
 
-    get foo() -> 12
+// data class Vector2
+
+//     [Indexed]: false
+//     x: Number
+
+//     [Indexed]
+//     y: Number
+
+//     get foo() -> 12
 
 // data struct Vector3
 //     x: F32

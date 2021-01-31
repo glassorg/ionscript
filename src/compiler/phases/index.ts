@@ -8,7 +8,7 @@ import checkReferences from "./checkReferences"
 import createRuntime from "./createRuntime"
 import runtimeTypeChecking from "./runtimeTypeChecking"
 import semanticAnalysis from "./semanticAnalysis"
-import inheritBaseClasses from "./inheritBaseClasses"
+// import inheritBaseClasses from "./inheritBaseClasses"
 import addDataClassConstructors from "./addDataClassConstructors"
 import addTypedStructArrays from "./addTypedStructArrays"
 import toModuleFiles from "./toModuleFiles"
@@ -31,7 +31,7 @@ const defaultPhases = [
     parsing,
     semanticAnalysis,
     fixImports,
-    inheritBaseClasses,
+    // inheritBaseClasses,
     controlFlowToExpressions,
     checkReferences, // probably leave this here.
     // createConditionalDeclarations,

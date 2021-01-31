@@ -1,9 +1,11 @@
 import { traverse, skip } from "@glas/traverse"
 import { getAncestor, getAncestorsAndSelfList, getOriginalDeclaration, SemanticError } from "./common"
-import { Node, FunctionExpression, Scope, Identifier, Reference, Declaration, VariableDeclaration, Declarator, Pattern, Parameter, Program, ClassDeclaration, ExpressionStatement, Expression, ImportDefaultSpecifier } from "./ast"
+import { Node, FunctionExpression, Scope, Identifier, Reference, Declaration, VariableDeclaration, Declarator, Pattern, Parameter, Program, ClassDeclaration, ExpressionStatement, Expression, ImportDefaultSpecifier, ObjectPattern, RestElement, ArrayPattern } from "./ast"
 import * as types from "./types"
 import { createIsType, IsType } from "./analysis/isType"
 import isConsequent from "./analysis/isConsequent"
+import { Console } from "console"
+import { Property } from ".."
 
 export type NodeMap<T> = {
     get(global: null): T
@@ -104,7 +106,7 @@ export default function createScopeMaps(
     let scopes: object[] = [global]
     map.set(null, global)
 
-    function declare(node: Declarator) {
+    function declare(node: Identifier) {
         identifiers.add(node.name)
         let scope: any = scopes[scopes.length - 1]
         scope[node.name as any] = node
@@ -118,14 +120,33 @@ export default function createScopeMaps(
         if (Declarator.is(node)) {
             declare(node)
         }
-        else {
-            traverse(node, {
-                enter(node) {
-                    if (Declarator.is(node)) {
-                        declare(node)
+        else if (RestElement.is(node)) {
+            declare(node.argument)
+        }
+        else if (ObjectPattern.is(node)) {
+            for (let property of node.properties) {
+                if (RestElement.is(property)) {
+                    declarePattern(property)
+                }
+                else {
+                    if (Reference.is(property.value)) {
+                        declare(property.value)
+                    }
+                    else if (Pattern.is(property.value)) {
+                        declarePattern(property.value)
                     }
                 }
-            })
+            }
+        }
+        else if (ArrayPattern.is(node)) {
+            for (let element of node.elements) {
+                if (element != null) {
+                    declarePattern(element)
+                }
+            }
+        }
+        else {
+            throw SemanticError(`TODO: Handle this Pattern: ${node.constructor.name}`, node)
         }
     }
 

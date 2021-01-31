@@ -53,6 +53,9 @@ export {
     default as ContinueStatement
 } from './ContinueStatement';
 export {
+    default as DebuggerStatement
+} from './DebuggerStatement';
+export {
     default as Declaration
 } from './Declaration';
 export {
@@ -121,6 +124,9 @@ export {
 export {
     default as Location
 } from './Location';
+export {
+    default as LoopStatement
+} from './LoopStatement';
 export {
     default as MemberExpression
 } from './MemberExpression';

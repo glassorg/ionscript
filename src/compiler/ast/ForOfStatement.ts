@@ -2,6 +2,7 @@
 This file was generated from ion source. Do not edit.
 */
 import * as _Object from './ion/Object';
+import * as LoopStatement from './LoopStatement';
 import * as Statement from './Statement';
 import * as Typed from './Typed';
 import * as Node from './Node';
@@ -12,7 +13,7 @@ import * as VariableDeclaration from './VariableDeclaration';
 import * as Expression from './Expression';
 import * as BlockStatement from './BlockStatement';
 import * as Class from './ion/Class';
-export class ForOfStatement implements _Object.Object , Statement.Statement , Typed.Typed , Node.Node {
+export class ForOfStatement implements _Object.Object , LoopStatement.LoopStatement , Statement.Statement , Typed.Typed , Node.Node {
     readonly location: Location.Location | Null.Null;
     readonly type: Type.Type | Null.Null;
     readonly left: VariableDeclaration.VariableDeclaration;
@@ -23,6 +24,7 @@ export class ForOfStatement implements _Object.Object , Statement.Statement , Ty
     static readonly implements = new Set([
         'ForOfStatement',
         'ion_Object',
+        'LoopStatement',
         'Statement',
         'Typed',
         'Node'

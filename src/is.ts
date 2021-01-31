@@ -1,13 +1,13 @@
 import * as symbols from "./symbols"
 
-export default function is(instance, type) {
+export default function is(instance, type, ...templateArgs) {
     //  if the type has an is function we call it
     if (type != null) {
         if (type[symbols.is]) {
-            return type[symbols.is](instance)
+            return type[symbols.is](instance, ...templateArgs)
         }
         if (typeof type.is === "function") {
-            return type.is(instance)
+            return type.is(instance, ...templateArgs)
         }
         if (typeof type === "function") {
             return instance instanceof type

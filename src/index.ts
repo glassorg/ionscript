@@ -20,3 +20,5 @@ export { default as I16 } from "./I16";
 export { default as I32 } from "./I32";
 export { default as F32 } from "./F32";
 export { default as F64 } from "./F64";
+export { default as TypedArray } from "./TypedArray";
+export { default as MetaProperty } from "./MetaProperty";
