@@ -1,6 +1,6 @@
 import { traverse, skip } from "@glas/traverse"
 import { getAncestor, getAncestorsAndSelfList, getOriginalDeclaration, SemanticError } from "./common"
-import { Node, FunctionExpression, Scope, Identifier, Reference, Declaration, VariableDeclaration, Declarator, Pattern, Parameter, Program, ClassDeclaration, ExpressionStatement, Expression, ImportDefaultSpecifier, ObjectPattern, RestElement, ArrayPattern } from "./ast"
+import { Node, FunctionExpression, Scope, Identifier, Reference, Declaration, VariableDeclaration, Declarator, Pattern, Parameter, Program, ClassDeclaration, ExpressionStatement, Expression, ImportDefaultSpecifier, ObjectPattern, RestElement, ArrayPattern, AssignmentPattern } from "./ast"
 import * as types from "./types"
 import { createIsType, IsType } from "./analysis/isType"
 import isConsequent from "./analysis/isConsequent"
@@ -144,6 +144,9 @@ export default function createScopeMaps(
                     declarePattern(element)
                 }
             }
+        }
+        else if (AssignmentPattern.is(node)) {
+            declarePattern(node.left)
         }
         else {
             throw SemanticError(`TODO: Handle this Pattern: ${node.constructor.name}`, node)

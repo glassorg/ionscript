@@ -5,6 +5,7 @@ import { AssignmentExpression, BinaryExpression, BlockStatement, CallExpression,
 import { getLast, runtimeModuleName } from "../common"
 import toCodeString from "../toCodeString"
 import combineExpressions from "../analysis/combineExpressions"
+import splitExpressions from "../analysis/splitExpressions"
 
 // let Vector_x = Symbol("Vector_x")
 function getSymbolName(c: ClassDeclaration, d: VariableDeclaration) {
@@ -24,6 +25,22 @@ export function throwTypeError(type: Type, valueName: string): Statement {
             arguments: [stringValue]
         })
     })
+}
+
+function replaceDotExpressionsMakeMembersOptional(value) {
+    return traverse(value, {
+        leave(node) {
+            if (DotExpression.is(node)) {
+                return new Reference({ name: "_" })
+            }
+            // type checks should NOT throw null so we implicitly
+            // convert all dot expressions to optional, but not
+            if (MemberExpression.is(node) && !node.optional &&
+                !(Reference.is(node.object) && node.object.name === runtimeModuleName)) {
+                return node.patch({ optional: true })
+            }
+        }
+    })    
 }
 
 export function typeCheckOrThrow(value: Expression, type: Type, name: string): Statement {
@@ -124,7 +141,17 @@ function replaceTypedVarsWithProperties(clas: ClassDeclaration, options: Options
     })
 }
 
-export function toRuntimeType(type, name: string) {
+export function toRuntimeType(type, name: string = "") {
+
+    if (CallExpression.is(type) && toCodeString(type).startsWith("ionscript.is(.,")) {
+        // this is SUB-OPTIMAL. type conversion from following
+        //  phase createRuntime has already replaced types.
+        return type.arguments[1]
+    }
+
+    if (TypeExpression.is(type)) {
+        return toRuntimeType(type.value, name)
+    }
 
     if (FunctionType.is(type)) {
         //  we do NOT have runtime function type checking yet
@@ -134,6 +161,24 @@ export function toRuntimeType(type, name: string) {
 
     if (RuntimeType.is(type)) {
         return type
+    }
+    
+    if (BinaryExpression.is(type) && (type.operator === "is" || type.operator === "==") && DotExpression.is(type.left)) {
+        return toRuntimeType(type.right, name)
+    }
+
+    if (BinaryExpression.is(type)) {
+        if (type.operator === "||") {
+            let operands = [...splitExpressions(type, "||")]
+            return new CallExpression({
+                new: true,
+                callee: new MemberExpression({
+                    object: new Reference({ name: runtimeModuleName }),
+                    property: new Identifier({ name: "UnionType" })
+                }),
+                arguments: operands.map(toRuntimeType as any)
+            })
+        }
     }
 
     return new CallExpression({
@@ -152,19 +197,7 @@ export function toRuntimeType(type, name: string) {
                 body: new BlockStatement({
                     body: [
                         new ReturnStatement({
-                            argument: traverse((type as TypeExpression).value ?? type, {
-                                leave(node) {
-                                    if (DotExpression.is(node)) {
-                                        return new Reference({ name: "_" })
-                                    }
-                                    // type checks should NOT throw null so we implicitly
-                                    // convert all dot expressions to optional, but not
-                                    if (MemberExpression.is(node) && !node.optional &&
-                                        !(Reference.is(node.object) && node.object.name === runtimeModuleName)) {
-                                        return node.patch({ optional: true })
-                                    }
-                                }
-                            })
+                            argument: replaceDotExpressionsMakeMembersOptional((type as TypeExpression).value ?? type)
                         })
                     ]
                 })

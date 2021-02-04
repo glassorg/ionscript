@@ -2,6 +2,7 @@
 import "./global/index";
 export { default as is } from "./is";
 export { default as Type } from "./Type";
+export { default as UnionType } from "./UnionType";
 export { default as Enum } from "./Enum";
 export { default as Null } from "./Null";
 export { default as Data } from "./Data";

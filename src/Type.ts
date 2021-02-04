@@ -11,6 +11,7 @@ export default class Type {
     size?: number
     read?: ReadValue
     write?: WriteValue
+    coerce?: Function
 
     constructor(is: (a) => boolean, name?: string)
     constructor(is: (a) => boolean, name: string, size: number, read: ReadValue, write: WriteValue)

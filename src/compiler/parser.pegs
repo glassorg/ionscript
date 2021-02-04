@@ -336,8 +336,8 @@ MethodDeclaration
     }
 
 GetOrSetDeclarationType
-    = GetToken { return { kind: "get" } }
-    / SetToken { return { kind: "set" } }
+    = @GetToken !"(" { return { kind: "get" } }
+    / @SetToken !"(" { return { kind: "set" } }
 
 VariableDeclarationType
     = VarToken { return { kind: "var" } }
@@ -490,8 +490,14 @@ ObjectPattern
     }
 
 AssignmentProperty
-    = key:Identifier value:(_ ":" _ @Pattern)?
-    { return node("Property", { key, value: value || node("Reference", key), shorthand: value == null } ) }
+    = key:Identifier value:(_ ":" _ @Pattern / _ "=" _ @InlineExpression)?
+    {
+        if (ast.Expression.is(value)) {
+            // AssignmentPattern
+            return node("Property", { key, value: node("AssignmentPattern", { left: node("Declarator", key), right: value })})
+        }
+        return node("Property", { key, value: value || node("Reference", key), shorthand: value == null } )
+    }
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Enums and Flags

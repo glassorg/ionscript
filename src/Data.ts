@@ -20,7 +20,7 @@ export default class Data {
 
     constructor(properties) {
         if (properties == null) {
-            throw new Error("properties arguments is required")
+            throw new Error("properties object is required. Make sure you didn't extend this class with a non-data class.")
         }
         for (let [name, prop] of getWritableProperties(this)) {
             let value = properties[name]
@@ -33,11 +33,23 @@ export default class Data {
                     value = prop.value
                 }
                 else if (!is(value, prop.type)) {
-                    throw new Error(`${name} property is not a valid ${prop.type.name || prop.type}: ${value}`)
+                    // try to coerce
+                    var coerced = false
+                    if (typeof (prop.type as any).coerce === "function") {
+                        coerced = true
+                        value = (prop.type as any).coerce(value)
+                    }
+                    if (!coerced || !is(value, prop.type)) {
+                        throw new Error(`${name} property is not a valid ${prop.type.name || prop.type}: ${value}`)
+                    }
                 }
             }
             this[name] = value
         }
+    }
+
+    patch(properties) {
+        return new (this as any).constructor({ ...this, ...properties })
     }
 
     toJSON() {

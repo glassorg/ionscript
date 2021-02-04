@@ -244,8 +244,9 @@ export function getSemanticHighlights(
             }
 
             if (ClassDeclaration.is(node) || EnumDeclaration.is(node)) {
-                highlightStartingKeywords(node.location.start.line, 4)
+                highlightStartingKeywords(node.location.start.line, 10)
                 push(node.id, "struct")
+                // highlight "extends" if present.
             }
 
             if (ElementExpression.is(node)) {
