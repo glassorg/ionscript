@@ -1,18 +1,34 @@
-import
-    .Entity
-    .TimeStamp
-    .Email
-    .DateTime
+import @adobe.react-spectrum
+    Heading
+    Flex
+import @glas.platform.data
+    .Key
+import ..client
+    .useUser
+    .useFireStore
+    .useCurrentOrg
+import ..components
+    .Header
+    .View
+    .Link
+    .DeviceDeck
+import ..model
+    .namespace
+    .Organization
 
-export default data class Record extends Entity
+export function getUrl(locationKey) -> `/location/${encodeURIComponent(locationKey)}`
+export let url = "/location/:locationKeyEncoded"
 
-    created: TimeStamp | Null = null
-    updated: TimeStamp | Null = null
-    deleted: TimeStamp | Null = null
+export default ({ locationKeyEncoded }) ->
+    let locationKey = Key.parse(namespace, decodeURIComponent(locationKeyEncoded))
+    let [location, setLocation] = useFireStore(locationKey)
 
-    stamp(by: Email, time: DateTime = new Date().toISOString()) ->
-        let updated = new TimeStamp({ by, time })
-        return this.patch({ created: this.created || updated, updated })
+    return []
+        <Header/>
+            path: [{ url, name: location?.name ?? "" }]
+        <View />
+            if location
+                <DeviceDeck location={location} />
 
 // docRef
 // .then()

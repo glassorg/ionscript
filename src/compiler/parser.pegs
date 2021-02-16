@@ -1012,14 +1012,19 @@ InlineArrayExpression
 
 JSXAttributeName
     = InlineStringLiteral
-    / [@a-zA-Z$_0-9\-]+ !"."
+    / JSXIdentifierOrLiteral
+
+JSXIdentifierOrLiteral
+    = [@a-zA-Z$_0-9\-]+ !"."
     {
         let name = text()
         return isValidId(name) ? node("Identifier", { name } ) : node("Literal", { value: name })
     }
 
 JSXElementName
-    = object:Reference property:( "." @Identifier)?
+    = value:JSXIdentifierOrLiteral
+    { return ast.Identifier.is(value) ? new ast.Reference(value) : value }
+    / object:Reference property:( "." @Identifier)?
     { return property ? node("MemberExpression", { object, property }) : object }
 
 JSXAttribute

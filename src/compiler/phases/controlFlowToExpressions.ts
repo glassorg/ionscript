@@ -201,6 +201,21 @@ function convertExpressionWithNestedStatements(node) {
         let properties = [...node.properties]
         let keyValue = getKeyPropertyValue(properties)
         let hasNonPropertyStatements = children.find(Statement.is) != null
+        let hasExpressionStatements = hasNonPropertyStatements && (() => {
+            let found = false
+            traverse(children, {
+                enter(node) {
+                    if (found) {
+                        return skip
+                    }
+                    if (ExpressionStatement.is(node)) {
+                        found = true
+                        return skip
+                    }
+                }
+            })
+            return found
+        })();
         const propertiesName = "$"
         const childrenName = "children"
         let kind = node.kind
@@ -312,14 +327,17 @@ function convertExpressionWithNestedStatements(node) {
                 arguments: [
                     new ObjectExpression({
                         location,
-                        properties: [
+                        //  if there are no expression statements then there are no children
+                        //  this is important because react complains if empty elements
+                        //  even have an empty array as children.
+                        properties: hasExpressionStatements ? [
                             ...properties,
                             new Property({
                                 location,
                                 key: new Identifier({ location, name: childrenName }),
                                 value: new ArrayExpression({ location, elements: [] })
                             })
-                        ]
+                        ] : properties
                     }),
                 ]
             })
@@ -350,20 +368,21 @@ function convertExpressionWithNestedStatements(node) {
             // extract key field since JSX expects it as 3rd argument
             let keyValue: Expression | null = getKeyPropertyValue(properties)
 
+            let propertiesWithChildren = [
+                ...properties,
+                ...(
+                    children.length == 0 ? [] :[new Property({
+                        location,
+                        key: new Identifier({ location, name: "children" }),
+                        value: children.length === 1 ? children[0] : new ArrayExpression({ location, elements: children })
+                    })]
+                )
+            ]
+
             //  TODO: We should probably just output JSX
             let args: Array<any> = [
                 kind,
-                new ObjectExpression({
-                    location,
-                    properties: [
-                        ...properties,
-                        new Property({
-                            location,
-                            key: new Identifier({ location, name: "children" }),
-                            value: children.length === 1 ? children[0] : new ArrayExpression({ location, elements: children })
-                        })
-                    ]
-                })
+                new ObjectExpression({ location, properties: propertiesWithChildren})
             ]
             if (keyValue) {
                 args.push(keyValue)
@@ -427,7 +446,7 @@ export default function controlFlowToExpressions(root: Assembly, options: Option
                                             right: new Reference({ location, name: "c"})
                                         }),
                                         expression: true
-                                    })
+                                    }),
                                 ]
                             })
                         }

@@ -212,26 +212,6 @@ export default function createRuntime(root: Assembly, options: Options) {
                                 return replaceNodes(node.right, DotExpression.is, node.left)
                             }
                         }
-                        //  checked variables and things.
-                        //  we NO longer convert let statements to get functions.
-                        // if (VariableDeclaration.is(node)) {
-                        //     if (node.static || node.instance) {
-                        //         // for now.... TODO: Fix, convert let to var
-                        //         // if (node.kind === "let" && node.value != null && !FunctionExpression.is(node.value)) {
-                        //         //     return node.patch({
-                        //         //         kind: "get",
-                        //         //         value: new FunctionExpression({
-                        //         //             params: [],
-                        //         //             body: new BlockStatement({
-                        //         //                 body: [
-                        //         //                     new ReturnStatement({ argument: node.value })
-                        //         //                 ]
-                        //         //             })
-                        //         //         })
-                        //         //     })
-                        //         // }
-                        //     }
-                        // }
                         if (ClassDeclaration.is(node)) {
                             let result = node
                             if (!node.isData) {
@@ -308,7 +288,8 @@ export default function createRuntime(root: Assembly, options: Options) {
                                             })
                                         ],
                                     // also remove all the instance variable declarations
-                                    instance: result.instance!.patch({
+                                    // leave functions in for structs.
+                                    instance: node.isStruct ? result.instance : result.instance!.patch({
                                         declarations: []
                                     })
                                 })
