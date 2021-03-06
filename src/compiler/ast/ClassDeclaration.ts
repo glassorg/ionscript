@@ -29,10 +29,12 @@ export class ClassDeclaration implements _Object.Object , Meta.Meta , Declaratio
     readonly type: Type.Type | Null.Null;
     readonly export: Integer.Integer;
     readonly isStruct: Boolean.Boolean;
+    readonly isInterface: Boolean.Boolean;
     readonly isData: Boolean.Boolean;
     readonly id: Declarator.Declarator;
     readonly parameters: _Array.Array<Parameter.Parameter>;
     readonly baseClasses: _Array.Array<Reference.Reference | MemberExpression.MemberExpression>;
+    readonly interfaces: _Array.Array<Reference.Reference | MemberExpression.MemberExpression>;
     readonly static: _Array.Array<VariableDeclaration.VariableDeclaration>;
     readonly instance: InstanceDeclarations.InstanceDeclarations;
     readonly instanceType: Type.Type | Null.Null;
@@ -54,10 +56,12 @@ export class ClassDeclaration implements _Object.Object , Meta.Meta , Declaratio
         type = null,
         export: _export = 0,
         isStruct = false,
+        isInterface = false,
         isData = false,
         id,
         parameters = [],
         baseClasses = [],
+        interfaces = [],
         static: _static,
         instance,
         instanceType = null
@@ -67,10 +71,12 @@ export class ClassDeclaration implements _Object.Object , Meta.Meta , Declaratio
         type?: Type.Type | Null.Null,
         export?: Integer.Integer,
         isStruct?: Boolean.Boolean,
+        isInterface?: Boolean.Boolean,
         isData?: Boolean.Boolean,
         id: Declarator.Declarator,
         parameters?: _Array.Array<Parameter.Parameter>,
         baseClasses?: _Array.Array<Reference.Reference | MemberExpression.MemberExpression>,
+        interfaces?: _Array.Array<Reference.Reference | MemberExpression.MemberExpression>,
         static: _Array.Array<VariableDeclaration.VariableDeclaration>,
         instance: InstanceDeclarations.InstanceDeclarations,
         instanceType?: Type.Type | Null.Null
@@ -85,6 +91,8 @@ export class ClassDeclaration implements _Object.Object , Meta.Meta , Declaratio
             throw new Error('export is not a Integer: ' + Class.toString(_export));
         if (!Boolean.isBoolean(isStruct))
             throw new Error('isStruct is not a Boolean: ' + Class.toString(isStruct));
+        if (!Boolean.isBoolean(isInterface))
+            throw new Error('isInterface is not a Boolean: ' + Class.toString(isInterface));
         if (!Boolean.isBoolean(isData))
             throw new Error('isData is not a Boolean: ' + Class.toString(isData));
         if (!Declarator.isDeclarator(id))
@@ -93,6 +101,8 @@ export class ClassDeclaration implements _Object.Object , Meta.Meta , Declaratio
             throw new Error('parameters is not a Array: ' + Class.toString(parameters));
         if (!_Array.isArray(baseClasses))
             throw new Error('baseClasses is not a Array: ' + Class.toString(baseClasses));
+        if (!_Array.isArray(interfaces))
+            throw new Error('interfaces is not a Array: ' + Class.toString(interfaces));
         if (!_Array.isArray(_static))
             throw new Error('static is not a Array: ' + Class.toString(_static));
         if (!InstanceDeclarations.isInstanceDeclarations(instance))
@@ -104,10 +114,12 @@ export class ClassDeclaration implements _Object.Object , Meta.Meta , Declaratio
         this.type = type;
         this.export = _export;
         this.isStruct = isStruct;
+        this.isInterface = isInterface;
         this.isData = isData;
         this.id = id;
         this.parameters = parameters;
         this.baseClasses = baseClasses;
+        this.interfaces = interfaces;
         this.static = _static;
         this.instance = instance;
         this.instanceType = instanceType;
@@ -119,10 +131,12 @@ export class ClassDeclaration implements _Object.Object , Meta.Meta , Declaratio
         type?: Type.Type | Null.Null,
         export?: Integer.Integer,
         isStruct?: Boolean.Boolean,
+        isInterface?: Boolean.Boolean,
         isData?: Boolean.Boolean,
         id?: Declarator.Declarator,
         parameters?: _Array.Array<Parameter.Parameter>,
         baseClasses?: _Array.Array<Reference.Reference | MemberExpression.MemberExpression>,
+        interfaces?: _Array.Array<Reference.Reference | MemberExpression.MemberExpression>,
         static?: _Array.Array<VariableDeclaration.VariableDeclaration>,
         instance?: InstanceDeclarations.InstanceDeclarations,
         instanceType?: Type.Type | Null.Null

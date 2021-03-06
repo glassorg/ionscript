@@ -312,6 +312,20 @@ export default function createRuntime(root: Assembly, options: Options) {
                                                 })
                                             ]
                                         })
+                                    }),
+                                    new VariableDeclaration({
+                                        static: new Identifier({ name: "static" }),
+                                        kind: "var",
+                                        id: new Declarator({ name: "interfaces" }),
+                                        value: new CallExpression({
+                                            new: true,
+                                            callee: new Reference({ name: "Set"}),
+                                            arguments: [
+                                                new ArrayExpression({
+                                                    elements: node.interfaces
+                                                })
+                                            ]
+                                        })
                                     })
                                 )
                                 staticVarsWithDefaults.push(

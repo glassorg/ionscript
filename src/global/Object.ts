@@ -1,6 +1,18 @@
 import is from "../is";
 import {is as isSymbol} from "../symbols";
 
+if (Object.fromEntries == null) {
+    (Object as any).fromEntries = function(entries) {
+        let object = {};
+        if (entries != null) {
+            for (let [key, value] of entries) {
+                object[key] = value
+            }
+        }
+        return object
+    };
+}
+
 Object.defineProperties(Object, {
     [isSymbol]: {
         value(a, keyType?, valueType?) {

@@ -74,6 +74,9 @@ Indented Javascript
     - In debug mode files must be able to be incrementally compiled individually.
     - In release mode compilation and optimization as a group is allowed.
 
+- Interfaces?
+    - Yes. Interfaces become Type's at runtime and can be implemented statically or dynamically.
+
 ## Syntax
 
 ### Import

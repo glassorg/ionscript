@@ -33,6 +33,8 @@ export default new Set([
     "super",
     "switch",
     "struct",   //  ionscript
+    "interface",// ionscript
+    "implements", // ionscript
     "static",   //  ionscript
     "this",
     "throw",

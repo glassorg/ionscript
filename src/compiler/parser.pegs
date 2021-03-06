@@ -520,16 +520,21 @@ ClassModifiers
     / AbstractModifier
     / &. { return {} }
 
+ClassType
+    = ClassToken { return {} }
+    / StructToken { return { isStruct: true } }
+    / InterfaceToken { return { isInterface: true } }
+
 ClassDeclaration
     = meta:MetaProperties
-        modifiers:ClassModifiers isStruct:(ClassToken { return false } / StructToken { return true })
-        _ id:Declarator params:TemplateParameters? _ baseClasses:Extends? EOL
+        modifiers:ClassModifiers type:ClassType
+        _ id:Declarator params:TemplateParameters? _ baseClasses:Extends? _ interfaces:Implements? EOL
         Indent
             declarations:(Dent @(MethodDeclaration / TempClassPropertyDeclaration))*
         Outdent
         {
             return node("ClassDeclaration", {
-                id, ...modifiers, isStruct, params: params || [], baseClasses: baseClasses || [],
+                id, ...modifiers, ...type, params: params || [], baseClasses: baseClasses || [], interfaces: interfaces || [],
                 static: declarations.filter(d => d.static),
                 meta: meta || null,
                 instance: node("InstanceDeclarations", { declarations: declarations.filter(d => !d.static).map(d => d.patch({ instance: true })) })
@@ -541,6 +546,10 @@ TemplateParameters
 
 Extends
     = ExtendsToken _ head:Reference tail:(_ "," _ @Reference)*
+    { return [head, ...tail] }
+
+Implements
+    = ImplementsToken _ head:Reference tail:(_ "," _ @Reference)*
     { return [head, ...tail] }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1294,6 +1303,8 @@ ClassToken      = @"class"      !IdPart
 EnumToken       = @"enum"       !IdPart
 FlagsToken      = @"flags"      !IdPart
 StructToken     = @"struct"     !IdPart
+InterfaceToken  = @"interface"  !IdPart
+ImplementsToken = @"implements" !IdPart
 VarToken        = @"var"        !IdPart
 LetToken        = @"let"        !IdPart
 PropertyToken   = @"property"   !IdPart
@@ -1342,6 +1353,8 @@ Keyword
     // / WhereToken
     / ClassToken
     / StructToken
+    / InterfaceToken
+    / ImplementsToken
     / VarToken
     / LetToken
     / ForToken

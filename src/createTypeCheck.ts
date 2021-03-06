@@ -1,13 +1,18 @@
 
-type DataClass = { baseClasses: Set<DataClass>, implements: Set<DataClass> }
+type DataClass = { baseClasses: Set<DataClass>, implements: Set<DataClass>, interfaces: Set<DataClass> }
 
 export default function createTypeCheck(cls: DataClass) {
     cls.implements = new Set<DataClass>()
     for (let baseClass of cls.baseClasses) {
         cls.implements.add(baseClass)
-        for (let i of baseClass.implements) {
-            cls.implements.add(i)
+        if (baseClass.implements) {
+            for (let i of baseClass.implements) {
+                cls.implements.add(i)
+            }
         }
+    }
+    for (let baseInterface of cls.interfaces) {
+        cls.implements.add(baseInterface)
     }
     return (instance) => {
         if (instance == null) {

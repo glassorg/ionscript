@@ -1,43 +1,14 @@
-import @adobe.react-spectrum
-    Heading
-    Flex
-import @glas.platform.data
-    .Key
-import ..client
-    .useUser
-    .useFireStore
-    .useCurrentOrg
-import ..components
-    .Header
-    .View
-    .Link
-    .DeviceDeck
-import ..model
-    .namespace
-    .Organization
 
-export function getUrl(locationKey) -> `/location/${encodeURIComponent(locationKey)}`
-export let url = "/location/:locationKeyEncoded"
 
-export default ({ locationKeyEncoded }) ->
-    let locationKey = Key.parse(namespace, decodeURIComponent(locationKeyEncoded))
-    let [location, setLocation] = useFireStore(locationKey)
+interface Foo extends Bar
+    foo: Number
 
-    return []
-        <Header/>
-            path: [{ url, name: location?.name ?? "" }]
-        <View />
-            if location
-                <DeviceDeck location={location} />
+data class A
 
-// docRef
-// .then()
+data class B extends A implements Foo
 
-// let all = []
-//     foo
-//     .[12][5]
-//     foo(1,2)
-//     (5)
+//     y: Number
+//     foo: () => Boolean
 
 // meta Indexed: Boolean = true
 

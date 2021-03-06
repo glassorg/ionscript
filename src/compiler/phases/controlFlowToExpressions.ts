@@ -1,6 +1,6 @@
 import { Options } from "../Compiler"
 import { traverse, skip, remove } from "@glas/traverse"
-import { ArrayExpression, BinaryExpression, BlockStatement, CallExpression, Declarator, ElementExpression, Expression, ExpressionStatement, FunctionExpression, Identifier, ImportDeclaration, ImportNamespaceSpecifier, ImportSpecifier, Literal, Location, MemberExpression, Node, ObjectExpression, OutlineOperation, Parameter, Program, Property, Reference, ReturnStatement, SpreadElement, Statement, AssignmentExpression } from "../ast"
+import { ArrayExpression, BinaryExpression, BlockStatement, CallExpression, Declarator, ElementExpression, Expression, ExpressionStatement, FunctionExpression, Identifier, ImportDeclaration, ImportNamespaceSpecifier, ImportSpecifier, Literal, Location, MemberExpression, Node, ObjectExpression, OutlineOperation, Parameter, Program, Property, Reference, ReturnStatement, SpreadElement, Statement, AssignmentExpression, VariableDeclaration } from "../ast"
 import Assembly from "../ast/Assembly"
 import ArrowFunctionExpression from "../ast/ArrowFunctionExpression"
 import { hasDeclarator, SemanticError } from "../common"
@@ -205,10 +205,10 @@ function convertExpressionWithNestedStatements(node) {
             let found = false
             traverse(children, {
                 enter(node) {
-                    if (found) {
+                    if (found || VariableDeclaration.is(node)) {
                         return skip
                     }
-                    if (ExpressionStatement.is(node)) {
+                    if (ExpressionStatement.is(node) || Expression.is(node)) {
                         found = true
                         return skip
                     }

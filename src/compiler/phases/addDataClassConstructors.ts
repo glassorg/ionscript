@@ -1,6 +1,6 @@
 import { Options } from "../Compiler";
 import { traverse, skip } from "@glas/traverse"
-import { VariableDeclaration, Identifier, Literal, Assembly, ClassDeclaration, Declaration, Reference, Node, Declarator, FunctionExpression, BlockStatement, AssignmentPattern, ObjectPattern, ObjectExpression, Parameter, Property, ExpressionStatement, MemberExpression, ThisExpression, IfStatement, DotExpression, Statement, Expression, Type, TypeExpression, BinaryExpression, UnaryExpression, ThrowStatement, CallExpression, AssignmentExpression, EnumDeclaration } from "../ast";
+import { VariableDeclaration, Identifier, Assembly, ClassDeclaration, Reference, Declarator, FunctionExpression, BlockStatement, AssignmentPattern, ObjectPattern, ObjectExpression, Parameter, Property, ExpressionStatement, MemberExpression, ThisExpression, IfStatement, DotExpression, Statement, Type, TypeExpression, BinaryExpression, UnaryExpression, CallExpression, AssignmentExpression, Expression } from "../ast";
 import { replaceNodes, throwTypeError } from "./runtimeTypeChecking";
 import { clone, SemanticError } from "../common";
 import combineExpressions from "../analysis/combineExpressions";
@@ -147,6 +147,59 @@ function getConstructor(declarations: ReadonlyArray<VariableDeclaration>) {
     return declarations.find(d => Identifier.is(d.id) && d.id.name === "constructor")
 }
 
+function convertInterfaceToType(node: ClassDeclaration, options: Options) {
+    // convert this interface to a runtime type declaration
+    let { location } = node
+    let expressions: Expression[] = []
+    for (let ref of node.baseClasses) {
+        expressions.push(new BinaryExpression({
+            left: new DotExpression({ location }),
+            operator: "is",
+            right: ref,
+        }))
+    }
+    for (let ref of node.interfaces) {
+        options.errors.push(SemanticError(`Use 'extends' instead of 'implements' in interfaces`, ref))
+    }
+    for (let staticMember of node.static) {
+        options.errors.push(SemanticError(`Static members not allowed in interfaces`, staticMember.static))
+    }
+    for (let d of node.instance.declarations) {
+        if (!VariableDeclaration.is(d)) {
+            options.errors.push(SemanticError(`Declaration type not allowed in interfaces`, d))
+        }
+        else {
+            if (d.value != null) {
+                options.errors.push(SemanticError(`Default values not allowed on interface members`, d.value))
+            }
+            if (d.type == null) {
+                options.errors.push(SemanticError(`Interface members must specify a type`, d.id))
+            }
+            else {
+                expressions.push(new BinaryExpression({
+                    left: new MemberExpression({
+                        object: new DotExpression({ location }),
+                        property: d.id
+                    }),
+                    operator: "is",
+                    right: d.type,
+                }))
+            }
+        }
+    }
+    return new VariableDeclaration({
+        location,
+        kind: "type",
+        id: node.id,
+        value: expressions.length == 0
+        ? types.Any
+        : new TypeExpression({
+            location,
+            value: combineExpressions(expressions, "&&")
+        }),
+    })
+}
+
 export default function addDataClassConstructors(root: Assembly, options: Options) {
 
     return traverse(root, {
@@ -156,15 +209,20 @@ export default function addDataClassConstructors(root: Assembly, options: Option
             }
         },
         leave(node) {
-            if (ClassDeclaration.is(node) && (node.isData && node.isStruct && getConstructor(node.instance.declarations) == null)) {
-                return node.patch({
-                    instance: node.instance.patch({
-                        declarations: [
-                            createDataClassConstructor(node, [...node.instance.declarations.values()].filter(a => a.kind === "var"), node.isStruct, options),
-                            ...node.instance.declarations,
-                        ]
+            if (ClassDeclaration.is(node)) {
+                if ((node.isData && node.isStruct && getConstructor(node.instance.declarations) == null)) {
+                    return node.patch({
+                        instance: node.instance.patch({
+                            declarations: [
+                                createDataClassConstructor(node, [...node.instance.declarations.values()].filter(a => a.kind === "var"), node.isStruct, options),
+                                ...node.instance.declarations,
+                            ]
+                        })
                     })
-                })
+                }
+                if (node.isInterface) {
+                    return convertInterfaceToType(node, options)
+                }
             }
         }
     })
