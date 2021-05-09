@@ -4,6 +4,7 @@ import { ArrayExpression, BinaryExpression, BlockStatement, CallExpression, Decl
 import Assembly from "../ast/Assembly"
 import ArrowFunctionExpression from "../ast/ArrowFunctionExpression"
 import { hasDeclarator, SemanticError } from "../common"
+import combineExpressions from "../analysis/combineExpressions"
 
 var nextKeyIndex = 0
 function nextKeyLiteral() {
@@ -424,12 +425,17 @@ export default function controlFlowToExpressions(root: Assembly, options: Option
                         }
                         if (OutlineOperation.is(node)) {
                             let { operator } = node
+                            let onlyExpressions = node.operands.every(Expression.is)
+                            if (onlyExpressions) {
+                                // just convert to simple left associated expressions
+                                return combineExpressions(node.operands as Expression[], operator)
+                            }
                             let operands = new ArrayExpression({ location, elements: node.operands })
                             return new CallExpression({
                                 location,
                                 callee: new MemberExpression({
                                     location,
-                                    object: convertExpressionWithNestedStatements(operands) ?? operands,
+                                    object: convertExpressionWithNestedStatements(operands) || operands,
                                     property: new Identifier({ location, name: "reduce" })
                                 }),
                                 arguments: [

@@ -1,9 +1,5 @@
-import { is } from "../symbols"
+import { is as isSymbol } from "../symbols"
 
-Object.defineProperties(RegExp.prototype, {
-    [is]: {
-        value(this: RegExp, a) {
-            return a != null && this.test(a);
-        }
-    }
-});
+RegExp.prototype[isSymbol] = function(this: RegExp, a) {
+    return a != null && this.test(a);
+};

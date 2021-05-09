@@ -1,7 +1,7 @@
 import createScopeMaps from "../createScopeMaps";
 import { traverse, remove } from "@glas/traverse";
-import { Assembly, ClassDeclaration, Declaration, Declarator, Exportable, FunctionExpression, Identifier, ImportDeclaration, Location, MemberExpression, ModuleSpecifier, Node, Program, Reference, RestElement, ThisExpression, VariableDeclaration } from "../ast";
-import { getAncestor, getOriginalDeclarator, memoizeIntern, SemanticError } from "../common";
+import { Assembly, AssignmentExpression, ClassDeclaration, Declaration, Declarator, Exportable, FunctionExpression, Identifier, ImportDeclaration, Location, MemberExpression, ModuleSpecifier, Node, Program, Reference, RestElement, ThisExpression, VariableDeclaration } from "../ast";
+import { getAncestor, getOriginalDeclaration, getOriginalDeclarator, memoizeIntern, SemanticError } from "../common";
 import { getGlobalReference, getModulePath } from "../pathFunctions";
 import toCodeString from "../toCodeString";
 import * as types from "../types";
@@ -49,6 +49,15 @@ export default function checkReferences(root: Assembly, options: Options) {
                                 })
                             })
                         })
+                    }
+                }
+            }
+            if (AssignmentExpression.is(node) && Reference.is(node.left)) {
+                let scope = scopes.get(node)
+                if (scope != null) {
+                    let declaration = getOriginalDeclaration(node.left, scopes, ancestorsMap);
+                    if (VariableDeclaration.is(declaration) && declaration.kind === "let") {
+                        options.errors.push(SemanticError(`Cannot assign to 'let' variables. Did you mean to use 'var'?`, node.left))
                     }
                 }
             }

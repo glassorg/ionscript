@@ -1,11 +1,41 @@
+let check =
+    &&
+        position isnt Null
+        position.x == x
+        position.y == y
+        position.z == z
 
+// import .functions
+//     clamp
 
-interface Foo extends Bar
-    foo: Number
+// export default data struct Range
+//     min: F32
+//     max: F32
 
-data class A
+//     constructor(min: F32, max: F32) ->
+//         this.min = Math.min(min, max)
+//         this.max = Math.max(min, max)
 
-data class B extends A implements Foo
+//     add(min: F32, max: F32 = min) ->
+//         if min == 0 && max == 0
+//             return this
+//         return new Range(this.min + min, this.max + max)
+
+//     overlaps(range: Range | Null) ->
+//         return &&
+//             range isnt Null
+//             range.min >= this.min
+//             range.min <= this.max
+//             range.max >= this.min
+//             range.max <= this.max
+
+//     intersect(range: Range | Null) ->
+//         if rang is Null || !this.overlaps(range)
+//             return null
+//         return new Range()
+//             clamp(range.min, this.min, this.max)
+//             clamp(range.max, this.min, this.max)
+
 
 //     y: Number
 //     foo: () => Boolean

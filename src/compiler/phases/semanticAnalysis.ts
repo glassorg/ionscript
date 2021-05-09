@@ -1,7 +1,7 @@
 import { Options } from "../Compiler"
-import { traverse, skip, replace } from "@glas/traverse"
-import { BinaryExpression, ClassDeclaration, Declarator, ElementExpression, Expression, ForOfStatement, FunctionExpression, Identifier, Literal, Program, Reference, RestElement, ReturnStatement, UnaryExpression, VariableDeclaration, YieldExpression } from "../ast"
-import { getAncestor, SemanticError } from "../common"
+import { traverse, replace } from "@glas/traverse"
+import { BinaryExpression, ClassDeclaration, Declarator, ElementExpression, ForOfStatement, FunctionExpression, Identifier, Literal, Program, Reference, RestElement, ReturnStatement, UnaryExpression, VariableDeclaration, YieldExpression } from "../ast"
+import { SemanticError } from "../common"
 import Assembly from "../ast/Assembly"
 import toCodeString from "../toCodeString"
 import * as types from "../types";

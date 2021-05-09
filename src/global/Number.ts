@@ -1,9 +1,5 @@
-import { is } from "../symbols";
+import { is as isSymbol } from "../symbols";
 
-Object.defineProperties(Number, {
-    [is]: {
-        value(a) {
-            return typeof a === "number";
-        }
-    }
-});
+Number[isSymbol] = function(a) {
+    return typeof a === "number";
+};
