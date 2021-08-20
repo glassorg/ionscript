@@ -1,9 +1,8 @@
-let check =
-    &&
-        position isnt Null
-        position.x == x
-        position.y == y
-        position.z == z
+export function cell(material, thermalEnergy) ->
+    return
+        |
+            (thermalEnergy & 0xFFFF) << 8
+            (material & 0xFF)
 
 // import .functions
 //     clamp

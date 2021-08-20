@@ -11,6 +11,10 @@
   "bin": {
     "isc": "bin/isc.js"
   },
+  "exports": {
+    ".": "./lib/index.js",
+    "./": "./lib/"
+  },
   "targets": {
     "browser": {
       "publicUrl": "https://glassorg.github.io/ionscript/"
