@@ -1,8 +1,15 @@
-export function cell(material, thermalEnergy) ->
-    return
-        |
-            (thermalEnergy & 0xFFFF) << 8
-            (material & 0xFF)
+let sum =
+    +
+        0
+        1
+        2
+        3
+
+// export function cell(material, thermalEnergy) ->
+//     return
+//         |
+//             (thermalEnergy & 0xFFFF) << 8
+//             (material & 0xFF)
 
 // import .functions
 //     clamp

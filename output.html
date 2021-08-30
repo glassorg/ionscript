@@ -203,54 +203,26 @@ ul.jsondiffpatch-textdiff {
 
         <article>
             <header><span>Input</span></header>
-            <p><div class="jsondiffpatch-delta jsondiffpatch-node jsondiffpatch-child-node-type-object"><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key="ionscript/Sample"><div class="jsondiffpatch-property-name">ionscript/Sample</div><div class="jsondiffpatch-value"><pre>&quot;let check =<br>    &amp;&amp;<br>        position isnt Null<br>        position.x == x<br>        position.y == y<br>        position.z == z<br><br>// import .functions<br>//     clamp<br><br>// export default data struct Range<br>//     min: F32<br>//     max: F32<br><br>//     constructor(min: F32, max: F32) -&gt;<br>//         this.min = Math.min(min, max)<br>//         this.max = Math.max(min, max)<br><br>//     add(min: F32, max: F32 = min) -&gt;<br>//         if min == 0 &amp;&amp; max == 0<br>//             return this<br>//         return new Range(this.min + min, this.max + max)<br><br>//     overlaps(range: Range | Null) -&gt;<br>//         return &amp;&amp;<br>//             range isnt Null<br>//             range.min &gt;= this.min<br>//             range.min &lt;= this.max<br>//             range.max &gt;= this.min<br>//             range.max &lt;= this.max<br><br>//     intersect(range: Range | Null) -&gt;<br>//         if rang is Null || !this.overlaps(range)<br>//             return null<br>//         return new Range()<br>//             clamp(range.min, this.min, this.max)<br>//             clamp(range.max, this.min, this.max)<br><br><br>//     y: Number<br>//     foo: () =&gt; Boolean<br><br>// meta Indexed: Boolean = true<br><br>// data class Vector2<br><br>//     [Indexed]: false<br>//     x: Number<br><br>//     [Indexed]<br>//     y: Number<br><br>//     get foo() -&gt; 12<br><br>// data struct Vector3<br>//     x: F32<br>//     y: F32<br>//     z: F32<br><br>// data struct Sphere<br>//     radius: F32<br>//     center: Vector3<br>//     center2: Vector3<br><br>// import @glas.platform.graphics.(Graphics3D)<br>// import (ionscript) { Range, is }<br><br>// import @glas:platform:graphics:math:{Color, Matrix4, Vector3}<br>// import @glas:platform:graphics:elements:Dock<br>// import @glas:platform:graphics:Graphics.{useGraphics}<br>//     useGraphics<br>// import @glas:platform:graphics:Graphics3D<br><br>// foo() -&gt;<br>//     return bar()<br>//         1<br>//         2<br><br>// let foo = () -&gt; throw new Error()<br>//     1<br>//     2<br><br>// // foo(x = 12)<br><br>// for i in 0..12<br>//     log(i)<br><br>// x = y = foo()<br>//     1<br>//     2<br>&quot;</pre></div></li></ul></div></p>
+            <p><div class="jsondiffpatch-delta jsondiffpatch-node jsondiffpatch-child-node-type-object"><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key="ionscript/Sample"><div class="jsondiffpatch-property-name">ionscript/Sample</div><div class="jsondiffpatch-value"><pre>&quot;let sum =<br>    +<br>        0<br>        1<br>        2<br>        3<br><br>// export function cell(material, thermalEnergy) -&gt;<br>//     return<br>//         |<br>//             (thermalEnergy &amp; 0xFFFF) &lt;&lt; 8<br>//             (material &amp; 0xFF)<br><br>// import .functions<br>//     clamp<br><br>// export default data struct Range<br>//     min: F32<br>//     max: F32<br><br>//     constructor(min: F32, max: F32) -&gt;<br>//         this.min = Math.min(min, max)<br>//         this.max = Math.max(min, max)<br><br>//     add(min: F32, max: F32 = min) -&gt;<br>//         if min == 0 &amp;&amp; max == 0<br>//             return this<br>//         return new Range(this.min + min, this.max + max)<br><br>//     overlaps(range: Range | Null) -&gt;<br>//         return &amp;&amp;<br>//             range isnt Null<br>//             range.min &gt;= this.min<br>//             range.min &lt;= this.max<br>//             range.max &gt;= this.min<br>//             range.max &lt;= this.max<br><br>//     intersect(range: Range | Null) -&gt;<br>//         if rang is Null || !this.overlaps(range)<br>//             return null<br>//         return new Range()<br>//             clamp(range.min, this.min, this.max)<br>//             clamp(range.max, this.min, this.max)<br><br><br>//     y: Number<br>//     foo: () =&gt; Boolean<br><br>// meta Indexed: Boolean = true<br><br>// data class Vector2<br><br>//     [Indexed]: false<br>//     x: Number<br><br>//     [Indexed]<br>//     y: Number<br><br>//     get foo() -&gt; 12<br><br>// data struct Vector3<br>//     x: F32<br>//     y: F32<br>//     z: F32<br><br>// data struct Sphere<br>//     radius: F32<br>//     center: Vector3<br>//     center2: Vector3<br><br>// import @glas.platform.graphics.(Graphics3D)<br>// import (ionscript) { Range, is }<br><br>// import @glas:platform:graphics:math:{Color, Matrix4, Vector3}<br>// import @glas:platform:graphics:elements:Dock<br>// import @glas:platform:graphics:Graphics.{useGraphics}<br>//     useGraphics<br>// import @glas:platform:graphics:Graphics3D<br><br>// foo() -&gt;<br>//     return bar()<br>//         1<br>//         2<br><br>// let foo = () -&gt; throw new Error()<br>//     1<br>//     2<br><br>// // foo(x = 12)<br><br>// for i in 0..12<br>//     log(i)<br><br>// x = y = foo()<br>//     1<br>//     2<br>&quot;</pre></div></li></ul></div></p>
         </article>
     
         <article>
             <header><span>parsing</span></header>
-            <p><div class="jsondiffpatch-delta jsondiffpatch-node jsondiffpatch-child-node-type-object"><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-added" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Assembly&quot;</pre></div></li><li class="jsondiffpatch-deleted" data-key="ionscript/Sample"><div class="jsondiffpatch-property-name">ionscript/Sample</div><div class="jsondiffpatch-value"><pre>&quot;let check =<br>    &amp;&amp;<br>        position isnt Null<br>        position.x == x<br>        position.y == y<br>        position.z == z<br><br>// import .functions<br>//     clamp<br><br>// export default data struct Range<br>//     min: F32<br>//     max: F32<br><br>//     constructor(min: F32, max: F32) -&gt;<br>//         this.min = Math.min(min, max)<br>//         this.max = Math.max(min, max)<br><br>//     add(min: F32, max: F32 = min) -&gt;<br>//         if min == 0 &amp;&amp; max == 0<br>//             return this<br>//         return new Range(this.min + min, this.max + max)<br><br>//     overlaps(range: Range | Null) -&gt;<br>//         return &amp;&amp;<br>//             range isnt Null<br>//             range.min &gt;= this.min<br>//             range.min &lt;= this.max<br>//             range.max &gt;= this.min<br>//             range.max &lt;= this.max<br><br>//     intersect(range: Range | Null) -&gt;<br>//         if rang is Null || !this.overlaps(range)<br>//             return null<br>//         return new Range()<br>//             clamp(range.min, this.min, this.max)<br>//             clamp(range.max, this.min, this.max)<br><br><br>//     y: Number<br>//     foo: () =&gt; Boolean<br><br>// meta Indexed: Boolean = true<br><br>// data class Vector2<br><br>//     [Indexed]: false<br>//     x: Number<br><br>//     [Indexed]<br>//     y: Number<br><br>//     get foo() -&gt; 12<br><br>// data struct Vector3<br>//     x: F32<br>//     y: F32<br>//     z: F32<br><br>// data struct Sphere<br>//     radius: F32<br>//     center: Vector3<br>//     center2: Vector3<br><br>// import @glas.platform.graphics.(Graphics3D)<br>// import (ionscript) { Range, is }<br><br>// import @glas:platform:graphics:math:{Color, Matrix4, Vector3}<br>// import @glas:platform:graphics:elements:Dock<br>// import @glas:platform:graphics:Graphics.{useGraphics}<br>//     useGraphics<br>// import @glas:platform:graphics:Graphics3D<br><br>// foo() -&gt;<br>//     return bar()<br>//         1<br>//         2<br><br>// let foo = () -&gt; throw new Error()<br>//     1<br>//     2<br><br>// // foo(x = 12)<br><br>// for i in 0..12<br>//     log(i)<br><br>// x = y = foo()<br>//     1<br>//     2<br>&quot;</pre></div></li><li class="jsondiffpatch-added" data-key="modules"><div class="jsondiffpatch-property-name">modules</div><div class="jsondiffpatch-value"><pre>Map {
+            <p><div class="jsondiffpatch-delta jsondiffpatch-node jsondiffpatch-child-node-type-object"><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-added" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Assembly&quot;</pre></div></li><li class="jsondiffpatch-deleted" data-key="ionscript/Sample"><div class="jsondiffpatch-property-name">ionscript/Sample</div><div class="jsondiffpatch-value"><pre>&quot;let sum =<br>    +<br>        0<br>        1<br>        2<br>        3<br><br>// export function cell(material, thermalEnergy) -&gt;<br>//     return<br>//         |<br>//             (thermalEnergy &amp; 0xFFFF) &lt;&lt; 8<br>//             (material &amp; 0xFF)<br><br>// import .functions<br>//     clamp<br><br>// export default data struct Range<br>//     min: F32<br>//     max: F32<br><br>//     constructor(min: F32, max: F32) -&gt;<br>//         this.min = Math.min(min, max)<br>//         this.max = Math.max(min, max)<br><br>//     add(min: F32, max: F32 = min) -&gt;<br>//         if min == 0 &amp;&amp; max == 0<br>//             return this<br>//         return new Range(this.min + min, this.max + max)<br><br>//     overlaps(range: Range | Null) -&gt;<br>//         return &amp;&amp;<br>//             range isnt Null<br>//             range.min &gt;= this.min<br>//             range.min &lt;= this.max<br>//             range.max &gt;= this.min<br>//             range.max &lt;= this.max<br><br>//     intersect(range: Range | Null) -&gt;<br>//         if rang is Null || !this.overlaps(range)<br>//             return null<br>//         return new Range()<br>//             clamp(range.min, this.min, this.max)<br>//             clamp(range.max, this.min, this.max)<br><br><br>//     y: Number<br>//     foo: () =&gt; Boolean<br><br>// meta Indexed: Boolean = true<br><br>// data class Vector2<br><br>//     [Indexed]: false<br>//     x: Number<br><br>//     [Indexed]<br>//     y: Number<br><br>//     get foo() -&gt; 12<br><br>// data struct Vector3<br>//     x: F32<br>//     y: F32<br>//     z: F32<br><br>// data struct Sphere<br>//     radius: F32<br>//     center: Vector3<br>//     center2: Vector3<br><br>// import @glas.platform.graphics.(Graphics3D)<br>// import (ionscript) { Range, is }<br><br>// import @glas:platform:graphics:math:{Color, Matrix4, Vector3}<br>// import @glas:platform:graphics:elements:Dock<br>// import @glas:platform:graphics:Graphics.{useGraphics}<br>//     useGraphics<br>// import @glas:platform:graphics:Graphics3D<br><br>// foo() -&gt;<br>//     return bar()<br>//         1<br>//         2<br><br>// let foo = () -&gt; throw new Error()<br>//     1<br>//     2<br><br>// // foo(x = 12)<br><br>// for i in 0..12<br>//     log(i)<br><br>// x = y = foo()<br>//     1<br>//     2<br>&quot;</pre></div></li><li class="jsondiffpatch-added" data-key="modules"><div class="jsondiffpatch-property-name">modules</div><div class="jsondiffpatch-value"><pre>Map {
   &quot;ionscript/Sample&quot;: Program {
     &quot;id&quot;: Declarator { &quot;name&quot;: &quot;ionscript/Sample&quot; },
     &quot;body&quot;: [
       VariableDeclaration {
         &quot;meta&quot;: [],
-        &quot;id&quot;: Declarator { &quot;name&quot;: &quot;check&quot; },
+        &quot;id&quot;: Declarator { &quot;name&quot;: &quot;sum&quot; },
         &quot;value&quot;: OutlineOperation {
           &quot;operands&quot;: [
-            BinaryExpression {
-              &quot;left&quot;: Reference { &quot;name&quot;: &quot;position&quot; },
-              &quot;operator&quot;: &quot;isnt&quot;,
-              &quot;right&quot;: Reference { &quot;name&quot;: &quot;Null&quot; }
-            },
-            BinaryExpression {
-              &quot;left&quot;: MemberExpression {
-                &quot;optional&quot;: false,
-                &quot;object&quot;: Reference { &quot;name&quot;: &quot;position&quot; },
-                &quot;property&quot;: Identifier { &quot;name&quot;: &quot;x&quot; }
-              },
-              &quot;operator&quot;: &quot;==&quot;,
-              &quot;right&quot;: Reference { &quot;name&quot;: &quot;x&quot; }
-            },
-            BinaryExpression {
-              &quot;left&quot;: MemberExpression {
-                &quot;optional&quot;: false,
-                &quot;object&quot;: Reference { &quot;name&quot;: &quot;position&quot; },
-                &quot;property&quot;: Identifier { &quot;name&quot;: &quot;y&quot; }
-              },
-              &quot;operator&quot;: &quot;==&quot;,
-              &quot;right&quot;: Reference { &quot;name&quot;: &quot;y&quot; }
-            },
-            BinaryExpression {
-              &quot;left&quot;: MemberExpression {
-                &quot;optional&quot;: false,
-                &quot;object&quot;: Reference { &quot;name&quot;: &quot;position&quot; },
-                &quot;property&quot;: Identifier { &quot;name&quot;: &quot;z&quot; }
-              },
-              &quot;operator&quot;: &quot;==&quot;,
-              &quot;right&quot;: Reference { &quot;name&quot;: &quot;z&quot; }
-            }
+            Literal { &quot;value&quot;: 0 },
+            Literal { &quot;value&quot;: 1 },
+            Literal { &quot;value&quot;: 2 },
+            Literal { &quot;value&quot;: 3 }
           ],
-          &quot;operator&quot;: &quot;&amp;&amp;&quot;
+          &quot;operator&quot;: &quot;+&quot;
         },
         &quot;export&quot;: 0,
         &quot;kind&quot;: &quot;let&quot;,
@@ -264,35 +236,30 @@ ul.jsondiffpatch-textdiff {
     
         <article>
             <header><span>semanticAnalysis</span></header>
-            <p><div class="jsondiffpatch-delta jsondiffpatch-node jsondiffpatch-child-node-type-object"><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Assembly&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="modules"><div class="jsondiffpatch-property-name">modules</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Map&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="ionscript/Sample"><div class="jsondiffpatch-property-name">ionscript/Sample</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Program&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-array" data-key="body"><div class="jsondiffpatch-property-name">body</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-array"><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="0"><div class="jsondiffpatch-property-name">0</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;VariableDeclaration&quot;</pre></div></li><li class="jsondiffpatch-unchanged" data-key="export"><div class="jsondiffpatch-property-name">export</div><div class="jsondiffpatch-value"><pre>0</pre></div></li><li class="jsondiffpatch-unchanged" data-key="id"><div class="jsondiffpatch-property-name">id</div><div class="jsondiffpatch-value"><pre>Declarator { &quot;name&quot;: &quot;check&quot; }</pre></div></li><li class="jsondiffpatch-unchanged" data-key="inherited"><div class="jsondiffpatch-property-name">inherited</div><div class="jsondiffpatch-value"><pre>false</pre></div></li><li class="jsondiffpatch-unchanged" data-key="instance"><div class="jsondiffpatch-property-name">instance</div><div class="jsondiffpatch-value"><pre>false</pre></div></li><li class="jsondiffpatch-unchanged" data-key="kind"><div class="jsondiffpatch-property-name">kind</div><div class="jsondiffpatch-value"><pre>&quot;let&quot;</pre></div></li><li class="jsondiffpatch-unchanged" data-key="meta"><div class="jsondiffpatch-property-name">meta</div><div class="jsondiffpatch-value"><pre>[]</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="value"><div class="jsondiffpatch-property-name">value</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;OutlineOperation&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-array" data-key="operands"><div class="jsondiffpatch-property-name">operands</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-array"><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="0"><div class="jsondiffpatch-property-name">0</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-modified" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value jsondiffpatch-left-value"><pre>&quot;BinaryExpression&quot;</pre></div><div class="jsondiffpatch-value jsondiffpatch-right-value"><pre>&quot;UnaryExpression&quot;</pre></div></li><li class="jsondiffpatch-added" data-key="argument"><div class="jsondiffpatch-property-name">argument</div><div class="jsondiffpatch-value"><pre>BinaryExpression {
-  &quot;left&quot;: Reference { &quot;name&quot;: &quot;position&quot; },
-  &quot;operator&quot;: &quot;is&quot;,
-  &quot;right&quot;: Reference { &quot;name&quot;: &quot;Null&quot; }
-}</pre></div></li><li class="jsondiffpatch-deleted" data-key="left"><div class="jsondiffpatch-property-name">left</div><div class="jsondiffpatch-value"><pre>Reference { &quot;name&quot;: &quot;position&quot; }</pre></div></li><li class="jsondiffpatch-modified" data-key="operator"><div class="jsondiffpatch-property-name">operator</div><div class="jsondiffpatch-value jsondiffpatch-left-value"><pre>&quot;isnt&quot;</pre></div><div class="jsondiffpatch-value jsondiffpatch-right-value"><pre>&quot;!&quot;</pre></div></li><li class="jsondiffpatch-added" data-key="prefix"><div class="jsondiffpatch-property-name">prefix</div><div class="jsondiffpatch-value"><pre>true</pre></div></li><li class="jsondiffpatch-deleted" data-key="right"><div class="jsondiffpatch-property-name">right</div><div class="jsondiffpatch-value"><pre>Reference { &quot;name&quot;: &quot;Null&quot; }</pre></div></li></ul></li><li class="jsondiffpatch-unchanged" data-key="1"><div class="jsondiffpatch-property-name">1</div><div class="jsondiffpatch-value"><pre>BinaryExpression {
-  &quot;left&quot;: MemberExpression {
-    &quot;optional&quot;: false,
-    &quot;object&quot;: Reference { &quot;name&quot;: &quot;position&quot; },
-    &quot;property&quot;: Identifier { &quot;name&quot;: &quot;x&quot; }
-  },
-  &quot;operator&quot;: &quot;==&quot;,
-  &quot;right&quot;: Reference { &quot;name&quot;: &quot;x&quot; }
-}</pre></div></li><li class="jsondiffpatch-unchanged" data-key="2"><div class="jsondiffpatch-property-name">2</div><div class="jsondiffpatch-value"><pre>BinaryExpression {
-  &quot;left&quot;: MemberExpression {
-    &quot;optional&quot;: false,
-    &quot;object&quot;: Reference { &quot;name&quot;: &quot;position&quot; },
-    &quot;property&quot;: Identifier { &quot;name&quot;: &quot;y&quot; }
-  },
-  &quot;operator&quot;: &quot;==&quot;,
-  &quot;right&quot;: Reference { &quot;name&quot;: &quot;y&quot; }
-}</pre></div></li><li class="jsondiffpatch-unchanged" data-key="3"><div class="jsondiffpatch-property-name">3</div><div class="jsondiffpatch-value"><pre>BinaryExpression {
-  &quot;left&quot;: MemberExpression {
-    &quot;optional&quot;: false,
-    &quot;object&quot;: Reference { &quot;name&quot;: &quot;position&quot; },
-    &quot;property&quot;: Identifier { &quot;name&quot;: &quot;z&quot; }
-  },
-  &quot;operator&quot;: &quot;==&quot;,
-  &quot;right&quot;: Reference { &quot;name&quot;: &quot;z&quot; }
-}</pre></div></li></ul></li><li class="jsondiffpatch-unchanged" data-key="operator"><div class="jsondiffpatch-property-name">operator</div><div class="jsondiffpatch-value"><pre>&quot;&amp;&amp;&quot;</pre></div></li></ul></li></ul></li></ul></li><li class="jsondiffpatch-unchanged" data-key="id"><div class="jsondiffpatch-property-name">id</div><div class="jsondiffpatch-value"><pre>Declarator { &quot;name&quot;: &quot;ionscript/Sample&quot; }</pre></div></li></ul></li></ul></li></ul></div></p>
+            <p><div class="jsondiffpatch-delta jsondiffpatch-node jsondiffpatch-child-node-type-object"><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Assembly&quot;</pre></div></li><li class="jsondiffpatch-unchanged" data-key="modules"><div class="jsondiffpatch-property-name">modules</div><div class="jsondiffpatch-value"><pre>Map {
+  &quot;ionscript/Sample&quot;: Program {
+    &quot;id&quot;: Declarator { &quot;name&quot;: &quot;ionscript/Sample&quot; },
+    &quot;body&quot;: [
+      VariableDeclaration {
+        &quot;meta&quot;: [],
+        &quot;id&quot;: Declarator { &quot;name&quot;: &quot;sum&quot; },
+        &quot;value&quot;: OutlineOperation {
+          &quot;operands&quot;: [
+            Literal { &quot;value&quot;: 0 },
+            Literal { &quot;value&quot;: 1 },
+            Literal { &quot;value&quot;: 2 },
+            Literal { &quot;value&quot;: 3 }
+          ],
+          &quot;operator&quot;: &quot;+&quot;
+        },
+        &quot;export&quot;: 0,
+        &quot;kind&quot;: &quot;let&quot;,
+        &quot;instance&quot;: false,
+        &quot;inherited&quot;: false
+      }
+    ]
+  }
+}</pre></div></li></ul></div></p>
         </article>
     
         <article>
@@ -303,47 +270,15 @@ ul.jsondiffpatch-textdiff {
     &quot;body&quot;: [
       VariableDeclaration {
         &quot;meta&quot;: [],
-        &quot;id&quot;: Declarator { &quot;name&quot;: &quot;check&quot; },
+        &quot;id&quot;: Declarator { &quot;name&quot;: &quot;sum&quot; },
         &quot;value&quot;: OutlineOperation {
           &quot;operands&quot;: [
-            UnaryExpression {
-              &quot;operator&quot;: &quot;!&quot;,
-              &quot;argument&quot;: BinaryExpression {
-                &quot;left&quot;: Reference { &quot;name&quot;: &quot;position&quot; },
-                &quot;operator&quot;: &quot;is&quot;,
-                &quot;right&quot;: Reference { &quot;name&quot;: &quot;Null&quot; }
-              },
-              &quot;prefix&quot;: true
-            },
-            BinaryExpression {
-              &quot;left&quot;: MemberExpression {
-                &quot;optional&quot;: false,
-                &quot;object&quot;: Reference { &quot;name&quot;: &quot;position&quot; },
-                &quot;property&quot;: Identifier { &quot;name&quot;: &quot;x&quot; }
-              },
-              &quot;operator&quot;: &quot;==&quot;,
-              &quot;right&quot;: Reference { &quot;name&quot;: &quot;x&quot; }
-            },
-            BinaryExpression {
-              &quot;left&quot;: MemberExpression {
-                &quot;optional&quot;: false,
-                &quot;object&quot;: Reference { &quot;name&quot;: &quot;position&quot; },
-                &quot;property&quot;: Identifier { &quot;name&quot;: &quot;y&quot; }
-              },
-              &quot;operator&quot;: &quot;==&quot;,
-              &quot;right&quot;: Reference { &quot;name&quot;: &quot;y&quot; }
-            },
-            BinaryExpression {
-              &quot;left&quot;: MemberExpression {
-                &quot;optional&quot;: false,
-                &quot;object&quot;: Reference { &quot;name&quot;: &quot;position&quot; },
-                &quot;property&quot;: Identifier { &quot;name&quot;: &quot;z&quot; }
-              },
-              &quot;operator&quot;: &quot;==&quot;,
-              &quot;right&quot;: Reference { &quot;name&quot;: &quot;z&quot; }
-            }
+            Literal { &quot;value&quot;: 0 },
+            Literal { &quot;value&quot;: 1 },
+            Literal { &quot;value&quot;: 2 },
+            Literal { &quot;value&quot;: 3 }
           ],
-          &quot;operator&quot;: &quot;&amp;&amp;&quot;
+          &quot;operator&quot;: &quot;+&quot;
         },
         &quot;export&quot;: 0,
         &quot;kind&quot;: &quot;let&quot;,
@@ -357,89 +292,37 @@ ul.jsondiffpatch-textdiff {
     
         <article>
             <header><span>controlFlowToExpressions</span></header>
-            <p><div class="jsondiffpatch-delta jsondiffpatch-node jsondiffpatch-child-node-type-object"><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Assembly&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="modules"><div class="jsondiffpatch-property-name">modules</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Map&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="ionscript/Sample"><div class="jsondiffpatch-property-name">ionscript/Sample</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Program&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-array" data-key="body"><div class="jsondiffpatch-property-name">body</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-array"><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="0"><div class="jsondiffpatch-property-name">0</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;VariableDeclaration&quot;</pre></div></li><li class="jsondiffpatch-unchanged" data-key="export"><div class="jsondiffpatch-property-name">export</div><div class="jsondiffpatch-value"><pre>0</pre></div></li><li class="jsondiffpatch-unchanged" data-key="id"><div class="jsondiffpatch-property-name">id</div><div class="jsondiffpatch-value"><pre>Declarator { &quot;name&quot;: &quot;check&quot; }</pre></div></li><li class="jsondiffpatch-unchanged" data-key="inherited"><div class="jsondiffpatch-property-name">inherited</div><div class="jsondiffpatch-value"><pre>false</pre></div></li><li class="jsondiffpatch-unchanged" data-key="instance"><div class="jsondiffpatch-property-name">instance</div><div class="jsondiffpatch-value"><pre>false</pre></div></li><li class="jsondiffpatch-unchanged" data-key="kind"><div class="jsondiffpatch-property-name">kind</div><div class="jsondiffpatch-value"><pre>&quot;let&quot;</pre></div></li><li class="jsondiffpatch-unchanged" data-key="meta"><div class="jsondiffpatch-property-name">meta</div><div class="jsondiffpatch-value"><pre>[]</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="value"><div class="jsondiffpatch-property-name">value</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-modified" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value jsondiffpatch-left-value"><pre>&quot;OutlineOperation&quot;</pre></div><div class="jsondiffpatch-value jsondiffpatch-right-value"><pre>&quot;BinaryExpression&quot;</pre></div></li><li class="jsondiffpatch-added" data-key="left"><div class="jsondiffpatch-property-name">left</div><div class="jsondiffpatch-value"><pre>UnaryExpression {
-  &quot;operator&quot;: &quot;!&quot;,
-  &quot;argument&quot;: BinaryExpression {
-    &quot;left&quot;: Reference { &quot;name&quot;: &quot;position&quot; },
-    &quot;operator&quot;: &quot;is&quot;,
-    &quot;right&quot;: Reference { &quot;name&quot;: &quot;Null&quot; }
-  },
-  &quot;prefix&quot;: true
-}</pre></div></li><li class="jsondiffpatch-deleted" data-key="operands"><div class="jsondiffpatch-property-name">operands</div><div class="jsondiffpatch-value"><pre>[
-  UnaryExpression {
-    &quot;operator&quot;: &quot;!&quot;,
-    &quot;argument&quot;: BinaryExpression {
-      &quot;left&quot;: Reference { &quot;name&quot;: &quot;position&quot; },
-      &quot;operator&quot;: &quot;is&quot;,
-      &quot;right&quot;: Reference { &quot;name&quot;: &quot;Null&quot; }
-    },
-    &quot;prefix&quot;: true
-  },
-  BinaryExpression {
-    &quot;left&quot;: MemberExpression {
-      &quot;optional&quot;: false,
-      &quot;object&quot;: Reference { &quot;name&quot;: &quot;position&quot; },
-      &quot;property&quot;: Identifier { &quot;name&quot;: &quot;x&quot; }
-    },
-    &quot;operator&quot;: &quot;==&quot;,
-    &quot;right&quot;: Reference { &quot;name&quot;: &quot;x&quot; }
-  },
-  BinaryExpression {
-    &quot;left&quot;: MemberExpression {
-      &quot;optional&quot;: false,
-      &quot;object&quot;: Reference { &quot;name&quot;: &quot;position&quot; },
-      &quot;property&quot;: Identifier { &quot;name&quot;: &quot;y&quot; }
-    },
-    &quot;operator&quot;: &quot;==&quot;,
-    &quot;right&quot;: Reference { &quot;name&quot;: &quot;y&quot; }
-  },
-  BinaryExpression {
-    &quot;left&quot;: MemberExpression {
-      &quot;optional&quot;: false,
-      &quot;object&quot;: Reference { &quot;name&quot;: &quot;position&quot; },
-      &quot;property&quot;: Identifier { &quot;name&quot;: &quot;z&quot; }
-    },
-    &quot;operator&quot;: &quot;==&quot;,
-    &quot;right&quot;: Reference { &quot;name&quot;: &quot;z&quot; }
-  }
-]</pre></div></li><li class="jsondiffpatch-unchanged" data-key="operator"><div class="jsondiffpatch-property-name">operator</div><div class="jsondiffpatch-value"><pre>&quot;&amp;&amp;&quot;</pre></div></li><li class="jsondiffpatch-added" data-key="right"><div class="jsondiffpatch-property-name">right</div><div class="jsondiffpatch-value"><pre>BinaryExpression {
-  &quot;left&quot;: BinaryExpression {
-    &quot;left&quot;: MemberExpression {
-      &quot;optional&quot;: false,
-      &quot;object&quot;: Reference { &quot;name&quot;: &quot;position&quot; },
-      &quot;property&quot;: Identifier { &quot;name&quot;: &quot;x&quot; }
-    },
-    &quot;operator&quot;: &quot;==&quot;,
-    &quot;right&quot;: Reference { &quot;name&quot;: &quot;x&quot; }
-  },
-  &quot;operator&quot;: &quot;&amp;&amp;&quot;,
+            <p><div class="jsondiffpatch-delta jsondiffpatch-node jsondiffpatch-child-node-type-object"><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Assembly&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="modules"><div class="jsondiffpatch-property-name">modules</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Map&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="ionscript/Sample"><div class="jsondiffpatch-property-name">ionscript/Sample</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Program&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-array" data-key="body"><div class="jsondiffpatch-property-name">body</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-array"><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="0"><div class="jsondiffpatch-property-name">0</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;VariableDeclaration&quot;</pre></div></li><li class="jsondiffpatch-unchanged" data-key="export"><div class="jsondiffpatch-property-name">export</div><div class="jsondiffpatch-value"><pre>0</pre></div></li><li class="jsondiffpatch-unchanged" data-key="id"><div class="jsondiffpatch-property-name">id</div><div class="jsondiffpatch-value"><pre>Declarator { &quot;name&quot;: &quot;sum&quot; }</pre></div></li><li class="jsondiffpatch-unchanged" data-key="inherited"><div class="jsondiffpatch-property-name">inherited</div><div class="jsondiffpatch-value"><pre>false</pre></div></li><li class="jsondiffpatch-unchanged" data-key="instance"><div class="jsondiffpatch-property-name">instance</div><div class="jsondiffpatch-value"><pre>false</pre></div></li><li class="jsondiffpatch-unchanged" data-key="kind"><div class="jsondiffpatch-property-name">kind</div><div class="jsondiffpatch-value"><pre>&quot;let&quot;</pre></div></li><li class="jsondiffpatch-unchanged" data-key="meta"><div class="jsondiffpatch-property-name">meta</div><div class="jsondiffpatch-value"><pre>[]</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="value"><div class="jsondiffpatch-property-name">value</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-modified" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value jsondiffpatch-left-value"><pre>&quot;OutlineOperation&quot;</pre></div><div class="jsondiffpatch-value jsondiffpatch-right-value"><pre>&quot;BinaryExpression&quot;</pre></div></li><li class="jsondiffpatch-added" data-key="left"><div class="jsondiffpatch-property-name">left</div><div class="jsondiffpatch-value"><pre>Literal { &quot;value&quot;: 0 }</pre></div></li><li class="jsondiffpatch-deleted" data-key="operands"><div class="jsondiffpatch-property-name">operands</div><div class="jsondiffpatch-value"><pre>[
+  Literal { &quot;value&quot;: 0 },
+  Literal { &quot;value&quot;: 1 },
+  Literal { &quot;value&quot;: 2 },
+  Literal { &quot;value&quot;: 3 }
+]</pre></div></li><li class="jsondiffpatch-unchanged" data-key="operator"><div class="jsondiffpatch-property-name">operator</div><div class="jsondiffpatch-value"><pre>&quot;+&quot;</pre></div></li><li class="jsondiffpatch-added" data-key="right"><div class="jsondiffpatch-property-name">right</div><div class="jsondiffpatch-value"><pre>BinaryExpression {
+  &quot;left&quot;: Literal { &quot;value&quot;: 1 },
+  &quot;operator&quot;: &quot;+&quot;,
   &quot;right&quot;: BinaryExpression {
-    &quot;left&quot;: BinaryExpression {
-      &quot;left&quot;: MemberExpression {
-        &quot;optional&quot;: false,
-        &quot;object&quot;: Reference { &quot;name&quot;: &quot;position&quot; },
-        &quot;property&quot;: Identifier { &quot;name&quot;: &quot;y&quot; }
-      },
-      &quot;operator&quot;: &quot;==&quot;,
-      &quot;right&quot;: Reference { &quot;name&quot;: &quot;y&quot; }
-    },
-    &quot;operator&quot;: &quot;&amp;&amp;&quot;,
-    &quot;right&quot;: BinaryExpression {
-      &quot;left&quot;: MemberExpression {
-        &quot;optional&quot;: false,
-        &quot;object&quot;: Reference { &quot;name&quot;: &quot;position&quot; },
-        &quot;property&quot;: Identifier { &quot;name&quot;: &quot;z&quot; }
-      },
-      &quot;operator&quot;: &quot;==&quot;,
-      &quot;right&quot;: Reference { &quot;name&quot;: &quot;z&quot; }
-    }
+    &quot;left&quot;: Literal { &quot;value&quot;: 2 },
+    &quot;operator&quot;: &quot;+&quot;,
+    &quot;right&quot;: Literal { &quot;value&quot;: 3 }
   }
 }</pre></div></li></ul></li></ul></li></ul></li><li class="jsondiffpatch-unchanged" data-key="id"><div class="jsondiffpatch-property-name">id</div><div class="jsondiffpatch-value"><pre>Declarator { &quot;name&quot;: &quot;ionscript/Sample&quot; }</pre></div></li></ul></li></ul></li></ul></div></p>
         </article>
     
         <article>
             <header><span>checkReferences</span></header>
-            <p><div class="jsondiffpatch-delta jsondiffpatch-node jsondiffpatch-child-node-type-object"><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Assembly&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="modules"><div class="jsondiffpatch-property-name">modules</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Map&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="ionscript/Sample"><div class="jsondiffpatch-property-name">ionscript/Sample</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Program&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-array" data-key="body"><div class="jsondiffpatch-property-name">body</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-array"><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="0"><div class="jsondiffpatch-property-name">0</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;VariableDeclaration&quot;</pre></div></li><li class="jsondiffpatch-unchanged" data-key="export"><div class="jsondiffpatch-property-name">export</div><div class="jsondiffpatch-value"><pre>0</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="id"><div class="jsondiffpatch-property-name">id</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Declarator&quot;</pre></div></li><li class="jsondiffpatch-unchanged" data-key="name"><div class="jsondiffpatch-property-name">name</div><div class="jsondiffpatch-value"><pre>&quot;check&quot;</pre></div></li><li class="jsondiffpatch-added" data-key="path"><div class="jsondiffpatch-property-name">path</div><div class="jsondiffpatch-value"><pre>&quot;ionscript/Sample#1:5:check&quot;</pre></div></li></ul></li><li class="jsondiffpatch-unchanged" data-key="inherited"><div class="jsondiffpatch-property-name">inherited</div><div class="jsondiffpatch-value"><pre>false</pre></div></li><li class="jsondiffpatch-unchanged" data-key="instance"><div class="jsondiffpatch-property-name">instance</div><div class="jsondiffpatch-value"><pre>false</pre></div></li><li class="jsondiffpatch-unchanged" data-key="kind"><div class="jsondiffpatch-property-name">kind</div><div class="jsondiffpatch-value"><pre>&quot;let&quot;</pre></div></li><li class="jsondiffpatch-unchanged" data-key="meta"><div class="jsondiffpatch-property-name">meta</div><div class="jsondiffpatch-value"><pre>[]</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="value"><div class="jsondiffpatch-property-name">value</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;BinaryExpression&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="left"><div class="jsondiffpatch-property-name">left</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;UnaryExpression&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="argument"><div class="jsondiffpatch-property-name">argument</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;BinaryExpression&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="left"><div class="jsondiffpatch-property-name">left</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Reference&quot;</pre></div></li><li class="jsondiffpatch-unchanged" data-key="name"><div class="jsondiffpatch-property-name">name</div><div class="jsondiffpatch-value"><pre>&quot;position&quot;</pre></div></li><li class="jsondiffpatch-added" data-key="path"><div class="jsondiffpatch-property-name">path</div><div class="jsondiffpatch-value"><pre>&quot;global:position&quot;</pre></div></li></ul></li><li class="jsondiffpatch-unchanged" data-key="operator"><div class="jsondiffpatch-property-name">operator</div><div class="jsondiffpatch-value"><pre>&quot;is&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="right"><div class="jsondiffpatch-property-name">right</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-modified" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value jsondiffpatch-left-value"><pre>&quot;Reference&quot;</pre></div><div class="jsondiffpatch-value jsondiffpatch-right-value"><pre>&quot;MemberExpression&quot;</pre></div></li><li class="jsondiffpatch-deleted" data-key="name"><div class="jsondiffpatch-property-name">name</div><div class="jsondiffpatch-value"><pre>&quot;Null&quot;</pre></div></li><li class="jsondiffpatch-added" data-key="object"><div class="jsondiffpatch-property-name">object</div><div class="jsondiffpatch-value"><pre>Reference { &quot;name&quot;: &quot;ionscript&quot; }</pre></div></li><li class="jsondiffpatch-added" data-key="optional"><div class="jsondiffpatch-property-name">optional</div><div class="jsondiffpatch-value"><pre>false</pre></div></li><li class="jsondiffpatch-added" data-key="property"><div class="jsondiffpatch-property-name">property</div><div class="jsondiffpatch-value"><pre>Identifier { &quot;name&quot;: &quot;Null&quot; }</pre></div></li></ul></li></ul></li><li class="jsondiffpatch-unchanged" data-key="operator"><div class="jsondiffpatch-property-name">operator</div><div class="jsondiffpatch-value"><pre>&quot;!&quot;</pre></div></li><li class="jsondiffpatch-unchanged" data-key="prefix"><div class="jsondiffpatch-property-name">prefix</div><div class="jsondiffpatch-value"><pre>true</pre></div></li></ul></li><li class="jsondiffpatch-unchanged" data-key="operator"><div class="jsondiffpatch-property-name">operator</div><div class="jsondiffpatch-value"><pre>&quot;&amp;&amp;&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="right"><div class="jsondiffpatch-property-name">right</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;BinaryExpression&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="left"><div class="jsondiffpatch-property-name">left</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;BinaryExpression&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="left"><div class="jsondiffpatch-property-name">left</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;MemberExpression&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="object"><div class="jsondiffpatch-property-name">object</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Reference&quot;</pre></div></li><li class="jsondiffpatch-unchanged" data-key="name"><div class="jsondiffpatch-property-name">name</div><div class="jsondiffpatch-value"><pre>&quot;position&quot;</pre></div></li><li class="jsondiffpatch-added" data-key="path"><div class="jsondiffpatch-property-name">path</div><div class="jsondiffpatch-value"><pre>&quot;global:position&quot;</pre></div></li></ul></li><li class="jsondiffpatch-unchanged" data-key="optional"><div class="jsondiffpatch-property-name">optional</div><div class="jsondiffpatch-value"><pre>false</pre></div></li><li class="jsondiffpatch-unchanged" data-key="property"><div class="jsondiffpatch-property-name">property</div><div class="jsondiffpatch-value"><pre>Identifier { &quot;name&quot;: &quot;x&quot; }</pre></div></li></ul></li><li class="jsondiffpatch-unchanged" data-key="operator"><div class="jsondiffpatch-property-name">operator</div><div class="jsondiffpatch-value"><pre>&quot;==&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="right"><div class="jsondiffpatch-property-name">right</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Reference&quot;</pre></div></li><li class="jsondiffpatch-unchanged" data-key="name"><div class="jsondiffpatch-property-name">name</div><div class="jsondiffpatch-value"><pre>&quot;x&quot;</pre></div></li><li class="jsondiffpatch-added" data-key="path"><div class="jsondiffpatch-property-name">path</div><div class="jsondiffpatch-value"><pre>&quot;global:x&quot;</pre></div></li></ul></li></ul></li><li class="jsondiffpatch-unchanged" data-key="operator"><div class="jsondiffpatch-property-name">operator</div><div class="jsondiffpatch-value"><pre>&quot;&amp;&amp;&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="right"><div class="jsondiffpatch-property-name">right</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;BinaryExpression&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="left"><div class="jsondiffpatch-property-name">left</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;BinaryExpression&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="left"><div class="jsondiffpatch-property-name">left</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;MemberExpression&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="object"><div class="jsondiffpatch-property-name">object</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Reference&quot;</pre></div></li><li class="jsondiffpatch-unchanged" data-key="name"><div class="jsondiffpatch-property-name">name</div><div class="jsondiffpatch-value"><pre>&quot;position&quot;</pre></div></li><li class="jsondiffpatch-added" data-key="path"><div class="jsondiffpatch-property-name">path</div><div class="jsondiffpatch-value"><pre>&quot;global:position&quot;</pre></div></li></ul></li><li class="jsondiffpatch-unchanged" data-key="optional"><div class="jsondiffpatch-property-name">optional</div><div class="jsondiffpatch-value"><pre>false</pre></div></li><li class="jsondiffpatch-unchanged" data-key="property"><div class="jsondiffpatch-property-name">property</div><div class="jsondiffpatch-value"><pre>Identifier { &quot;name&quot;: &quot;y&quot; }</pre></div></li></ul></li><li class="jsondiffpatch-unchanged" data-key="operator"><div class="jsondiffpatch-property-name">operator</div><div class="jsondiffpatch-value"><pre>&quot;==&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="right"><div class="jsondiffpatch-property-name">right</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Reference&quot;</pre></div></li><li class="jsondiffpatch-unchanged" data-key="name"><div class="jsondiffpatch-property-name">name</div><div class="jsondiffpatch-value"><pre>&quot;y&quot;</pre></div></li><li class="jsondiffpatch-added" data-key="path"><div class="jsondiffpatch-property-name">path</div><div class="jsondiffpatch-value"><pre>&quot;global:y&quot;</pre></div></li></ul></li></ul></li><li class="jsondiffpatch-unchanged" data-key="operator"><div class="jsondiffpatch-property-name">operator</div><div class="jsondiffpatch-value"><pre>&quot;&amp;&amp;&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="right"><div class="jsondiffpatch-property-name">right</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;BinaryExpression&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="left"><div class="jsondiffpatch-property-name">left</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;MemberExpression&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="object"><div class="jsondiffpatch-property-name">object</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Reference&quot;</pre></div></li><li class="jsondiffpatch-unchanged" data-key="name"><div class="jsondiffpatch-property-name">name</div><div class="jsondiffpatch-value"><pre>&quot;position&quot;</pre></div></li><li class="jsondiffpatch-added" data-key="path"><div class="jsondiffpatch-property-name">path</div><div class="jsondiffpatch-value"><pre>&quot;global:position&quot;</pre></div></li></ul></li><li class="jsondiffpatch-unchanged" data-key="optional"><div class="jsondiffpatch-property-name">optional</div><div class="jsondiffpatch-value"><pre>false</pre></div></li><li class="jsondiffpatch-unchanged" data-key="property"><div class="jsondiffpatch-property-name">property</div><div class="jsondiffpatch-value"><pre>Identifier { &quot;name&quot;: &quot;z&quot; }</pre></div></li></ul></li><li class="jsondiffpatch-unchanged" data-key="operator"><div class="jsondiffpatch-property-name">operator</div><div class="jsondiffpatch-value"><pre>&quot;==&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="right"><div class="jsondiffpatch-property-name">right</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Reference&quot;</pre></div></li><li class="jsondiffpatch-unchanged" data-key="name"><div class="jsondiffpatch-property-name">name</div><div class="jsondiffpatch-value"><pre>&quot;z&quot;</pre></div></li><li class="jsondiffpatch-added" data-key="path"><div class="jsondiffpatch-property-name">path</div><div class="jsondiffpatch-value"><pre>&quot;global:z&quot;</pre></div></li></ul></li></ul></li></ul></li></ul></li></ul></li></ul></li></ul></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="id"><div class="jsondiffpatch-property-name">id</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Declarator&quot;</pre></div></li><li class="jsondiffpatch-unchanged" data-key="name"><div class="jsondiffpatch-property-name">name</div><div class="jsondiffpatch-value"><pre>&quot;ionscript/Sample&quot;</pre></div></li><li class="jsondiffpatch-added" data-key="path"><div class="jsondiffpatch-property-name">path</div><div class="jsondiffpatch-value"><pre>&quot;ionscript/Sample#&quot;</pre></div></li></ul></li></ul></li></ul></li></ul></div></p>
+            <p><div class="jsondiffpatch-delta jsondiffpatch-node jsondiffpatch-child-node-type-object"><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Assembly&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="modules"><div class="jsondiffpatch-property-name">modules</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Map&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="ionscript/Sample"><div class="jsondiffpatch-property-name">ionscript/Sample</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Program&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-array" data-key="body"><div class="jsondiffpatch-property-name">body</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-array"><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="0"><div class="jsondiffpatch-property-name">0</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;VariableDeclaration&quot;</pre></div></li><li class="jsondiffpatch-unchanged" data-key="export"><div class="jsondiffpatch-property-name">export</div><div class="jsondiffpatch-value"><pre>0</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="id"><div class="jsondiffpatch-property-name">id</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Declarator&quot;</pre></div></li><li class="jsondiffpatch-unchanged" data-key="name"><div class="jsondiffpatch-property-name">name</div><div class="jsondiffpatch-value"><pre>&quot;sum&quot;</pre></div></li><li class="jsondiffpatch-added" data-key="path"><div class="jsondiffpatch-property-name">path</div><div class="jsondiffpatch-value"><pre>&quot;ionscript/Sample#1:5:sum&quot;</pre></div></li></ul></li><li class="jsondiffpatch-unchanged" data-key="inherited"><div class="jsondiffpatch-property-name">inherited</div><div class="jsondiffpatch-value"><pre>false</pre></div></li><li class="jsondiffpatch-unchanged" data-key="instance"><div class="jsondiffpatch-property-name">instance</div><div class="jsondiffpatch-value"><pre>false</pre></div></li><li class="jsondiffpatch-unchanged" data-key="kind"><div class="jsondiffpatch-property-name">kind</div><div class="jsondiffpatch-value"><pre>&quot;let&quot;</pre></div></li><li class="jsondiffpatch-unchanged" data-key="meta"><div class="jsondiffpatch-property-name">meta</div><div class="jsondiffpatch-value"><pre>[]</pre></div></li><li class="jsondiffpatch-unchanged" data-key="value"><div class="jsondiffpatch-property-name">value</div><div class="jsondiffpatch-value"><pre>BinaryExpression {
+  &quot;left&quot;: Literal { &quot;value&quot;: 0 },
+  &quot;operator&quot;: &quot;+&quot;,
+  &quot;right&quot;: BinaryExpression {
+    &quot;left&quot;: Literal { &quot;value&quot;: 1 },
+    &quot;operator&quot;: &quot;+&quot;,
+    &quot;right&quot;: BinaryExpression {
+      &quot;left&quot;: Literal { &quot;value&quot;: 2 },
+      &quot;operator&quot;: &quot;+&quot;,
+      &quot;right&quot;: Literal { &quot;value&quot;: 3 }
+    }
+  }
+}</pre></div></li></ul></li></ul></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="id"><div class="jsondiffpatch-property-name">id</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Declarator&quot;</pre></div></li><li class="jsondiffpatch-unchanged" data-key="name"><div class="jsondiffpatch-property-name">name</div><div class="jsondiffpatch-value"><pre>&quot;ionscript/Sample&quot;</pre></div></li><li class="jsondiffpatch-added" data-key="path"><div class="jsondiffpatch-property-name">path</div><div class="jsondiffpatch-value"><pre>&quot;ionscript/Sample#&quot;</pre></div></li></ul></li></ul></li></ul></li></ul></div></p>
         </article>
     
         <article>
@@ -454,76 +337,19 @@ ul.jsondiffpatch-textdiff {
       VariableDeclaration {
         &quot;meta&quot;: [],
         &quot;id&quot;: Declarator {
-          &quot;name&quot;: &quot;check&quot;,
-          &quot;path&quot;: &quot;ionscript/Sample#1:5:check&quot;
+          &quot;name&quot;: &quot;sum&quot;,
+          &quot;path&quot;: &quot;ionscript/Sample#1:5:sum&quot;
         },
         &quot;value&quot;: BinaryExpression {
-          &quot;left&quot;: UnaryExpression {
-            &quot;operator&quot;: &quot;!&quot;,
-            &quot;argument&quot;: BinaryExpression {
-              &quot;left&quot;: Reference {
-                &quot;name&quot;: &quot;position&quot;,
-                &quot;path&quot;: &quot;global:position&quot;
-              },
-              &quot;operator&quot;: &quot;is&quot;,
-              &quot;right&quot;: MemberExpression {
-                &quot;optional&quot;: false,
-                &quot;object&quot;: Reference { &quot;name&quot;: &quot;ionscript&quot; },
-                &quot;property&quot;: Identifier { &quot;name&quot;: &quot;Null&quot; }
-              }
-            },
-            &quot;prefix&quot;: true
-          },
-          &quot;operator&quot;: &quot;&amp;&amp;&quot;,
+          &quot;left&quot;: Literal { &quot;value&quot;: 0 },
+          &quot;operator&quot;: &quot;+&quot;,
           &quot;right&quot;: BinaryExpression {
-            &quot;left&quot;: BinaryExpression {
-              &quot;left&quot;: MemberExpression {
-                &quot;optional&quot;: false,
-                &quot;object&quot;: Reference {
-                  &quot;name&quot;: &quot;position&quot;,
-                  &quot;path&quot;: &quot;global:position&quot;
-                },
-                &quot;property&quot;: Identifier { &quot;name&quot;: &quot;x&quot; }
-              },
-              &quot;operator&quot;: &quot;==&quot;,
-              &quot;right&quot;: Reference {
-                &quot;name&quot;: &quot;x&quot;,
-                &quot;path&quot;: &quot;global:x&quot;
-              }
-            },
-            &quot;operator&quot;: &quot;&amp;&amp;&quot;,
+            &quot;left&quot;: Literal { &quot;value&quot;: 1 },
+            &quot;operator&quot;: &quot;+&quot;,
             &quot;right&quot;: BinaryExpression {
-              &quot;left&quot;: BinaryExpression {
-                &quot;left&quot;: MemberExpression {
-                  &quot;optional&quot;: false,
-                  &quot;object&quot;: Reference {
-                    &quot;name&quot;: &quot;position&quot;,
-                    &quot;path&quot;: &quot;global:position&quot;
-                  },
-                  &quot;property&quot;: Identifier { &quot;name&quot;: &quot;y&quot; }
-                },
-                &quot;operator&quot;: &quot;==&quot;,
-                &quot;right&quot;: Reference {
-                  &quot;name&quot;: &quot;y&quot;,
-                  &quot;path&quot;: &quot;global:y&quot;
-                }
-              },
-              &quot;operator&quot;: &quot;&amp;&amp;&quot;,
-              &quot;right&quot;: BinaryExpression {
-                &quot;left&quot;: MemberExpression {
-                  &quot;optional&quot;: false,
-                  &quot;object&quot;: Reference {
-                    &quot;name&quot;: &quot;position&quot;,
-                    &quot;path&quot;: &quot;global:position&quot;
-                  },
-                  &quot;property&quot;: Identifier { &quot;name&quot;: &quot;z&quot; }
-                },
-                &quot;operator&quot;: &quot;==&quot;,
-                &quot;right&quot;: Reference {
-                  &quot;name&quot;: &quot;z&quot;,
-                  &quot;path&quot;: &quot;global:z&quot;
-                }
-              }
+              &quot;left&quot;: Literal { &quot;value&quot;: 2 },
+              &quot;operator&quot;: &quot;+&quot;,
+              &quot;right&quot;: Literal { &quot;value&quot;: 3 }
             }
           }
         },
@@ -549,76 +375,19 @@ ul.jsondiffpatch-textdiff {
       VariableDeclaration {
         &quot;meta&quot;: [],
         &quot;id&quot;: Declarator {
-          &quot;name&quot;: &quot;check&quot;,
-          &quot;path&quot;: &quot;ionscript/Sample#1:5:check&quot;
+          &quot;name&quot;: &quot;sum&quot;,
+          &quot;path&quot;: &quot;ionscript/Sample#1:5:sum&quot;
         },
         &quot;value&quot;: BinaryExpression {
-          &quot;left&quot;: UnaryExpression {
-            &quot;operator&quot;: &quot;!&quot;,
-            &quot;argument&quot;: BinaryExpression {
-              &quot;left&quot;: Reference {
-                &quot;name&quot;: &quot;position&quot;,
-                &quot;path&quot;: &quot;global:position&quot;
-              },
-              &quot;operator&quot;: &quot;is&quot;,
-              &quot;right&quot;: MemberExpression {
-                &quot;optional&quot;: false,
-                &quot;object&quot;: Reference { &quot;name&quot;: &quot;ionscript&quot; },
-                &quot;property&quot;: Identifier { &quot;name&quot;: &quot;Null&quot; }
-              }
-            },
-            &quot;prefix&quot;: true
-          },
-          &quot;operator&quot;: &quot;&amp;&amp;&quot;,
+          &quot;left&quot;: Literal { &quot;value&quot;: 0 },
+          &quot;operator&quot;: &quot;+&quot;,
           &quot;right&quot;: BinaryExpression {
-            &quot;left&quot;: BinaryExpression {
-              &quot;left&quot;: MemberExpression {
-                &quot;optional&quot;: false,
-                &quot;object&quot;: Reference {
-                  &quot;name&quot;: &quot;position&quot;,
-                  &quot;path&quot;: &quot;global:position&quot;
-                },
-                &quot;property&quot;: Identifier { &quot;name&quot;: &quot;x&quot; }
-              },
-              &quot;operator&quot;: &quot;==&quot;,
-              &quot;right&quot;: Reference {
-                &quot;name&quot;: &quot;x&quot;,
-                &quot;path&quot;: &quot;global:x&quot;
-              }
-            },
-            &quot;operator&quot;: &quot;&amp;&amp;&quot;,
+            &quot;left&quot;: Literal { &quot;value&quot;: 1 },
+            &quot;operator&quot;: &quot;+&quot;,
             &quot;right&quot;: BinaryExpression {
-              &quot;left&quot;: BinaryExpression {
-                &quot;left&quot;: MemberExpression {
-                  &quot;optional&quot;: false,
-                  &quot;object&quot;: Reference {
-                    &quot;name&quot;: &quot;position&quot;,
-                    &quot;path&quot;: &quot;global:position&quot;
-                  },
-                  &quot;property&quot;: Identifier { &quot;name&quot;: &quot;y&quot; }
-                },
-                &quot;operator&quot;: &quot;==&quot;,
-                &quot;right&quot;: Reference {
-                  &quot;name&quot;: &quot;y&quot;,
-                  &quot;path&quot;: &quot;global:y&quot;
-                }
-              },
-              &quot;operator&quot;: &quot;&amp;&amp;&quot;,
-              &quot;right&quot;: BinaryExpression {
-                &quot;left&quot;: MemberExpression {
-                  &quot;optional&quot;: false,
-                  &quot;object&quot;: Reference {
-                    &quot;name&quot;: &quot;position&quot;,
-                    &quot;path&quot;: &quot;global:position&quot;
-                  },
-                  &quot;property&quot;: Identifier { &quot;name&quot;: &quot;z&quot; }
-                },
-                &quot;operator&quot;: &quot;==&quot;,
-                &quot;right&quot;: Reference {
-                  &quot;name&quot;: &quot;z&quot;,
-                  &quot;path&quot;: &quot;global:z&quot;
-                }
-              }
+              &quot;left&quot;: Literal { &quot;value&quot;: 2 },
+              &quot;operator&quot;: &quot;+&quot;,
+              &quot;right&quot;: Literal { &quot;value&quot;: 3 }
             }
           }
         },
@@ -644,76 +413,19 @@ ul.jsondiffpatch-textdiff {
       VariableDeclaration {
         &quot;meta&quot;: [],
         &quot;id&quot;: Declarator {
-          &quot;name&quot;: &quot;check&quot;,
-          &quot;path&quot;: &quot;ionscript/Sample#1:5:check&quot;
+          &quot;name&quot;: &quot;sum&quot;,
+          &quot;path&quot;: &quot;ionscript/Sample#1:5:sum&quot;
         },
         &quot;value&quot;: BinaryExpression {
-          &quot;left&quot;: UnaryExpression {
-            &quot;operator&quot;: &quot;!&quot;,
-            &quot;argument&quot;: BinaryExpression {
-              &quot;left&quot;: Reference {
-                &quot;name&quot;: &quot;position&quot;,
-                &quot;path&quot;: &quot;global:position&quot;
-              },
-              &quot;operator&quot;: &quot;is&quot;,
-              &quot;right&quot;: MemberExpression {
-                &quot;optional&quot;: false,
-                &quot;object&quot;: Reference { &quot;name&quot;: &quot;ionscript&quot; },
-                &quot;property&quot;: Identifier { &quot;name&quot;: &quot;Null&quot; }
-              }
-            },
-            &quot;prefix&quot;: true
-          },
-          &quot;operator&quot;: &quot;&amp;&amp;&quot;,
+          &quot;left&quot;: Literal { &quot;value&quot;: 0 },
+          &quot;operator&quot;: &quot;+&quot;,
           &quot;right&quot;: BinaryExpression {
-            &quot;left&quot;: BinaryExpression {
-              &quot;left&quot;: MemberExpression {
-                &quot;optional&quot;: false,
-                &quot;object&quot;: Reference {
-                  &quot;name&quot;: &quot;position&quot;,
-                  &quot;path&quot;: &quot;global:position&quot;
-                },
-                &quot;property&quot;: Identifier { &quot;name&quot;: &quot;x&quot; }
-              },
-              &quot;operator&quot;: &quot;==&quot;,
-              &quot;right&quot;: Reference {
-                &quot;name&quot;: &quot;x&quot;,
-                &quot;path&quot;: &quot;global:x&quot;
-              }
-            },
-            &quot;operator&quot;: &quot;&amp;&amp;&quot;,
+            &quot;left&quot;: Literal { &quot;value&quot;: 1 },
+            &quot;operator&quot;: &quot;+&quot;,
             &quot;right&quot;: BinaryExpression {
-              &quot;left&quot;: BinaryExpression {
-                &quot;left&quot;: MemberExpression {
-                  &quot;optional&quot;: false,
-                  &quot;object&quot;: Reference {
-                    &quot;name&quot;: &quot;position&quot;,
-                    &quot;path&quot;: &quot;global:position&quot;
-                  },
-                  &quot;property&quot;: Identifier { &quot;name&quot;: &quot;y&quot; }
-                },
-                &quot;operator&quot;: &quot;==&quot;,
-                &quot;right&quot;: Reference {
-                  &quot;name&quot;: &quot;y&quot;,
-                  &quot;path&quot;: &quot;global:y&quot;
-                }
-              },
-              &quot;operator&quot;: &quot;&amp;&amp;&quot;,
-              &quot;right&quot;: BinaryExpression {
-                &quot;left&quot;: MemberExpression {
-                  &quot;optional&quot;: false,
-                  &quot;object&quot;: Reference {
-                    &quot;name&quot;: &quot;position&quot;,
-                    &quot;path&quot;: &quot;global:position&quot;
-                  },
-                  &quot;property&quot;: Identifier { &quot;name&quot;: &quot;z&quot; }
-                },
-                &quot;operator&quot;: &quot;==&quot;,
-                &quot;right&quot;: Reference {
-                  &quot;name&quot;: &quot;z&quot;,
-                  &quot;path&quot;: &quot;global:z&quot;
-                }
-              }
+              &quot;left&quot;: Literal { &quot;value&quot;: 2 },
+              &quot;operator&quot;: &quot;+&quot;,
+              &quot;right&quot;: Literal { &quot;value&quot;: 3 }
             }
           }
         },
@@ -729,293 +441,75 @@ ul.jsondiffpatch-textdiff {
     
         <article>
             <header><span>createRuntime</span></header>
-            <p><div class="jsondiffpatch-delta jsondiffpatch-node jsondiffpatch-child-node-type-object"><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Assembly&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="modules"><div class="jsondiffpatch-property-name">modules</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Map&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="ionscript/Sample"><div class="jsondiffpatch-property-name">ionscript/Sample</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Program&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-array" data-key="body"><div class="jsondiffpatch-property-name">body</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-array"><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="0"><div class="jsondiffpatch-property-name">0</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-modified" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value jsondiffpatch-left-value"><pre>&quot;VariableDeclaration&quot;</pre></div><div class="jsondiffpatch-value jsondiffpatch-right-value"><pre>&quot;ImportDeclaration&quot;</pre></div></li><li class="jsondiffpatch-unchanged" data-key="export"><div class="jsondiffpatch-property-name">export</div><div class="jsondiffpatch-value"><pre>0</pre></div></li><li class="jsondiffpatch-deleted" data-key="id"><div class="jsondiffpatch-property-name">id</div><div class="jsondiffpatch-value"><pre>Declarator {
-  &quot;name&quot;: &quot;check&quot;,
-  &quot;path&quot;: &quot;ionscript/Sample#1:5:check&quot;
-}</pre></div></li><li class="jsondiffpatch-deleted" data-key="inherited"><div class="jsondiffpatch-property-name">inherited</div><div class="jsondiffpatch-value"><pre>false</pre></div></li><li class="jsondiffpatch-deleted" data-key="instance"><div class="jsondiffpatch-property-name">instance</div><div class="jsondiffpatch-value"><pre>false</pre></div></li><li class="jsondiffpatch-deleted" data-key="kind"><div class="jsondiffpatch-property-name">kind</div><div class="jsondiffpatch-value"><pre>&quot;let&quot;</pre></div></li><li class="jsondiffpatch-deleted" data-key="meta"><div class="jsondiffpatch-property-name">meta</div><div class="jsondiffpatch-value"><pre>[]</pre></div></li><li class="jsondiffpatch-added" data-key="source"><div class="jsondiffpatch-property-name">source</div><div class="jsondiffpatch-value"><pre>Literal { &quot;value&quot;: &quot;ionscript&quot; }</pre></div></li><li class="jsondiffpatch-added" data-key="specifiers"><div class="jsondiffpatch-property-name">specifiers</div><div class="jsondiffpatch-value"><pre>[
-  ImportNamespaceSpecifier {
-    &quot;local&quot;: Declarator { &quot;name&quot;: &quot;ionscript&quot; }
+            <p><div class="jsondiffpatch-delta jsondiffpatch-node jsondiffpatch-child-node-type-object"><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Assembly&quot;</pre></div></li><li class="jsondiffpatch-unchanged" data-key="modules"><div class="jsondiffpatch-property-name">modules</div><div class="jsondiffpatch-value"><pre>Map {
+  &quot;ionscript/Sample&quot;: Program {
+    &quot;id&quot;: Declarator {
+      &quot;name&quot;: &quot;ionscript/Sample&quot;,
+      &quot;path&quot;: &quot;ionscript/Sample#&quot;
+    },
+    &quot;body&quot;: [
+      VariableDeclaration {
+        &quot;meta&quot;: [],
+        &quot;id&quot;: Declarator {
+          &quot;name&quot;: &quot;sum&quot;,
+          &quot;path&quot;: &quot;ionscript/Sample#1:5:sum&quot;
+        },
+        &quot;value&quot;: BinaryExpression {
+          &quot;left&quot;: Literal { &quot;value&quot;: 0 },
+          &quot;operator&quot;: &quot;+&quot;,
+          &quot;right&quot;: BinaryExpression {
+            &quot;left&quot;: Literal { &quot;value&quot;: 1 },
+            &quot;operator&quot;: &quot;+&quot;,
+            &quot;right&quot;: BinaryExpression {
+              &quot;left&quot;: Literal { &quot;value&quot;: 2 },
+              &quot;operator&quot;: &quot;+&quot;,
+              &quot;right&quot;: Literal { &quot;value&quot;: 3 }
+            }
+          }
+        },
+        &quot;export&quot;: 0,
+        &quot;kind&quot;: &quot;let&quot;,
+        &quot;instance&quot;: false,
+        &quot;inherited&quot;: false
+      }
+    ]
   }
-]</pre></div></li><li class="jsondiffpatch-deleted" data-key="value"><div class="jsondiffpatch-property-name">value</div><div class="jsondiffpatch-value"><pre>BinaryExpression {
-  &quot;left&quot;: UnaryExpression {
-    &quot;operator&quot;: &quot;!&quot;,
-    &quot;argument&quot;: BinaryExpression {
-      &quot;left&quot;: Reference {
-        &quot;name&quot;: &quot;position&quot;,
-        &quot;path&quot;: &quot;global:position&quot;
-      },
-      &quot;operator&quot;: &quot;is&quot;,
-      &quot;right&quot;: MemberExpression {
-        &quot;optional&quot;: false,
-        &quot;object&quot;: Reference { &quot;name&quot;: &quot;ionscript&quot; },
-        &quot;property&quot;: Identifier { &quot;name&quot;: &quot;Null&quot; }
-      }
-    },
-    &quot;prefix&quot;: true
-  },
-  &quot;operator&quot;: &quot;&amp;&amp;&quot;,
-  &quot;right&quot;: BinaryExpression {
-    &quot;left&quot;: BinaryExpression {
-      &quot;left&quot;: MemberExpression {
-        &quot;optional&quot;: false,
-        &quot;object&quot;: Reference {
-          &quot;name&quot;: &quot;position&quot;,
-          &quot;path&quot;: &quot;global:position&quot;
-        },
-        &quot;property&quot;: Identifier { &quot;name&quot;: &quot;x&quot; }
-      },
-      &quot;operator&quot;: &quot;==&quot;,
-      &quot;right&quot;: Reference {
-        &quot;name&quot;: &quot;x&quot;,
-        &quot;path&quot;: &quot;global:x&quot;
-      }
-    },
-    &quot;operator&quot;: &quot;&amp;&amp;&quot;,
-    &quot;right&quot;: BinaryExpression {
-      &quot;left&quot;: BinaryExpression {
-        &quot;left&quot;: MemberExpression {
-          &quot;optional&quot;: false,
-          &quot;object&quot;: Reference {
-            &quot;name&quot;: &quot;position&quot;,
-            &quot;path&quot;: &quot;global:position&quot;
-          },
-          &quot;property&quot;: Identifier { &quot;name&quot;: &quot;y&quot; }
-        },
-        &quot;operator&quot;: &quot;==&quot;,
-        &quot;right&quot;: Reference {
-          &quot;name&quot;: &quot;y&quot;,
-          &quot;path&quot;: &quot;global:y&quot;
-        }
-      },
-      &quot;operator&quot;: &quot;&amp;&amp;&quot;,
-      &quot;right&quot;: BinaryExpression {
-        &quot;left&quot;: MemberExpression {
-          &quot;optional&quot;: false,
-          &quot;object&quot;: Reference {
-            &quot;name&quot;: &quot;position&quot;,
-            &quot;path&quot;: &quot;global:position&quot;
-          },
-          &quot;property&quot;: Identifier { &quot;name&quot;: &quot;z&quot; }
-        },
-        &quot;operator&quot;: &quot;==&quot;,
-        &quot;right&quot;: Reference {
-          &quot;name&quot;: &quot;z&quot;,
-          &quot;path&quot;: &quot;global:z&quot;
-        }
-      }
-    }
-  }
-}</pre></div></li></ul></li><li class="jsondiffpatch-added" data-key="1"><div class="jsondiffpatch-property-name">1</div><div class="jsondiffpatch-value"><pre>VariableDeclaration {
-  &quot;meta&quot;: [],
-  &quot;id&quot;: Declarator {
-    &quot;name&quot;: &quot;check&quot;,
-    &quot;path&quot;: &quot;ionscript/Sample#1:5:check&quot;
-  },
-  &quot;value&quot;: BinaryExpression {
-    &quot;left&quot;: UnaryExpression {
-      &quot;operator&quot;: &quot;!&quot;,
-      &quot;argument&quot;: CallExpression {
-        &quot;optional&quot;: false,
-        &quot;new&quot;: false,
-        &quot;callee&quot;: MemberExpression {
-          &quot;optional&quot;: false,
-          &quot;object&quot;: Reference { &quot;name&quot;: &quot;ionscript&quot; },
-          &quot;property&quot;: Identifier { &quot;name&quot;: &quot;is&quot; }
-        },
-        &quot;arguments&quot;: [
-          Reference {
-            &quot;name&quot;: &quot;position&quot;,
-            &quot;path&quot;: &quot;global:position&quot;
-          },
-          MemberExpression {
-            &quot;optional&quot;: false,
-            &quot;object&quot;: Reference { &quot;name&quot;: &quot;ionscript&quot; },
-            &quot;property&quot;: Identifier { &quot;name&quot;: &quot;Null&quot; }
-          }
-        ]
-      },
-      &quot;prefix&quot;: true
-    },
-    &quot;operator&quot;: &quot;&amp;&amp;&quot;,
-    &quot;right&quot;: BinaryExpression {
-      &quot;left&quot;: BinaryExpression {
-        &quot;left&quot;: MemberExpression {
-          &quot;optional&quot;: false,
-          &quot;object&quot;: Reference {
-            &quot;name&quot;: &quot;position&quot;,
-            &quot;path&quot;: &quot;global:position&quot;
-          },
-          &quot;property&quot;: Identifier { &quot;name&quot;: &quot;x&quot; }
-        },
-        &quot;operator&quot;: &quot;==&quot;,
-        &quot;right&quot;: Reference {
-          &quot;name&quot;: &quot;x&quot;,
-          &quot;path&quot;: &quot;global:x&quot;
-        }
-      },
-      &quot;operator&quot;: &quot;&amp;&amp;&quot;,
-      &quot;right&quot;: BinaryExpression {
-        &quot;left&quot;: BinaryExpression {
-          &quot;left&quot;: MemberExpression {
-            &quot;optional&quot;: false,
-            &quot;object&quot;: Reference {
-              &quot;name&quot;: &quot;position&quot;,
-              &quot;path&quot;: &quot;global:position&quot;
-            },
-            &quot;property&quot;: Identifier { &quot;name&quot;: &quot;y&quot; }
-          },
-          &quot;operator&quot;: &quot;==&quot;,
-          &quot;right&quot;: Reference {
-            &quot;name&quot;: &quot;y&quot;,
-            &quot;path&quot;: &quot;global:y&quot;
-          }
-        },
-        &quot;operator&quot;: &quot;&amp;&amp;&quot;,
-        &quot;right&quot;: BinaryExpression {
-          &quot;left&quot;: MemberExpression {
-            &quot;optional&quot;: false,
-            &quot;object&quot;: Reference {
-              &quot;name&quot;: &quot;position&quot;,
-              &quot;path&quot;: &quot;global:position&quot;
-            },
-            &quot;property&quot;: Identifier { &quot;name&quot;: &quot;z&quot; }
-          },
-          &quot;operator&quot;: &quot;==&quot;,
-          &quot;right&quot;: Reference {
-            &quot;name&quot;: &quot;z&quot;,
-            &quot;path&quot;: &quot;global:z&quot;
-          }
-        }
-      }
-    }
-  },
-  &quot;export&quot;: 0,
-  &quot;kind&quot;: &quot;let&quot;,
-  &quot;instance&quot;: false,
-  &quot;inherited&quot;: false
-}</pre></div></li></ul></li><li class="jsondiffpatch-unchanged" data-key="id"><div class="jsondiffpatch-property-name">id</div><div class="jsondiffpatch-value"><pre>Declarator {
-  &quot;name&quot;: &quot;ionscript/Sample&quot;,
-  &quot;path&quot;: &quot;ionscript/Sample#&quot;
-}</pre></div></li></ul></li></ul></li></ul></div></p>
+}</pre></div></li></ul></div></p>
         </article>
     
         <article>
             <header><span>toEsTree</span></header>
-            <p><div class="jsondiffpatch-delta jsondiffpatch-node jsondiffpatch-child-node-type-object"><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-deleted" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Assembly&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="modules"><div class="jsondiffpatch-property-name">modules</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Map&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="ionscript/Sample"><div class="jsondiffpatch-property-name">ionscript/Sample</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-deleted" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Program&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-array" data-key="body"><div class="jsondiffpatch-property-name">body</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-array"><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="0"><div class="jsondiffpatch-property-name">0</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-deleted" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;ImportDeclaration&quot;</pre></div></li><li class="jsondiffpatch-unchanged" data-key="export"><div class="jsondiffpatch-property-name">export</div><div class="jsondiffpatch-value"><pre>0</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="source"><div class="jsondiffpatch-property-name">source</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-deleted" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Literal&quot;</pre></div></li><li class="jsondiffpatch-added" data-key="type"><div class="jsondiffpatch-property-name">type</div><div class="jsondiffpatch-value"><pre>&quot;Literal&quot;</pre></div></li><li class="jsondiffpatch-unchanged" data-key="value"><div class="jsondiffpatch-property-name">value</div><div class="jsondiffpatch-value"><pre>&quot;ionscript&quot;</pre></div></li></ul></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-array" data-key="specifiers"><div class="jsondiffpatch-property-name">specifiers</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-array"><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="0"><div class="jsondiffpatch-property-name">0</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-deleted" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;ImportNamespaceSpecifier&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="local"><div class="jsondiffpatch-property-name">local</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-deleted" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Declarator&quot;</pre></div></li><li class="jsondiffpatch-unchanged" data-key="name"><div class="jsondiffpatch-property-name">name</div><div class="jsondiffpatch-value"><pre>&quot;ionscript&quot;</pre></div></li><li class="jsondiffpatch-added" data-key="type"><div class="jsondiffpatch-property-name">type</div><div class="jsondiffpatch-value"><pre>&quot;Identifier&quot;</pre></div></li></ul></li><li class="jsondiffpatch-added" data-key="type"><div class="jsondiffpatch-property-name">type</div><div class="jsondiffpatch-value"><pre>&quot;ImportNamespaceSpecifier&quot;</pre></div></li></ul></li></ul></li><li class="jsondiffpatch-added" data-key="type"><div class="jsondiffpatch-property-name">type</div><div class="jsondiffpatch-value"><pre>&quot;ImportDeclaration&quot;</pre></div></li></ul></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="1"><div class="jsondiffpatch-property-name">1</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-deleted" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;VariableDeclaration&quot;</pre></div></li><li class="jsondiffpatch-added" data-key="declarations"><div class="jsondiffpatch-property-name">declarations</div><div class="jsondiffpatch-value"><pre>[
+            <p><div class="jsondiffpatch-delta jsondiffpatch-node jsondiffpatch-child-node-type-object"><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-deleted" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Assembly&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="modules"><div class="jsondiffpatch-property-name">modules</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Map&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="ionscript/Sample"><div class="jsondiffpatch-property-name">ionscript/Sample</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-deleted" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Program&quot;</pre></div></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-array" data-key="body"><div class="jsondiffpatch-property-name">body</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-array"><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="0"><div class="jsondiffpatch-property-name">0</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-deleted" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;VariableDeclaration&quot;</pre></div></li><li class="jsondiffpatch-added" data-key="declarations"><div class="jsondiffpatch-property-name">declarations</div><div class="jsondiffpatch-value"><pre>[
   {
     &quot;type&quot;: &quot;VariableDeclarator&quot;,
     &quot;id&quot;: {
       &quot;type&quot;: &quot;Identifier&quot;,
-      &quot;name&quot;: &quot;check&quot;
+      &quot;name&quot;: &quot;sum&quot;
     },
     &quot;init&quot;: {
       &quot;type&quot;: &quot;BinaryExpression&quot;,
       &quot;left&quot;: {
-        &quot;type&quot;: &quot;UnaryExpression&quot;,
-        &quot;operator&quot;: &quot;!&quot;,
-        &quot;argument&quot;: {
-          &quot;type&quot;: &quot;CallExpression&quot;,
-          &quot;optional&quot;: false,
-          &quot;new&quot;: false,
-          &quot;callee&quot;: {
-            &quot;type&quot;: &quot;MemberExpression&quot;,
-            &quot;optional&quot;: false,
-            &quot;object&quot;: {
-              &quot;type&quot;: &quot;Identifier&quot;,
-              &quot;name&quot;: &quot;ionscript&quot;
-            },
-            &quot;property&quot;: {
-              &quot;type&quot;: &quot;Identifier&quot;,
-              &quot;name&quot;: &quot;is&quot;
-            }
-          },
-          &quot;arguments&quot;: [
-            {
-              &quot;type&quot;: &quot;Identifier&quot;,
-              &quot;name&quot;: &quot;position&quot;
-            },
-            {
-              &quot;type&quot;: &quot;MemberExpression&quot;,
-              &quot;optional&quot;: false,
-              &quot;object&quot;: {
-                &quot;type&quot;: &quot;Identifier&quot;,
-                &quot;name&quot;: &quot;ionscript&quot;
-              },
-              &quot;property&quot;: {
-                &quot;type&quot;: &quot;Identifier&quot;,
-                &quot;name&quot;: &quot;Null&quot;
-              }
-            }
-          ]
-        },
-        &quot;prefix&quot;: true
+        &quot;type&quot;: &quot;Literal&quot;,
+        &quot;value&quot;: 0
       },
-      &quot;operator&quot;: &quot;&amp;&amp;&quot;,
+      &quot;operator&quot;: &quot;+&quot;,
       &quot;right&quot;: {
         &quot;type&quot;: &quot;BinaryExpression&quot;,
         &quot;left&quot;: {
-          &quot;type&quot;: &quot;BinaryExpression&quot;,
-          &quot;left&quot;: {
-            &quot;type&quot;: &quot;MemberExpression&quot;,
-            &quot;optional&quot;: false,
-            &quot;object&quot;: {
-              &quot;type&quot;: &quot;Identifier&quot;,
-              &quot;name&quot;: &quot;position&quot;
-            },
-            &quot;property&quot;: {
-              &quot;type&quot;: &quot;Identifier&quot;,
-              &quot;name&quot;: &quot;x&quot;
-            }
-          },
-          &quot;operator&quot;: &quot;===&quot;,
-          &quot;right&quot;: {
-            &quot;type&quot;: &quot;Identifier&quot;,
-            &quot;name&quot;: &quot;x&quot;
-          }
+          &quot;type&quot;: &quot;Literal&quot;,
+          &quot;value&quot;: 1
         },
-        &quot;operator&quot;: &quot;&amp;&amp;&quot;,
+        &quot;operator&quot;: &quot;+&quot;,
         &quot;right&quot;: {
           &quot;type&quot;: &quot;BinaryExpression&quot;,
           &quot;left&quot;: {
-            &quot;type&quot;: &quot;BinaryExpression&quot;,
-            &quot;left&quot;: {
-              &quot;type&quot;: &quot;MemberExpression&quot;,
-              &quot;optional&quot;: false,
-              &quot;object&quot;: {
-                &quot;type&quot;: &quot;Identifier&quot;,
-                &quot;name&quot;: &quot;position&quot;
-              },
-              &quot;property&quot;: {
-                &quot;type&quot;: &quot;Identifier&quot;,
-                &quot;name&quot;: &quot;y&quot;
-              }
-            },
-            &quot;operator&quot;: &quot;===&quot;,
-            &quot;right&quot;: {
-              &quot;type&quot;: &quot;Identifier&quot;,
-              &quot;name&quot;: &quot;y&quot;
-            }
+            &quot;type&quot;: &quot;Literal&quot;,
+            &quot;value&quot;: 2
           },
-          &quot;operator&quot;: &quot;&amp;&amp;&quot;,
+          &quot;operator&quot;: &quot;+&quot;,
           &quot;right&quot;: {
-            &quot;type&quot;: &quot;BinaryExpression&quot;,
-            &quot;left&quot;: {
-              &quot;type&quot;: &quot;MemberExpression&quot;,
-              &quot;optional&quot;: false,
-              &quot;object&quot;: {
-                &quot;type&quot;: &quot;Identifier&quot;,
-                &quot;name&quot;: &quot;position&quot;
-              },
-              &quot;property&quot;: {
-                &quot;type&quot;: &quot;Identifier&quot;,
-                &quot;name&quot;: &quot;z&quot;
-              }
-            },
-            &quot;operator&quot;: &quot;===&quot;,
-            &quot;right&quot;: {
-              &quot;type&quot;: &quot;Identifier&quot;,
-              &quot;name&quot;: &quot;z&quot;
-            }
+            &quot;type&quot;: &quot;Literal&quot;,
+            &quot;value&quot;: 3
           }
         }
       }
@@ -1023,83 +517,18 @@ ul.jsondiffpatch-textdiff {
     &quot;kind&quot;: &quot;let&quot;
   }
 ]</pre></div></li><li class="jsondiffpatch-deleted" data-key="export"><div class="jsondiffpatch-property-name">export</div><div class="jsondiffpatch-value"><pre>0</pre></div></li><li class="jsondiffpatch-deleted" data-key="id"><div class="jsondiffpatch-property-name">id</div><div class="jsondiffpatch-value"><pre>Declarator {
-  &quot;name&quot;: &quot;check&quot;,
-  &quot;path&quot;: &quot;ionscript/Sample#1:5:check&quot;
+  &quot;name&quot;: &quot;sum&quot;,
+  &quot;path&quot;: &quot;ionscript/Sample#1:5:sum&quot;
 }</pre></div></li><li class="jsondiffpatch-deleted" data-key="inherited"><div class="jsondiffpatch-property-name">inherited</div><div class="jsondiffpatch-value"><pre>false</pre></div></li><li class="jsondiffpatch-deleted" data-key="instance"><div class="jsondiffpatch-property-name">instance</div><div class="jsondiffpatch-value"><pre>false</pre></div></li><li class="jsondiffpatch-modified" data-key="kind"><div class="jsondiffpatch-property-name">kind</div><div class="jsondiffpatch-value jsondiffpatch-left-value"><pre>&quot;let&quot;</pre></div><div class="jsondiffpatch-value jsondiffpatch-right-value"><pre>&quot;const&quot;</pre></div></li><li class="jsondiffpatch-deleted" data-key="meta"><div class="jsondiffpatch-property-name">meta</div><div class="jsondiffpatch-value"><pre>[]</pre></div></li><li class="jsondiffpatch-added" data-key="type"><div class="jsondiffpatch-property-name">type</div><div class="jsondiffpatch-value"><pre>&quot;VariableDeclaration&quot;</pre></div></li><li class="jsondiffpatch-deleted" data-key="value"><div class="jsondiffpatch-property-name">value</div><div class="jsondiffpatch-value"><pre>BinaryExpression {
-  &quot;left&quot;: UnaryExpression {
-    &quot;operator&quot;: &quot;!&quot;,
-    &quot;argument&quot;: CallExpression {
-      &quot;optional&quot;: false,
-      &quot;new&quot;: false,
-      &quot;callee&quot;: MemberExpression {
-        &quot;optional&quot;: false,
-        &quot;object&quot;: Reference { &quot;name&quot;: &quot;ionscript&quot; },
-        &quot;property&quot;: Identifier { &quot;name&quot;: &quot;is&quot; }
-      },
-      &quot;arguments&quot;: [
-        Reference {
-          &quot;name&quot;: &quot;position&quot;,
-          &quot;path&quot;: &quot;global:position&quot;
-        },
-        MemberExpression {
-          &quot;optional&quot;: false,
-          &quot;object&quot;: Reference { &quot;name&quot;: &quot;ionscript&quot; },
-          &quot;property&quot;: Identifier { &quot;name&quot;: &quot;Null&quot; }
-        }
-      ]
-    },
-    &quot;prefix&quot;: true
-  },
-  &quot;operator&quot;: &quot;&amp;&amp;&quot;,
+  &quot;left&quot;: Literal { &quot;value&quot;: 0 },
+  &quot;operator&quot;: &quot;+&quot;,
   &quot;right&quot;: BinaryExpression {
-    &quot;left&quot;: BinaryExpression {
-      &quot;left&quot;: MemberExpression {
-        &quot;optional&quot;: false,
-        &quot;object&quot;: Reference {
-          &quot;name&quot;: &quot;position&quot;,
-          &quot;path&quot;: &quot;global:position&quot;
-        },
-        &quot;property&quot;: Identifier { &quot;name&quot;: &quot;x&quot; }
-      },
-      &quot;operator&quot;: &quot;==&quot;,
-      &quot;right&quot;: Reference {
-        &quot;name&quot;: &quot;x&quot;,
-        &quot;path&quot;: &quot;global:x&quot;
-      }
-    },
-    &quot;operator&quot;: &quot;&amp;&amp;&quot;,
+    &quot;left&quot;: Literal { &quot;value&quot;: 1 },
+    &quot;operator&quot;: &quot;+&quot;,
     &quot;right&quot;: BinaryExpression {
-      &quot;left&quot;: BinaryExpression {
-        &quot;left&quot;: MemberExpression {
-          &quot;optional&quot;: false,
-          &quot;object&quot;: Reference {
-            &quot;name&quot;: &quot;position&quot;,
-            &quot;path&quot;: &quot;global:position&quot;
-          },
-          &quot;property&quot;: Identifier { &quot;name&quot;: &quot;y&quot; }
-        },
-        &quot;operator&quot;: &quot;==&quot;,
-        &quot;right&quot;: Reference {
-          &quot;name&quot;: &quot;y&quot;,
-          &quot;path&quot;: &quot;global:y&quot;
-        }
-      },
-      &quot;operator&quot;: &quot;&amp;&amp;&quot;,
-      &quot;right&quot;: BinaryExpression {
-        &quot;left&quot;: MemberExpression {
-          &quot;optional&quot;: false,
-          &quot;object&quot;: Reference {
-            &quot;name&quot;: &quot;position&quot;,
-            &quot;path&quot;: &quot;global:position&quot;
-          },
-          &quot;property&quot;: Identifier { &quot;name&quot;: &quot;z&quot; }
-        },
-        &quot;operator&quot;: &quot;==&quot;,
-        &quot;right&quot;: Reference {
-          &quot;name&quot;: &quot;z&quot;,
-          &quot;path&quot;: &quot;global:z&quot;
-        }
-      }
+      &quot;left&quot;: Literal { &quot;value&quot;: 2 },
+      &quot;operator&quot;: &quot;+&quot;,
+      &quot;right&quot;: Literal { &quot;value&quot;: 3 }
     }
   }
 }</pre></div></li></ul></li></ul></li><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="id"><div class="jsondiffpatch-property-name">id</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-deleted" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Declarator&quot;</pre></div></li><li class="jsondiffpatch-unchanged" data-key="name"><div class="jsondiffpatch-property-name">name</div><div class="jsondiffpatch-value"><pre>&quot;ionscript/Sample&quot;</pre></div></li><li class="jsondiffpatch-deleted" data-key="path"><div class="jsondiffpatch-property-name">path</div><div class="jsondiffpatch-value"><pre>&quot;ionscript/Sample#&quot;</pre></div></li><li class="jsondiffpatch-added" data-key="type"><div class="jsondiffpatch-property-name">type</div><div class="jsondiffpatch-value"><pre>&quot;Identifier&quot;</pre></div></li></ul></li><li class="jsondiffpatch-added" data-key="type"><div class="jsondiffpatch-property-name">type</div><div class="jsondiffpatch-value"><pre>&quot;Program&quot;</pre></div></li></ul></li></ul></li><li class="jsondiffpatch-added" data-key="type"><div class="jsondiffpatch-property-name">type</div><div class="jsondiffpatch-value"><pre>&quot;Assembly&quot;</pre></div></li></ul></div></p>
@@ -1115,23 +544,6 @@ ul.jsondiffpatch-textdiff {
     },
     &quot;body&quot;: [
       {
-        &quot;type&quot;: &quot;ImportDeclaration&quot;,
-        &quot;export&quot;: 0,
-        &quot;specifiers&quot;: [
-          {
-            &quot;local&quot;: {
-              &quot;type&quot;: &quot;Identifier&quot;,
-              &quot;name&quot;: &quot;ionscript&quot;
-            },
-            &quot;type&quot;: &quot;ImportNamespaceSpecifier&quot;
-          }
-        ],
-        &quot;source&quot;: {
-          &quot;type&quot;: &quot;Literal&quot;,
-          &quot;value&quot;: &quot;ionscript&quot;
-        }
-      },
-      {
         &quot;type&quot;: &quot;VariableDeclaration&quot;,
         &quot;kind&quot;: &quot;const&quot;,
         &quot;declarations&quot;: [
@@ -1139,116 +551,32 @@ ul.jsondiffpatch-textdiff {
             &quot;type&quot;: &quot;VariableDeclarator&quot;,
             &quot;id&quot;: {
               &quot;type&quot;: &quot;Identifier&quot;,
-              &quot;name&quot;: &quot;check&quot;
+              &quot;name&quot;: &quot;sum&quot;
             },
             &quot;init&quot;: {
               &quot;type&quot;: &quot;BinaryExpression&quot;,
               &quot;left&quot;: {
-                &quot;type&quot;: &quot;UnaryExpression&quot;,
-                &quot;operator&quot;: &quot;!&quot;,
-                &quot;argument&quot;: {
-                  &quot;type&quot;: &quot;CallExpression&quot;,
-                  &quot;optional&quot;: false,
-                  &quot;new&quot;: false,
-                  &quot;callee&quot;: {
-                    &quot;type&quot;: &quot;MemberExpression&quot;,
-                    &quot;optional&quot;: false,
-                    &quot;object&quot;: {
-                      &quot;type&quot;: &quot;Identifier&quot;,
-                      &quot;name&quot;: &quot;ionscript&quot;
-                    },
-                    &quot;property&quot;: {
-                      &quot;type&quot;: &quot;Identifier&quot;,
-                      &quot;name&quot;: &quot;is&quot;
-                    }
-                  },
-                  &quot;arguments&quot;: [
-                    {
-                      &quot;type&quot;: &quot;Identifier&quot;,
-                      &quot;name&quot;: &quot;position&quot;
-                    },
-                    {
-                      &quot;type&quot;: &quot;MemberExpression&quot;,
-                      &quot;optional&quot;: false,
-                      &quot;object&quot;: {
-                        &quot;type&quot;: &quot;Identifier&quot;,
-                        &quot;name&quot;: &quot;ionscript&quot;
-                      },
-                      &quot;property&quot;: {
-                        &quot;type&quot;: &quot;Identifier&quot;,
-                        &quot;name&quot;: &quot;Null&quot;
-                      }
-                    }
-                  ]
-                },
-                &quot;prefix&quot;: true
+                &quot;type&quot;: &quot;Literal&quot;,
+                &quot;value&quot;: 0
               },
-              &quot;operator&quot;: &quot;&amp;&amp;&quot;,
+              &quot;operator&quot;: &quot;+&quot;,
               &quot;right&quot;: {
                 &quot;type&quot;: &quot;BinaryExpression&quot;,
                 &quot;left&quot;: {
-                  &quot;type&quot;: &quot;BinaryExpression&quot;,
-                  &quot;left&quot;: {
-                    &quot;type&quot;: &quot;MemberExpression&quot;,
-                    &quot;optional&quot;: false,
-                    &quot;object&quot;: {
-                      &quot;type&quot;: &quot;Identifier&quot;,
-                      &quot;name&quot;: &quot;position&quot;
-                    },
-                    &quot;property&quot;: {
-                      &quot;type&quot;: &quot;Identifier&quot;,
-                      &quot;name&quot;: &quot;x&quot;
-                    }
-                  },
-                  &quot;operator&quot;: &quot;===&quot;,
-                  &quot;right&quot;: {
-                    &quot;type&quot;: &quot;Identifier&quot;,
-                    &quot;name&quot;: &quot;x&quot;
-                  }
+                  &quot;type&quot;: &quot;Literal&quot;,
+                  &quot;value&quot;: 1
                 },
-                &quot;operator&quot;: &quot;&amp;&amp;&quot;,
+                &quot;operator&quot;: &quot;+&quot;,
                 &quot;right&quot;: {
                   &quot;type&quot;: &quot;BinaryExpression&quot;,
                   &quot;left&quot;: {
-                    &quot;type&quot;: &quot;BinaryExpression&quot;,
-                    &quot;left&quot;: {
-                      &quot;type&quot;: &quot;MemberExpression&quot;,
-                      &quot;optional&quot;: false,
-                      &quot;object&quot;: {
-                        &quot;type&quot;: &quot;Identifier&quot;,
-                        &quot;name&quot;: &quot;position&quot;
-                      },
-                      &quot;property&quot;: {
-                        &quot;type&quot;: &quot;Identifier&quot;,
-                        &quot;name&quot;: &quot;y&quot;
-                      }
-                    },
-                    &quot;operator&quot;: &quot;===&quot;,
-                    &quot;right&quot;: {
-                      &quot;type&quot;: &quot;Identifier&quot;,
-                      &quot;name&quot;: &quot;y&quot;
-                    }
+                    &quot;type&quot;: &quot;Literal&quot;,
+                    &quot;value&quot;: 2
                   },
-                  &quot;operator&quot;: &quot;&amp;&amp;&quot;,
+                  &quot;operator&quot;: &quot;+&quot;,
                   &quot;right&quot;: {
-                    &quot;type&quot;: &quot;BinaryExpression&quot;,
-                    &quot;left&quot;: {
-                      &quot;type&quot;: &quot;MemberExpression&quot;,
-                      &quot;optional&quot;: false,
-                      &quot;object&quot;: {
-                        &quot;type&quot;: &quot;Identifier&quot;,
-                        &quot;name&quot;: &quot;position&quot;
-                      },
-                      &quot;property&quot;: {
-                        &quot;type&quot;: &quot;Identifier&quot;,
-                        &quot;name&quot;: &quot;z&quot;
-                      }
-                    },
-                    &quot;operator&quot;: &quot;===&quot;,
-                    &quot;right&quot;: {
-                      &quot;type&quot;: &quot;Identifier&quot;,
-                      &quot;name&quot;: &quot;z&quot;
-                    }
+                    &quot;type&quot;: &quot;Literal&quot;,
+                    &quot;value&quot;: 3
                   }
                 }
               }
@@ -1272,23 +600,6 @@ ul.jsondiffpatch-textdiff {
   },
   &quot;body&quot;: [
     {
-      &quot;type&quot;: &quot;ImportDeclaration&quot;,
-      &quot;export&quot;: 0,
-      &quot;specifiers&quot;: [
-        {
-          &quot;local&quot;: {
-            &quot;type&quot;: &quot;Identifier&quot;,
-            &quot;name&quot;: &quot;ionscript&quot;
-          },
-          &quot;type&quot;: &quot;ImportNamespaceSpecifier&quot;
-        }
-      ],
-      &quot;source&quot;: {
-        &quot;type&quot;: &quot;Literal&quot;,
-        &quot;value&quot;: &quot;ionscript&quot;
-      }
-    },
-    {
       &quot;type&quot;: &quot;VariableDeclaration&quot;,
       &quot;kind&quot;: &quot;const&quot;,
       &quot;declarations&quot;: [
@@ -1296,116 +607,32 @@ ul.jsondiffpatch-textdiff {
           &quot;type&quot;: &quot;VariableDeclarator&quot;,
           &quot;id&quot;: {
             &quot;type&quot;: &quot;Identifier&quot;,
-            &quot;name&quot;: &quot;check&quot;
+            &quot;name&quot;: &quot;sum&quot;
           },
           &quot;init&quot;: {
             &quot;type&quot;: &quot;BinaryExpression&quot;,
             &quot;left&quot;: {
-              &quot;type&quot;: &quot;UnaryExpression&quot;,
-              &quot;operator&quot;: &quot;!&quot;,
-              &quot;argument&quot;: {
-                &quot;type&quot;: &quot;CallExpression&quot;,
-                &quot;optional&quot;: false,
-                &quot;new&quot;: false,
-                &quot;callee&quot;: {
-                  &quot;type&quot;: &quot;MemberExpression&quot;,
-                  &quot;optional&quot;: false,
-                  &quot;object&quot;: {
-                    &quot;type&quot;: &quot;Identifier&quot;,
-                    &quot;name&quot;: &quot;ionscript&quot;
-                  },
-                  &quot;property&quot;: {
-                    &quot;type&quot;: &quot;Identifier&quot;,
-                    &quot;name&quot;: &quot;is&quot;
-                  }
-                },
-                &quot;arguments&quot;: [
-                  {
-                    &quot;type&quot;: &quot;Identifier&quot;,
-                    &quot;name&quot;: &quot;position&quot;
-                  },
-                  {
-                    &quot;type&quot;: &quot;MemberExpression&quot;,
-                    &quot;optional&quot;: false,
-                    &quot;object&quot;: {
-                      &quot;type&quot;: &quot;Identifier&quot;,
-                      &quot;name&quot;: &quot;ionscript&quot;
-                    },
-                    &quot;property&quot;: {
-                      &quot;type&quot;: &quot;Identifier&quot;,
-                      &quot;name&quot;: &quot;Null&quot;
-                    }
-                  }
-                ]
-              },
-              &quot;prefix&quot;: true
+              &quot;type&quot;: &quot;Literal&quot;,
+              &quot;value&quot;: 0
             },
-            &quot;operator&quot;: &quot;&amp;&amp;&quot;,
+            &quot;operator&quot;: &quot;+&quot;,
             &quot;right&quot;: {
               &quot;type&quot;: &quot;BinaryExpression&quot;,
               &quot;left&quot;: {
-                &quot;type&quot;: &quot;BinaryExpression&quot;,
-                &quot;left&quot;: {
-                  &quot;type&quot;: &quot;MemberExpression&quot;,
-                  &quot;optional&quot;: false,
-                  &quot;object&quot;: {
-                    &quot;type&quot;: &quot;Identifier&quot;,
-                    &quot;name&quot;: &quot;position&quot;
-                  },
-                  &quot;property&quot;: {
-                    &quot;type&quot;: &quot;Identifier&quot;,
-                    &quot;name&quot;: &quot;x&quot;
-                  }
-                },
-                &quot;operator&quot;: &quot;===&quot;,
-                &quot;right&quot;: {
-                  &quot;type&quot;: &quot;Identifier&quot;,
-                  &quot;name&quot;: &quot;x&quot;
-                }
+                &quot;type&quot;: &quot;Literal&quot;,
+                &quot;value&quot;: 1
               },
-              &quot;operator&quot;: &quot;&amp;&amp;&quot;,
+              &quot;operator&quot;: &quot;+&quot;,
               &quot;right&quot;: {
                 &quot;type&quot;: &quot;BinaryExpression&quot;,
                 &quot;left&quot;: {
-                  &quot;type&quot;: &quot;BinaryExpression&quot;,
-                  &quot;left&quot;: {
-                    &quot;type&quot;: &quot;MemberExpression&quot;,
-                    &quot;optional&quot;: false,
-                    &quot;object&quot;: {
-                      &quot;type&quot;: &quot;Identifier&quot;,
-                      &quot;name&quot;: &quot;position&quot;
-                    },
-                    &quot;property&quot;: {
-                      &quot;type&quot;: &quot;Identifier&quot;,
-                      &quot;name&quot;: &quot;y&quot;
-                    }
-                  },
-                  &quot;operator&quot;: &quot;===&quot;,
-                  &quot;right&quot;: {
-                    &quot;type&quot;: &quot;Identifier&quot;,
-                    &quot;name&quot;: &quot;y&quot;
-                  }
+                  &quot;type&quot;: &quot;Literal&quot;,
+                  &quot;value&quot;: 2
                 },
-                &quot;operator&quot;: &quot;&amp;&amp;&quot;,
+                &quot;operator&quot;: &quot;+&quot;,
                 &quot;right&quot;: {
-                  &quot;type&quot;: &quot;BinaryExpression&quot;,
-                  &quot;left&quot;: {
-                    &quot;type&quot;: &quot;MemberExpression&quot;,
-                    &quot;optional&quot;: false,
-                    &quot;object&quot;: {
-                      &quot;type&quot;: &quot;Identifier&quot;,
-                      &quot;name&quot;: &quot;position&quot;
-                    },
-                    &quot;property&quot;: {
-                      &quot;type&quot;: &quot;Identifier&quot;,
-                      &quot;name&quot;: &quot;z&quot;
-                    }
-                  },
-                  &quot;operator&quot;: &quot;===&quot;,
-                  &quot;right&quot;: {
-                    &quot;type&quot;: &quot;Identifier&quot;,
-                    &quot;name&quot;: &quot;z&quot;
-                  }
+                  &quot;type&quot;: &quot;Literal&quot;,
+                  &quot;value&quot;: 3
                 }
               }
             }
@@ -1416,35 +643,35 @@ ul.jsondiffpatch-textdiff {
     }
   ],
   &quot;type&quot;: &quot;Program&quot;
-}</pre></div><div class="jsondiffpatch-value jsondiffpatch-right-value"><pre>&quot;import * as ionscript from &apos;ionscript&apos;;<br>const check = !ionscript.is(position, ionscript.Null) &amp;&amp; (position.x === x &amp;&amp; (position.y === y &amp;&amp; position.z === z));&quot;</pre></div></li></ul></li><li class="jsondiffpatch-unchanged" data-key="type"><div class="jsondiffpatch-property-name">type</div><div class="jsondiffpatch-value"><pre>&quot;Assembly&quot;</pre></div></li></ul></div></p>
+}</pre></div><div class="jsondiffpatch-value jsondiffpatch-right-value"><pre>&quot;const sum = 0 + (1 + (2 + 3));&quot;</pre></div></li></ul></li><li class="jsondiffpatch-unchanged" data-key="type"><div class="jsondiffpatch-property-name">type</div><div class="jsondiffpatch-value"><pre>&quot;Assembly&quot;</pre></div></li></ul></div></p>
         </article>
     
         <article>
             <header><span>toModuleFiles</span></header>
-            <p><div class="jsondiffpatch-delta jsondiffpatch-node jsondiffpatch-child-node-type-object"><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="modules"><div class="jsondiffpatch-property-name">modules</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Map&quot;</pre></div></li><li class="jsondiffpatch-deleted" data-key="ionscript/Sample"><div class="jsondiffpatch-property-name">ionscript/Sample</div><div class="jsondiffpatch-value"><pre>&quot;import * as ionscript from &apos;ionscript&apos;;<br>const check = !ionscript.is(position, ionscript.Null) &amp;&amp; (position.x === x &amp;&amp; (position.y === y &amp;&amp; position.z === z));&quot;</pre></div></li><li class="jsondiffpatch-added" data-key="ionscript/Sample.js"><div class="jsondiffpatch-property-name">ionscript/Sample.js</div><div class="jsondiffpatch-value"><pre>&quot;\&quot;use strict\&quot;;<br><br>var ionscript = require(\&quot;ionscript\&quot;);<br><br>const check = !ionscript.is(position, ionscript.Null) &amp;&amp; position.x === x &amp;&amp; position.y === y &amp;&amp; position.z === z;&quot;</pre></div></li><li class="jsondiffpatch-added" data-key="ionscript/Sample.mjs"><div class="jsondiffpatch-property-name">ionscript/Sample.mjs</div><div class="jsondiffpatch-value"><pre>&quot;import * as ionscript from &apos;ionscript&apos;;<br>const check = !ionscript.is(position, ionscript.Null) &amp;&amp; (position.x === x &amp;&amp; (position.y === y &amp;&amp; position.z === z));&quot;</pre></div></li></ul></li><li class="jsondiffpatch-unchanged" data-key="type"><div class="jsondiffpatch-property-name">type</div><div class="jsondiffpatch-value"><pre>&quot;Assembly&quot;</pre></div></li></ul></div></p>
+            <p><div class="jsondiffpatch-delta jsondiffpatch-node jsondiffpatch-child-node-type-object"><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-node jsondiffpatch-child-node-type-object" data-key="modules"><div class="jsondiffpatch-property-name">modules</div><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key=""><div class="jsondiffpatch-property-name"></div><div class="jsondiffpatch-value"><pre>&quot;Map&quot;</pre></div></li><li class="jsondiffpatch-deleted" data-key="ionscript/Sample"><div class="jsondiffpatch-property-name">ionscript/Sample</div><div class="jsondiffpatch-value"><pre>&quot;const sum = 0 + (1 + (2 + 3));&quot;</pre></div></li><li class="jsondiffpatch-added" data-key="ionscript/Sample.js"><div class="jsondiffpatch-property-name">ionscript/Sample.js</div><div class="jsondiffpatch-value"><pre>&quot;\&quot;use strict\&quot;;<br><br>const sum = 0 + (1 + (2 + 3));&quot;</pre></div></li><li class="jsondiffpatch-added" data-key="ionscript/Sample.mjs"><div class="jsondiffpatch-property-name">ionscript/Sample.mjs</div><div class="jsondiffpatch-value"><pre>&quot;const sum = 0 + (1 + (2 + 3));&quot;</pre></div></li></ul></li><li class="jsondiffpatch-unchanged" data-key="type"><div class="jsondiffpatch-property-name">type</div><div class="jsondiffpatch-value"><pre>&quot;Assembly&quot;</pre></div></li></ul></div></p>
         </article>
     
         <article>
             <header><span>copyResources</span></header>
             <p><div class="jsondiffpatch-delta jsondiffpatch-node jsondiffpatch-child-node-type-object"><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key="modules"><div class="jsondiffpatch-property-name">modules</div><div class="jsondiffpatch-value"><pre>Map {
-  &quot;ionscript/Sample.mjs&quot;: &quot;import * as ionscript from &apos;ionscript&apos;;<br>const check = !ionscript.is(position, ionscript.Null) &amp;&amp; (position.x === x &amp;&amp; (position.y === y &amp;&amp; position.z === z));&quot;,
-  &quot;ionscript/Sample.js&quot;: &quot;\&quot;use strict\&quot;;<br><br>var ionscript = require(\&quot;ionscript\&quot;);<br><br>const check = !ionscript.is(position, ionscript.Null) &amp;&amp; position.x === x &amp;&amp; position.y === y &amp;&amp; position.z === z;&quot;
+  &quot;ionscript/Sample.mjs&quot;: &quot;const sum = 0 + (1 + (2 + 3));&quot;,
+  &quot;ionscript/Sample.js&quot;: &quot;\&quot;use strict\&quot;;<br><br>const sum = 0 + (1 + (2 + 3));&quot;
 }</pre></div></li><li class="jsondiffpatch-unchanged" data-key="type"><div class="jsondiffpatch-property-name">type</div><div class="jsondiffpatch-value"><pre>&quot;Assembly&quot;</pre></div></li></ul></div></p>
         </article>
     
         <article>
             <header><span>writeFiles</span></header>
             <p><div class="jsondiffpatch-delta jsondiffpatch-node jsondiffpatch-child-node-type-object"><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key="modules"><div class="jsondiffpatch-property-name">modules</div><div class="jsondiffpatch-value"><pre>Map {
-  &quot;ionscript/Sample.mjs&quot;: &quot;import * as ionscript from &apos;ionscript&apos;;<br>const check = !ionscript.is(position, ionscript.Null) &amp;&amp; (position.x === x &amp;&amp; (position.y === y &amp;&amp; position.z === z));&quot;,
-  &quot;ionscript/Sample.js&quot;: &quot;\&quot;use strict\&quot;;<br><br>var ionscript = require(\&quot;ionscript\&quot;);<br><br>const check = !ionscript.is(position, ionscript.Null) &amp;&amp; position.x === x &amp;&amp; position.y === y &amp;&amp; position.z === z;&quot;
+  &quot;ionscript/Sample.mjs&quot;: &quot;const sum = 0 + (1 + (2 + 3));&quot;,
+  &quot;ionscript/Sample.js&quot;: &quot;\&quot;use strict\&quot;;<br><br>const sum = 0 + (1 + (2 + 3));&quot;
 }</pre></div></li><li class="jsondiffpatch-unchanged" data-key="type"><div class="jsondiffpatch-property-name">type</div><div class="jsondiffpatch-value"><pre>&quot;Assembly&quot;</pre></div></li></ul></div></p>
         </article>
     
         <article>
             <header><span>Output</span></header>
             <p><div class="jsondiffpatch-delta jsondiffpatch-node jsondiffpatch-child-node-type-object"><ul class="jsondiffpatch-node jsondiffpatch-node-type-object"><li class="jsondiffpatch-unchanged" data-key="modules"><div class="jsondiffpatch-property-name">modules</div><div class="jsondiffpatch-value"><pre>Map {
-  &quot;ionscript/Sample.mjs&quot;: &quot;import * as ionscript from &apos;ionscript&apos;;<br>const check = !ionscript.is(position, ionscript.Null) &amp;&amp; (position.x === x &amp;&amp; (position.y === y &amp;&amp; position.z === z));&quot;,
-  &quot;ionscript/Sample.js&quot;: &quot;\&quot;use strict\&quot;;<br><br>var ionscript = require(\&quot;ionscript\&quot;);<br><br>const check = !ionscript.is(position, ionscript.Null) &amp;&amp; position.x === x &amp;&amp; position.y === y &amp;&amp; position.z === z;&quot;
+  &quot;ionscript/Sample.mjs&quot;: &quot;const sum = 0 + (1 + (2 + 3));&quot;,
+  &quot;ionscript/Sample.js&quot;: &quot;\&quot;use strict\&quot;;<br><br>const sum = 0 + (1 + (2 + 3));&quot;
 }</pre></div></li><li class="jsondiffpatch-unchanged" data-key="type"><div class="jsondiffpatch-property-name">type</div><div class="jsondiffpatch-value"><pre>&quot;Assembly&quot;</pre></div></li></ul></div></p>
         </article>
     
