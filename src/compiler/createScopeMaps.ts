@@ -159,7 +159,7 @@ export default function createScopeMaps(
                 let ancestor: Node | null = null
                 for (let i = ancestors.length - 1; i >= 0; i--) {
                     if (Node.is(ancestors[i])) {
-                        ancestor = ancestors[i]
+                        ancestor = ancestors[i] as Node
                         break
                     }
                 }

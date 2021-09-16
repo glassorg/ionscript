@@ -69,7 +69,7 @@ export default function checkReferences(root: Assembly, options: Options) {
                 if (scope == null) {
                     //  we might have been mutated by a changed template sub-reference
                     //  so we will use our unmutated ancestors scope if needed
-                    scope = scopes.get(ancestors[ancestors.length - 1])
+                    scope = scopes.get(ancestors[ancestors.length - 1] as any)
                     if (scope == null) {
                         console.log("scope not found for: ", node.location?.filename + " " + node.name)
                         return

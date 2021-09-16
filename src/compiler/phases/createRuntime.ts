@@ -458,7 +458,7 @@ export default function createRuntime(root: Assembly, options: Options) {
                                             right: d.value!
                                         })
                                     })),
-                                )
+                                ) as any
                             }
                             return result
                         }
