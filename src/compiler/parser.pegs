@@ -659,7 +659,7 @@ ExponentiationExpression
     { return right ? node("BinaryExpression", {left, operator:right.operator, right:right.right}) : left }
 
 MultiplicativeOperator
-    = "*" / "/" / "%"
+    = "*" / "/" !"/" / "%"
 
 MultiplicativeExpression
     = head:ExponentiationExpression tail:(_ MultiplicativeOperator _ ExponentiationExpression)*
@@ -1401,11 +1401,8 @@ Comment ""
 _ ""
     = ' '*
 
-__ ""
-    = (' ' / LineTerminatorSequence / Comment)*
-
 EOL "end of line"
-    = (_ Comment? LineTerminatorSequence+)+
+    = (_ Comment? LineTerminatorSequence)+
     / _ Comment? EOF
 
 EOF "" = !.
