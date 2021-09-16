@@ -1,0 +1,17 @@
+.DS_Store
+yarn-error.log
+lib
+node_modules
+tsconfig.json
+credentials.json
+webpack.config.js
+webpack.server.js
+app.yaml
+.browserslistrc
+.gcloudignore
+.npmrc
+.cache
+.vscode
+dist
+output.html
+.parcel-cache

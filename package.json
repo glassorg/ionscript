@@ -1,6 +1,6 @@
 {
   "name": "ionscript",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "Indented Javascript",
   "main": "lib/index.js",
   "browser": "docs/index.html",
@@ -10,6 +10,10 @@
   "license": "MIT",
   "bin": {
     "isc": "bin/isc.js"
+  },
+  "exports": {
+    ".": "./lib/index.js",
+    "./": "./lib/"
   },
   "targets": {
     "browser": {

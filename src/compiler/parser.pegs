@@ -645,7 +645,7 @@ UpdateExpression
     { return operator ? operation(argument, operator, null, { prefix: false }) : argument }
 
 UnaryOperator
-    = "+" / "-" / "!" / TypeofToken / DeleteToken
+    = "+" / "-" / "!" / TypeofToken / DeleteToken / VoidToken
 
 UnaryExpression
     = operator:(@UnaryOperator _)? argument:UpdateExpression
@@ -1294,6 +1294,7 @@ NotToken        = @"not"        !IdPart
 TypeofToken     = @"typeof"     !IdPart
 DeleteToken     = @"delete"     !IdPart
 NewToken        = @"new"        !IdPart
+VoidToken       = @"void"       !IdPart
 // WhereToken      = @"where"      !IdPart
 FunctionToken   = @"function"   !IdPart
 ImportToken     = @"import"     !IdPart
