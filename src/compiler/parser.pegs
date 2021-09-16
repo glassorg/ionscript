@@ -404,6 +404,8 @@ AssignmentOperator
 AssignmentLeftOperator
     = left:InlineExpression _ operator:AssignmentOperator
     { return { left, operator } }
+    / left:Pattern _ operator:(@"=" !"=")
+    { return { left, operator } }
 
 AssignmentStatement
     = leftOps:(@AssignmentLeftOperator _)+ right:OutlineExpression
@@ -459,35 +461,39 @@ ContinueStatement
 
 Pattern
     = Declarator
-    / ArrayPattern
-    / ObjectPattern
+    / InlineArrayPattern
+    / OutlineArrayPattern
+    / InlineObjectPattern
+    / OutlineObjectPattern
     / RestElement
 
-ArrayPattern
-    = "[" _ element:RestElement _ "]"
-    { return node("ArrayPattern", { elements: [element] }) }
-    / "[" _ head:Pattern? tail:(_ "," _ !"." @Pattern?)* rest:(_ "," _ @RestElement)? _ "]"
-    {
-        let elements = [head || null, ...tail.map((x) => x || null)]
-        if (rest) {
-            elements.push(rest)
-        }
-        return node("ArrayPattern", { elements })
-    }
+ArrayPatternElements
+    = head:(Pattern / RestElement)? tail:(_ "," _ !"." @(Pattern / RestElement)?)*
+    { return [head, ...tail] }
+
+InlineArrayPattern
+    = "[" _ elements:ArrayPatternElements _ "]"
+    { return node("ArrayPattern", { elements }) }
+
+OutlineArrayPattern
+    = "[" EOL Indent elements:( Dent @ArrayPatternElements EOL )+ Outdent _ "]"
+    { return node("ArrayPattern", { elements: elements.flat() }) }
 
 RestElement
     = "..." argument:Declarator
     { return node("RestElement", { argument }) }
 
-ObjectPattern
-    = "{" _ head:AssignmentProperty tail:(_ "," _ @AssignmentProperty)* rest:(_ "," _ @RestElement)? _ "}"
-    {
-        let properties = [head, ...tail]
-        if (rest) {
-            properties.push(rest)
-        }
-        return node("ObjectPattern", { properties })
-    }
+InlineAssignmentProperties
+    = head:(AssignmentProperty / RestElement) tail:(_ "," _ @(AssignmentProperty / RestElement))*
+    { return [head, ...tail] }
+
+InlineObjectPattern
+    = "{" _ properties:InlineAssignmentProperties _ "}"
+    { return node("ObjectPattern", { properties }) }
+
+OutlineObjectPattern
+    = "{" EOL Indent properties:( Dent @InlineAssignmentProperties EOL )+ Outdent _ "}"
+    { return node("ObjectPattern", { properties: properties.flat() }) }
 
 AssignmentProperty
     = key:Identifier value:(_ ":" _ @Pattern / _ "=" _ @InlineExpression)?

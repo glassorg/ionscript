@@ -1,9 +1,16 @@
-let sum =
-    +
-        0
-        1
-        2
-        3
+    {
+        foo, bar
+        ...rest
+    } = value
+
+    [
+        foo, bar
+        {
+            a, b
+            ...more
+        }
+        ...rest
+    ] = value
 
 // export function cell(material, thermalEnergy) ->
 //     return
