@@ -1,16 +1,21 @@
-    {
-        foo, bar
-        ...rest
-    } = value
+let navState = {}
+    foo: {}
+        bar: {}
+            what: 2, isnot: 3, up
 
-    [
-        foo, bar
-        {
-            a, b
-            ...more
-        }
-        ...rest
-    ] = value
+// {
+//     foo, bar
+//     ...rest
+// } = value
+
+// [
+//     foo, bar
+//     {
+//         a, b
+//         ...more
+//     }
+//     ...rest
+// ] = value
 
 // export function cell(material, thermalEnergy) ->
 //     return

@@ -1113,8 +1113,14 @@ OutlineObjectExpression
 //     = key:InlineExpression _ ":" _ value:OutlineExpression
 //     { return node("Property", { key, value, computed: true })}
 
+OutlinePropertiesOrStatement
+    = OutlineProperty
+    / @InlinePropertyList EOL
+    / Statement
+
 OutlinePropertyList
-    = EOL Indent @(Dent @(OutlineProperty / Statement))+ Outdent
+    = EOL Indent properties:(Dent @OutlinePropertiesOrStatement)+ Outdent
+    { return properties.flat() }
 
 PropertyStatement
     = OutlineProperty
@@ -1123,7 +1129,7 @@ PropertyStatement
 
 OutlineProperty
     = @InlineSpreadElement EOL
-    / "[" _ key:InlineExpression _ "]" _ ":" _ value: OutlineExpression
+    / "[" _ key:InlineExpression _ "]" _ ":" _ value:OutlineExpression
     { return node("Property", { key, value, computed: true }) }
     / key:(@(Identifier / InlineStringLiteral) _ ":") _ value:OutlineExpression
     { return node("Property", { key, value }) }
