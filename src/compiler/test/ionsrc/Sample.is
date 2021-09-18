@@ -1,7 +1,12 @@
-let navState = {}
-    foo: {}
-        bar: {}
-            what: 2, isnot: 3, up
+function decompressKey(compressedKey: String) ->
+    let [orgId, ...locationIds] = compressedKey.split(Device.delimiter)
+    let deviceId = locationIds.pop()
+    var key = Key.create(Organization, orgId)
+
+// let navState = {}
+//     foo: {}
+//         bar: {}
+//             what: 2, isnot: 3, up
 
 // {
 //     foo, bar

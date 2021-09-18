@@ -468,7 +468,7 @@ Pattern
     / RestElement
 
 ArrayPatternElements
-    = head:(Pattern / RestElement)? tail:(_ "," _ !"." @(Pattern / RestElement)?)*
+    = head:(Pattern / RestElement)? tail:(_ "," _ @(Pattern / RestElement)?)*
     { return [head, ...tail] }
 
 InlineArrayPattern
