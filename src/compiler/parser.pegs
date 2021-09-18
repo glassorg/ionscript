@@ -665,7 +665,7 @@ ExponentiationExpression
     { return right ? node("BinaryExpression", {left, operator:right.operator, right:right.right}) : left }
 
 MultiplicativeOperator
-    = "*" / "/" !"/" / "%"
+    = "*" / @"/" !"/" / "%"
 
 MultiplicativeExpression
     = head:ExponentiationExpression tail:(_ MultiplicativeOperator _ ExponentiationExpression)*
