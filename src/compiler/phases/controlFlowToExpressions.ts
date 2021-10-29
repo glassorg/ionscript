@@ -366,6 +366,7 @@ function convertExpressionWithNestedStatements(node) {
                     children.push(child)
                 }
             }
+
             // extract key field since JSX expects it as 3rd argument
             let keyValue: Expression | null = getKeyPropertyValue(properties)
 

@@ -209,7 +209,7 @@ export default function createRuntime(root: Assembly, options: Options) {
                                 })
                             }
                             else {
-                                return replaceNodes(node.right, DotExpression.is, node.left)
+                                return replaceNodes(node.right, (node) => Reference.is(node) && node.name == "_", node.left)
                             }
                         }
                         if (ClassDeclaration.is(node)) {

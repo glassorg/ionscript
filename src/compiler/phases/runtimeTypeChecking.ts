@@ -40,7 +40,7 @@ function replaceDotExpressionsMakeMembersOptional(value) {
                 return node.patch({ optional: true })
             }
         }
-    })    
+    })
 }
 
 export function typeCheckOrThrow(value: Expression, type: Type, name: string): Statement {

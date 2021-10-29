@@ -1,7 +1,17 @@
-function decompressKey(compressedKey: String) ->
-    let [orgId, ...locationIds] = compressedKey.split(Device.delimiter)
-    let deviceId = locationIds.pop()
-    var key = Key.create(Organization, orgId)
+
+
+interface Foo
+    beta: Number | Null
+
+// let obj = { beta: { alpha: 1 } }
+
+// // Should return true, but doesn't.
+// console.log( obj is Foo )
+
+// function decompressKey(compressedKey: String) ->
+//     let [orgId, ...locationIds] = compressedKey.split(Device.delimiter)
+//     let deviceId = locationIds.pop()
+//     var key = Key.create(Organization, orgId)
 
 // let navState = {}
 //     foo: {}
