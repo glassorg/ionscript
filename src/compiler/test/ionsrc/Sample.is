@@ -1,7 +1,6 @@
 
-
-interface Foo
-    beta: Number | Null
+<div />
+    let { x, y } = pos
 
 // let obj = { beta: { alpha: 1 } }
 

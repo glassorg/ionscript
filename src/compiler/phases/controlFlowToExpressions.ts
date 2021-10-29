@@ -1,6 +1,6 @@
 import { Options } from "../Compiler"
 import { traverse, skip, remove } from "@glas/traverse"
-import { ArrayExpression, BinaryExpression, BlockStatement, CallExpression, Declarator, ElementExpression, Expression, ExpressionStatement, FunctionExpression, Identifier, ImportDeclaration, ImportNamespaceSpecifier, ImportSpecifier, Literal, Location, MemberExpression, Node, ObjectExpression, OutlineOperation, Parameter, Program, Property, Reference, ReturnStatement, SpreadElement, Statement, AssignmentExpression, VariableDeclaration } from "../ast"
+import { ArrayExpression, BinaryExpression, BlockStatement, CallExpression, Declarator, ElementExpression, Expression, ExpressionStatement, FunctionExpression, Identifier, ImportDeclaration, ImportNamespaceSpecifier, ImportSpecifier, Literal, Location, MemberExpression, Node, ObjectExpression, OutlineOperation, Parameter, Program, Property, Reference, ReturnStatement, SpreadElement, Statement, AssignmentExpression, VariableDeclaration, ObjectPattern } from "../ast"
 import Assembly from "../ast/Assembly"
 import ArrowFunctionExpression from "../ast/ArrowFunctionExpression"
 import { hasDeclarator, SemanticError } from "../common"
@@ -259,7 +259,7 @@ function convertExpressionWithNestedStatements(node) {
                                     e = new Property({ key: e.id, value: e })
                                 }
                     
-                                if (Property.is(e) && Array.isArray(parent)) {
+                                if (Property.is(e) && Array.isArray(parent) && !ancestors.find(ObjectPattern.is)) {
                                     //  we do NOT allow properties to be set AFTER children have been added
                                     //  it would make it difficult to differentiate the properties from the children.
                                     if (addedChildren) {
