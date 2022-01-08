@@ -27,11 +27,11 @@ export function throwTypeError(type: Type, valueName: string): Statement {
     })
 }
 
-function replaceDotExpressionsMakeMembersOptional(value) {
+export function replaceDotExpressionsMakeMembersOptional(value, name = "_") {
     return traverse(value, {
         leave(node) {
             if (DotExpression.is(node)) {
-                return new Reference({ name: "_" })
+                return new Reference({ name })
             }
             // type checks should NOT throw null so we implicitly
             // convert all dot expressions to optional, but not

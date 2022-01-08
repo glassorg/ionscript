@@ -2,7 +2,7 @@ import { Options } from "../Compiler";
 import { traverse, skip, replace } from "@glas/traverse";
 import Assembly from "../ast/Assembly";
 import { ArrayExpression, AssignmentExpression, BinaryExpression, BlockStatement, CallExpression, ClassDeclaration, Declarator, DotExpression, Expression, ExpressionStatement, FunctionExpression, Identifier, ImportDeclaration, ImportDefaultSpecifier, ImportNamespaceSpecifier, InstanceDeclarations, Literal, MemberExpression, ObjectExpression, Parameter, Program, Property, Reference, RegularExpression, ReturnStatement, ThisExpression, TypeExpression, VariableDeclaration, Range, ForOfStatement, UnaryExpression, SpreadElement, FunctionType, RuntimeType, EnumDeclaration, Variable } from "../ast";
-import { replaceNodes, toRuntimeType } from "./runtimeTypeChecking";
+import { replaceNodes, toRuntimeType, replaceDotExpressionsMakeMembersOptional } from "./runtimeTypeChecking";
 import { typeProperties } from "./inferTypes";
 import { hasDeclarator, runtimeModuleName, SemanticError } from "../common";
 import createTypeCheck from "../../createTypeCheck";
@@ -159,8 +159,15 @@ export default function createRuntime(root: Assembly, options: Options) {
                         }
                         if (TypeExpression.is(node)) {
                             let last = path[path.length - 1]
+                            let parent = ancestors[ancestors.length - 1]
                             if (typeProperties.has(last)) {
                                 return null
+                            }
+                            if (BinaryExpression.is(parent) && parent.operator === "is") {
+                                if (!Reference.is(parent.left)) {
+                                    throw new Error("Not sure what to do with this: " + toCodeString(parent.left))
+                                }
+                                return replaceDotExpressionsMakeMembersOptional(node.value, parent.left.name)
                             }
                             return node.value
                         }

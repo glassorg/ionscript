@@ -1,6 +1,7 @@
 
-<div />
-    let { x, y } = pos
+class Foo
+
+func = (a: Foo | Null = null) -> 1
 
 // let obj = { beta: { alpha: 1 } }
 
